@@ -1,0 +1,40 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 02-make-verbose.dpatch by Philipp Benner <mail@philipp-benner.de>
+##
+## DP: Make the build process more verbose.
+
+@DPATCH@
+
+diff -urNad transmission-0.71.dfsg~/mk/common.mk transmission-0.71.dfsg/mk/common.mk
+--- transmission-0.71.dfsg~/mk/common.mk	2007-04-27 20:28:46.000000000 +0200
++++ transmission-0.71.dfsg/mk/common.mk	2007-04-27 20:29:38.000000000 +0200
+@@ -52,25 +52,25 @@
+ 
+ define CC_RULE
+ 	@echo "Cc $@"
+-	@CMD="$(CC) $(CFLAGS) -o $@ -c $<"; $$CMD || \
++	CMD="$(CC) $(CFLAGS) -o $@ -c $<"; $$CMD || \
+ 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+ endef
+ 
+ define CXX_RULE
+ 	@echo "C++ $@"
+-	@CMD="$(CXX) $(CXXFLAGS) -o $@ -c $<"; $$CMD || \
++	CMD="$(CXX) $(CXXFLAGS) -o $@ -c $<"; $$CMD || \
+ 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+ endef
+ 
+ define LINK_RULE
+ 	@echo "Link $@"
+-	@CMD="$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
++	CMD="$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
+ 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+ endef
+ 
+ define LINK_RULE_CXX
+ 	@echo "Link $@"
+-	@CMD="$(CXX) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
++	CMD="$(CXX) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
+ 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+ endef
+ 

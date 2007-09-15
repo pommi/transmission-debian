@@ -1,0 +1,57 @@
+transmission (0.82.dfsg-1) unstable; urgency=low
+
+  * New upstream release (Closes: #441886)
+  * including transmission deamon tools (Closes: #441072)
+  * updated get-orig-source target
+  * removed debtags from debian/control
+  * added homepage tag to debian/conrtol
+  * removed README.Debian
+
+ -- Philipp Benner <mail@philipp-benner.de>  Sat, 15 Sep 2007 18:58:42 +0200
+
+transmission (0.81.dfsg-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Leo Costela <costela@debian.org>  Fri, 31 Aug 2007 12:38:13 +0200
+
+transmission (0.80.dfsg-1) unstable; urgency=low
+
+  * New upstream release (closes: #437512)
+  * debian/menu: change section from Apps to Applications, according to new
+    policy
+
+ -- Leo Costela <costela@debian.org>  Tue, 21 Aug 2007 01:33:40 +0200
+
+transmission (0.72.dfsg-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Philipp Benner <mail@philipp-benner.de>  Tue,  1 May 2007 12:23:49 +0200
+
+transmission (0.71.dfsg-1) unstable; urgency=low
+
+  * new upstream release (Closes: #419970, #421145)
+  * transmission-cli and transmission-gtk have to replace old transmission
+  + package (Closes: #421196)
+  * making the build process more verbose
+  * patched the version.sh script to run without excluded directories
+  * destdir patch for makefiles no longer required
+
+ -- Philipp Benner <mail@philipp-benner.de>  Fri, 27 Apr 2007 19:37:05 +0200
+
+transmission (0.6.1.dfsg-2) unstable; urgency=low
+
+  * new desktop file and xpm icon (Closes: #394464)
+  * watchfile version mangle for debian version
+  * distributing command line and gui client in separated binary packages
+    (Closes: 415140)
+
+ -- Philipp Benner <mail@philipp-benner.de>  Wed,  4 Apr 2007 14:17:18 +0200
+
+transmission (0.6.1.dfsg-1) unstable; urgency=low
+
+  * Initial release (Closes: #358878)
+
+ -- Philipp Benner <mail@philipp-benner.de>  Tue, 29 Aug 2006 20:50:41 +0200
+

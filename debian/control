@@ -1,0 +1,41 @@
+Source: transmission
+Section: net
+Priority: optional
+Maintainer: Philipp Benner <mail@philipp-benner.de>
+Uploaders: Leo Costela <costela@debian.org>
+Build-Depends: debhelper (>= 5), autotools-dev, libgtk2.0-dev (>= 2.6.4-3.1),
+	       libglib2.0-dev (>= 2.12.4-2), libssl-dev (>= 0.9.8b-2),
+	       docbook-to-man (>= 1:2.0.0-21), dpatch
+Standards-Version: 3.7.2
+
+Package: transmission
+Architecture: all
+Depends: transmission-cli (>= ${binary:Version}), transmission-gtk (>= ${binary:Version})
+Description: free, lightweight BitTorrent client
+ Transmission is a simple BitTorrent client. It features a very simple,
+ intuitive interface (gui and command-line) on top on an efficient,
+ cross-platform back-end.
+ .
+  Homepage: http://transmission.m0k.org/
+
+Package: transmission-cli
+Architecture: any
+Depends: ${shlibs:Depends}
+Replaces: transmission (<< 0.6.1.dfsg-2)
+Description: free, lightweight BitTorrent client
+ Transmission-cli is a lightweight command-line BitTorrent client. It
+ features a very simple, intuitive interface on top on an efficient,
+ cross-platform back-end.
+ .
+  Homepage: http://transmission.m0k.org/
+
+Package: transmission-gtk
+Architecture: any
+Depends: ${shlibs:Depends}
+Replaces: transmission (<< 0.6.1.dfsg-2)
+Description: graphical user interface for transmission
+ Transmission-gtk is a GTK-based BitTorrent client. It features a
+ very simple, intuitive interface on top on an efficient,
+ cross-platform back-end.
+ .
+  Homepage: http://transmission.m0k.org/

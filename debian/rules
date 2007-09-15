@@ -1,0 +1,134 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+.NOTPARALLEL:
+include /usr/share/dpatch/dpatch.make
+
+configure: configure-stamp
+
+configure-stamp:
+	dh_testdir
+
+	./configure \
+		--prefix=/usr \
+		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
+
+	touch $@
+
+build: patch build-stamp
+
+build-stamp: configure
+	dh_testdir
+
+	$(MAKE)
+
+	touch $@
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+
+	[ ! -f build-stamp ] || $(MAKE) clean
+
+	$(RM) build-stamp 
+	$(RM) configure-stamp 
+
+# <bugfix>
+	$(RM) mk/config.mk
+	$(RM) mk/version.mk
+	$(RM) cli/.depend
+	$(RM) gtk/.depend
+	$(RM) libtransmission/.depend
+	$(RM) libtransmission/version.h
+	$(RM) daemon/.depend
+	$(RM) daemon/transmission-proxy
+# </bugfix>
+
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+# Don't use `make install` here since it installs transmissioncli.1
+# at the wrong place.
+	mkdir -p debian/transmission
+	$(MAKE) -C cli -f ../mk/cli.mk DESTDIR=$(CURDIR)/debian/tmp install-bin
+	$(MAKE) -C gtk -f ../mk/gtk.mk DESTDIR=$(CURDIR)/debian/tmp install
+	$(MAKE) -C daemon -f ../mk/daemon.mk DESTDIR=$(CURDIR)/debian/tmp install
+
+# Install icons and desktop file
+	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
+	install -m644 debian/transmission-gtk.xpm \
+		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
+
+# 	install -m755 daemon/transmission-daemon \
+# 		$(CURDIR)/debian/tmp/usr/bin/transmission-daemon
+# 	install -m755 daemon/transmission-proxy \
+# 		$(CURDIR)/debian/tmp/usr/bin/transmission-proxy
+# 	install -m755 daemon/transmission-remote \
+# 		$(CURDIR)/debian/tmp/usr/bin/transmission-remote
+
+UPSTREAM_VERSION=0.82
+
+transmission-$(UPSTREAM_VERSION).tar.gz:
+	[ ! -f transmission-$(UPSTREAM_VERSION.tar.gz ] \
+		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.gz
+transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.gz
+	mkdir $@
+	(cd $@ && tar -xzvf ../transmission-$(UPSTREAM_VERSION).tar.gz)
+transmission-$(UPSTREAM_VERSION).dfsg.orig: transmission-$(UPSTREAM_VERSION)
+	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).dfsg.orig
+transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSION).dfsg.orig
+	# remove license ambiguous parts
+	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
+	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
+	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
+get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
+	$(RM) transmission-$(UPSTREAM_VERSION).tar.gz*
+	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+	dh_installdocs
+	dh_installmenu
+	dh_installman
+	dh_install --sourcedir=debian/tmp
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: configure build clean binary-indep binary-arch binary install

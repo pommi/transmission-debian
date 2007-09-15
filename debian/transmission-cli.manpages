@@ -1,0 +1,4 @@
+cli/transmissioncli.1
+daemon/transmission-daemon.1
+daemon/transmission-proxy.1
+daemon/transmission-remote.1
