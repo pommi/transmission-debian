@@ -3,10 +3,11 @@ Section: net
 Priority: optional
 Maintainer: Philipp Benner <mail@philipp-benner.de>
 Uploaders: Leo Costela <costela@debian.org>
-Build-Depends: debhelper (>= 5), autotools-dev, libgtk2.0-dev (>= 2.6.4-3.1),
-	       libglib2.0-dev (>= 2.12.4-2), libssl-dev (>= 0.9.8b-2),
-	       docbook-to-man (>= 1:2.0.0-21), dpatch
+Build-Depends: debhelper (>= 5), autotools-dev, libgtk2.0-dev, libevent-dev,
+	       libglib2.0-dev, libssl-dev, docbook-to-man, dpatch
 Standards-Version: 3.7.2
+XS-Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/transmission/
+XS-Vcs-Svn: svn://svn.debian.org/collab-maint/deb-maint/transmission/
 
 Package: transmission
 Architecture: all

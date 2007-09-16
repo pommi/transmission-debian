@@ -46,7 +46,7 @@ clean: unpatch
 	dh_testdir
 	dh_testroot
 
-	[ ! -f build-stamp ] || $(MAKE) clean
+	[ ! -f Makefile ] || $(MAKE) clean
 
 	$(RM) build-stamp 
 	$(RM) configure-stamp 
@@ -81,13 +81,6 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
-
-# 	install -m755 daemon/transmission-daemon \
-# 		$(CURDIR)/debian/tmp/usr/bin/transmission-daemon
-# 	install -m755 daemon/transmission-proxy \
-# 		$(CURDIR)/debian/tmp/usr/bin/transmission-proxy
-# 	install -m755 daemon/transmission-remote \
-# 		$(CURDIR)/debian/tmp/usr/bin/transmission-remote
 
 UPSTREAM_VERSION=0.82
 
