@@ -46,7 +46,7 @@ clean: unpatch
 	dh_testdir
 	dh_testroot
 
-	[ ! -f Makefile ] || $(MAKE) clean
+	[ ! -f build-stamp ] || $(MAKE) clean
 
 	$(RM) build-stamp 
 	$(RM) configure-stamp 
