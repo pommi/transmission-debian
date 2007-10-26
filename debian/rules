@@ -70,7 +70,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	$(MAKE) DESTDIR=debian/transmission
+	$(MAKE) DESTDIR=debian/transmission install
 # Don't use `make install` here since it installs transmissioncli.1
 # at the wrong place.
 #	mkdir -p debian/transmission
