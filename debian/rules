@@ -70,15 +70,12 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	$(MAKE) DESTDIR=debian/transmission install
-# Don't use `make install` here since it installs transmissioncli.1
-# at the wrong place.
-#	mkdir -p debian/transmission
-#	$(MAKE) -C cli -f ../mk/cli.mk DESTDIR=$(CURDIR)/debian/tmp install-bin
-#	$(MAKE) -C gtk -f ../mk/gtk.mk DESTDIR=$(CURDIR)/debian/tmp install
-#	$(MAKE) -C daemon -f ../mk/daemon.mk DESTDIR=$(CURDIR)/debian/tmp install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 
-# Install icons and desktop file
+	# clean RPATH from transmission binary (costela - 2007-10-27)
+	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
+
+	# Install icons and desktop file
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
@@ -115,7 +112,7 @@ binary-arch: build install
 	dh_installdocs
 	dh_installmenu
 	dh_installman
-	dh_install --sourcedir=debian/tmp
+	dh_install --sourcedir=$(CURDIR)/debian/tmp
 	dh_strip
 	dh_compress
 	dh_fixperms

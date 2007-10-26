@@ -1,0 +1,32 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 10-dfsg_configure.dpatch by Leo "costela" Antunes <costela@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+
+--- transmission-0.90.dfsg/configure	2007-10-24 22:19:28.000000000 +0200
++++ transmission-0.90.dfsg/configure.dfsg	2007-10-26 19:00:29.000000000 +0200
+@@ -24663,7 +24663,7 @@
+ 
+ 
+ 
+-ac_config_files="$ac_config_files Makefile transmission.spec beos/Makefile cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile macosx/Makefile wx/Makefile wx/images/Makefile"
++ac_config_files="$ac_config_files Makefile transmission.spec cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile wx/Makefile wx/images/Makefile"
+ 
+ 
+ if test "x$use_gtk" = "xyes"; then
+@@ -25335,12 +25335,10 @@
+     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
+     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+     "transmission.spec") CONFIG_FILES="$CONFIG_FILES transmission.spec" ;;
+-    "beos/Makefile") CONFIG_FILES="$CONFIG_FILES beos/Makefile" ;;
+     "cli/Makefile") CONFIG_FILES="$CONFIG_FILES cli/Makefile" ;;
+     "daemon/Makefile") CONFIG_FILES="$CONFIG_FILES daemon/Makefile" ;;
+     "libtransmission/Makefile") CONFIG_FILES="$CONFIG_FILES libtransmission/Makefile" ;;
+     "third-party/Makefile") CONFIG_FILES="$CONFIG_FILES third-party/Makefile" ;;
+-    "macosx/Makefile") CONFIG_FILES="$CONFIG_FILES macosx/Makefile" ;;
+     "wx/Makefile") CONFIG_FILES="$CONFIG_FILES wx/Makefile" ;;
+     "wx/images/Makefile") CONFIG_FILES="$CONFIG_FILES wx/images/Makefile" ;;
+     "gtk/Makefile") CONFIG_FILES="$CONFIG_FILES gtk/Makefile" ;;

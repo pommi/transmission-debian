@@ -1,6 +1,19 @@
 transmission (0.90.dfsg-1) unstable; urgency=low
 
   * New upstream release (Closes: #447444, #447905).
+  * debian/watch: check for both gz and bz2 archives (Leo "costela" Antunes)
+  * debian/*.manpages: copied manpages from 0.82 into debian dir, since
+    upstream didn't release them this time, for some reason (Leo "costela"
+    Antunes)
+  * debian/rules: add $(CURDIR) to 'make install' call and corrected dir
+    (transmission to tmp), remove RPATH definition from transmission binary
+    (Leo "costela" Antunes)
+  * debian/control: add chrpath build-dep
+  * debian/transmission-cli.*: binary upstream rename from transmissioncli to
+    transmission-cli (Leo "costela" Antunes)
+  * debian/transmission-gtk.*: binary upstream rename from transmission-gtk to
+    transmission (perhaps this will generate some confusion with the package
+    names) (Leo "costela" Antunes)
 
  -- Philipp Benner <mail@philipp-benner.de>  Fri, 26 Oct 2007 16:02:39 +0200
 

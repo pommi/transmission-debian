@@ -1,4 +1,4 @@
-cli/transmissioncli.1
-daemon/transmission-daemon.1
-daemon/transmission-proxy.1
-daemon/transmission-remote.1
+debian/manpages/transmission-cli.1
+debian/manpages/transmission-daemon.1
+debian/manpages/transmission-proxy.1
+debian/manpages/transmission-remote.1
