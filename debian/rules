@@ -70,35 +70,37 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
+	$(MAKE) DESTDIR=debian/transmission
 # Don't use `make install` here since it installs transmissioncli.1
 # at the wrong place.
-	mkdir -p debian/transmission
-	$(MAKE) -C cli -f ../mk/cli.mk DESTDIR=$(CURDIR)/debian/tmp install-bin
-	$(MAKE) -C gtk -f ../mk/gtk.mk DESTDIR=$(CURDIR)/debian/tmp install
-	$(MAKE) -C daemon -f ../mk/daemon.mk DESTDIR=$(CURDIR)/debian/tmp install
+#	mkdir -p debian/transmission
+#	$(MAKE) -C cli -f ../mk/cli.mk DESTDIR=$(CURDIR)/debian/tmp install-bin
+#	$(MAKE) -C gtk -f ../mk/gtk.mk DESTDIR=$(CURDIR)/debian/tmp install
+#	$(MAKE) -C daemon -f ../mk/daemon.mk DESTDIR=$(CURDIR)/debian/tmp install
 
 # Install icons and desktop file
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
-UPSTREAM_VERSION=0.82
+UPSTREAM_VERSION=0.90
 
-transmission-$(UPSTREAM_VERSION).tar.gz:
-	[ ! -f transmission-$(UPSTREAM_VERSION.tar.gz ] \
-		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.gz
-transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.gz
-	mkdir $@
-	(cd $@ && tar -xzvf ../transmission-$(UPSTREAM_VERSION).tar.gz)
+transmission-$(UPSTREAM_VERSION).tar.bz2:
+	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
+		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.bz2
+transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.bz2
+	tar -xjvf transmission-$(UPSTREAM_VERSION).tar.bz2
 transmission-$(UPSTREAM_VERSION).dfsg.orig: transmission-$(UPSTREAM_VERSION)
 	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).dfsg.orig
 transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSION).dfsg.orig
 	# remove license ambiguous parts
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
+	sed -i s+beos/Makefile++   transmission-$(UPSTREAM_VERSION).dfsg.orig/configure
+	sed -i s+macosx/Makefile++ transmission-$(UPSTREAM_VERSION).dfsg.orig/configure
 	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
-	$(RM) transmission-$(UPSTREAM_VERSION).tar.gz*
+	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig
 
 # Build architecture-independent files here.
