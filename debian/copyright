@@ -1,135 +1,152 @@
-This package was debianized by Philipp Benner <mail@philipp-benner.de> on
-Tue, 29 Aug 2006 20:50:41 +0200.
+This package was downloaded from http://download.m0k.org/transmission/files/
 
-It was downloaded from http://download.m0k.org/transmission/files/
+Files: *
+Copyright: © 2005-2007 Transmission authors and contributors
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
 
-Upstream Author: Eric Petit <titer@m0k.org>
+Files libtransmission/basename.*, libtransmission/dirname.*,
+      libtransmission/strlcat.*, libtransmission/strlcpy.*
+Copyright: © 1997, 1998, 2004 Todd C. Miller <Todd.Miller@courtesan.com>
+License: MIT
+ Permission to use, copy, modify, and distribute this software for any
+ purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Copyright: 2005, 2006, 2007 Transmission authors and contributors
-(see `/usr/share/doc/transmission/AUTHORS')
+Files: daemon/client.*, daemon/daemon.*, daemon/errors.*, daemon/misc.*,
+       daemon/proxy.*, daemon/remote.*, daemon/server.*, daemon/torrents.*
+Copyright: © 2007 Joshua Elsasser
+License: MIT
 
-License:
+Files: libtransmission/bsdtree.h
+Copyright: © 2002 Niels Provos <provos@citi.umich.edu>
+License: MIT (2-clause version)
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
---------------------------------------------------------------------------------
-The Transmission binaries and source code are mostly distributed under the
-MIT license.
+Files: libtransmission/crypto.*, libtransmission/handshake.*,
+       libtransmission/inout.*, libtransmission/list.*,
+       libtransmission/makemeta.*, libtransmission/peer-*,
+       libtransmission/ptrarray.*, libtransmission/publish.*,
+       libtransmission/tracker.*, libtransmission/trevent.*,
+       gtk/actions.*, gtk/hig.*, gtk/makemeta-ui.*, gtk/tr_prefs.*,
+       gtk/torrent-inspector.*
+Copyright: © 2007 Charles Kerr <charles@rebelbase.com>
+License: MIT
+ This file is licensed by the GPL version 2.  Works owned by the
+ Transmission project are granted a special exemption to clause 2(b)
+ so that the bulk of its code can remain under the MIT license. 
+ This exemption does not extend to derived works not owned by
+ the Transmission project.
 
------
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+Files: daemon/bsdqueue.h
+Copyright: © 1991, 1993 The Regents of the University of California.
+License: MIT (3-clause version)
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. Neither the name of the University nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ SUCH DAMAGE.
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+Files: third-party/libevent/*
+Copyright: © 2002-2004 Niels Provos <provos@citi.umich.edu>
+License: MIT (3-clause version)
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL SIMON TATHAM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
---------------------------------------------------------------------------------
+Files: third-party/libevent/evdns.c
+Copyright: © 2006 Adam Langley <agl@imperialviolet.org>
+License: PD
+ This software is Public Domain. To view a copy of the public domain dedication,
+ visit http://creativecommons.org/licenses/publicdomain/ or send a letter to
+ Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+ .
+ I ask and expect, but do not require, that all derivative works contain an
+ attribution similar to:
+      Parts developed by Adam Langley <agl@imperialviolet.org>
 
-Files distributed under other licenses:
+Files: third-party/libevent/evport.*
+Copyright: © 2006 Sun Microsystems
+License: MIT (3-clause version)
 
-2-clause BSD license* (see below):
-	gtk/io.c, gtk/io.h, gtk/tr_torrent.c, gtk/tr_torrent.h, gtk/ipc.c,
-	gtk/ipc.h, gtk/tr_backend.c, gtk/tr_backend.h, gtk/dialogs.c,
-	gtk/dialogs.h, gtk/conf.c, gtk/conf.h, gtk/main.c, gtk/util.c,
-	gtk/util.h daemon/client.c daemon/daemon.c daemon/errors.h daemon/ipc.h
-	daemon/misc.h daemon/remote.c daemon/server.h daemon/torrents.h
-	daemon/client.h daemon/errors.c daemon/ipc.c daemon/misc.c daemon/proxy.c
-	daemon/server.c daemon/torrents.c
+Files: third-party/libevent/log.c
+Copyright: © 2005 Nick Mathewson <nickm@freehaven.net>,
+	     2000 Dug Song <dugsong@monkey.org>,
+	     1993 The Regents of the University of California
+License: MIT (3-clause version)
 
-modified 3-clause BSD license (see below):
-	 libtransmission/bsdqueue.h
-	
-LGPLv2 or later (see `/usr/share/common-licenses/LGPL'):
-	gtk/tr_cell_renderer_torrent.c, gtk/tr_cell_renderer_torrent.h
+Files: third-party/libevent/strlcpy.*
+Copyright: © 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+License: MIT (3-clause version)
 
-BSD like license for sha1 (see below):
-	libtransmission/sha1.c, libtransmission/sha1.h
+Files: wx/*
+Copyright: © 2007 Charles Kerr <charles@rebelbase.com>
+License: GPL-2
 
-2-clause BSD license:
---------------------------------------------------------------------------------
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-   
-   1. Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-   
-  THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
---------------------------------------------------------------------------------
+Files: debian/*
+Copyright: © 2006-2007 Philipp Benner <mail@philipp-benner.de>,
+	     	       Leo "costela" Antunes <costela@debian.org>
+License: GPL-2+
+ The Debian packaging information is under the GPL, version 2 or later.
 
-modified 3-clause BSD license:
---------------------------------------------------------------------------------
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-*       Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
-*       Redistributions in binary form must reproduce the above copyright
-	notice, this list of conditions and the following disclaimer in the
-	documentation and/or other materials provided with the distribution.
-*       Neither the name of ranchero.com or Brent Simmons nor the names of its
-        contributors may be used to endorse or promote products derived
-        from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
---------------------------------------------------------------------------------
-
-BSD like license for sha1:
---------------------------------------------------------------------------------
- This software is provided 'as-is', without any express or implied
- warranty. In no event will the authors be held liable for any damages
- arising from the use of this software.
-
- Permission is granted to anyone to use this software for any purpose,
- including commercial applications, and to alter it and redistribute it
- freely, subject to the following restrictions:
-
- 1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgement in the product documentation would be
-    appreciated but is not required.
- 2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as beging the original software.
- 3. This notice may not be removed or altered from any source distribution.
---------------------------------------------------------------------------------
-
-* The 2-clause BSD license is the same as the 3-clause BSD license except
-  that the third clause is missing. `/usr/share/common-licenses/BSD' is the
-  3-clause version. The 2-clause version is functionally equivalent to the
-  MIT License.
-
-The Debian packaging is (C) 2006, Philipp Benner <mail@philipp-benner.de> and
-is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL' and the
+complete text of the GNU Lesser General Public License can be found in
+`/usr/share/common-licenses/LGPL'.
