@@ -1,6 +1,6 @@
 The original source tarball has been modified since it contains
 license ambiguous files.
 
-The following directory has been removed:
+The following directories have been removed:
 ./beos
 ./macosx
