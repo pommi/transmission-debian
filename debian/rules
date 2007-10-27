@@ -93,8 +93,6 @@ transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSI
 	# remove license ambiguous parts
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
-	sed -i s+beos/Makefile++   transmission-$(UPSTREAM_VERSION).dfsg.orig/configure
-	sed -i s+macosx/Makefile++ transmission-$(UPSTREAM_VERSION).dfsg.orig/configure
 	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2
