@@ -1,8 +1,7 @@
 #! /bin/sh /usr/share/dpatch/dpatch-run
 ## 10-dfsg_configure.dpatch by Leo "costela" Antunes <costela@debian.org>
 ##
-## All lines beginning with `## DP:' are a description of the patch.
-## DP: No description.
+## DP: Change the configure script to handle source tree without beos and macosx directory.
 
 @DPATCH@
 
