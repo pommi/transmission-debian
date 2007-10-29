@@ -42,25 +42,16 @@ build-stamp: configure
 
 	touch $@
 
-clean: unpatch
+distclean:
+	# touch config.status to prefent execution of autoconf
+	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
+
+clean: distclean unpatch
 	dh_testdir
 	dh_testroot
 
-	[ ! -f build-stamp ] || $(MAKE) clean
-
 	$(RM) build-stamp 
 	$(RM) configure-stamp 
-
-# <bugfix>
-	$(RM) mk/config.mk
-	$(RM) mk/version.mk
-	$(RM) cli/.depend
-	$(RM) gtk/.depend
-	$(RM) libtransmission/.depend
-	$(RM) libtransmission/version.h
-	$(RM) daemon/.depend
-	$(RM) daemon/transmission-proxy
-# </bugfix>
 
 	dh_clean 
 
@@ -71,6 +62,8 @@ install: build
 	dh_installdirs
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	# <bugfix>rename manpage</bugfix>	
+	rename s/transmissioncli.1/transmission-cli.1/ $(CURDIR)/debian/tmp/usr/share/man/man1/transmissioncli.1
 
 	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
@@ -80,7 +73,7 @@ install: build
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
-UPSTREAM_VERSION=0.90
+UPSTREAM_VERSION=0.91
 
 transmission-$(UPSTREAM_VERSION).tar.bz2:
 	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \

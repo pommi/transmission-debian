@@ -1,3 +1,10 @@
+transmission (0.91.dfsg-1) unstable; urgency=low
+
+  * New upstream release (Closes: #448516).
+  * Using manpages from source package.
+
+ -- Philipp Benner <mail@philipp-benner.de>  Mon, 29 Oct 2007 19:53:02 +0100
+
 transmission (0.90.dfsg-2) unstable; urgency=low
 
   * Updated manuals.
