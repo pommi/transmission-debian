@@ -5,18 +5,19 @@
 
 @DPATCH@
 
---- transmission-0.90.dfsg/configure	2007-10-24 22:19:28.000000000 +0200
-+++ transmission-0.90.dfsg/configure.dfsg	2007-10-26 19:00:29.000000000 +0200
-@@ -24663,7 +24663,7 @@
+diff -urNad transmission-0.93.dfsg~/configure transmission-0.93.dfsg/configure
+--- transmission-0.93.dfsg~/configure	2007-11-17 16:36:48.000000000 +0100
++++ transmission-0.93.dfsg/configure	2007-11-17 16:41:27.000000000 +0100
+@@ -25587,7 +25587,7 @@
  
  
  
--ac_config_files="$ac_config_files Makefile transmission.spec beos/Makefile cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile macosx/Makefile wx/Makefile wx/images/Makefile"
-+ac_config_files="$ac_config_files Makefile transmission.spec cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile wx/Makefile wx/images/Makefile"
+-ac_config_files="$ac_config_files Makefile transmission.spec beos/Makefile cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile macosx/Makefile wx/Makefile wx/images/Makefile gtk/Makefile po/Makefile.in"
++ac_config_files="$ac_config_files Makefile transmission.spec cli/Makefile daemon/Makefile libtransmission/Makefile third-party/Makefile wx/Makefile wx/images/Makefile gtk/Makefile po/Makefile.in"
  
  
- if test "x$use_gtk" = "xyes"; then
-@@ -25335,12 +25335,10 @@
+ ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
+@@ -26254,12 +26254,10 @@
      "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
      "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
      "transmission.spec") CONFIG_FILES="$CONFIG_FILES transmission.spec" ;;

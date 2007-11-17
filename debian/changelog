@@ -1,3 +1,9 @@
+transmission (0.93.dfsg-1) unstable; urgency=low
+
+  * New upstream release (Closes: #450522).
+
+ -- Philipp Benner <mail@philipp-benner.de>  Fri, 16 Nov 2007 18:01:47 +0100
+
 transmission (0.91.dfsg-1) unstable; urgency=low
 
   * New upstream release (Closes: #448516).
