@@ -1,3 +1,9 @@
+transmission (0.93.dfsg-2) unstable; urgency=low
+
+  * Added missing build-dependency (python).
+
+ -- Philipp Benner <mail@philipp-benner.de>  Thu, 22 Nov 2007 12:37:14 +0100
+
 transmission (0.93.dfsg-1) unstable; urgency=low
 
   * New upstream release (Closes: #450522, #450778).
