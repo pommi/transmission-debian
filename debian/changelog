@@ -1,10 +1,10 @@
-transmission (0.94.dfsg-1) unstable; urgency=low
+transmission (0.95.dfsg-1) unstable; urgency=low
 
-  * New upstream release.
+  * New upstream release (Closes: #454127).
 
- -- Philipp Benner <mail@philipp-benner.de>  Mon, 26 Nov 2007 11:24:52 +0100
+ -- Philipp Benner <mail@philipp-benner.de>  Wed, 05 Dec 2007 14:37:05 +0100
 
-ansmission (0.93.dfsg-2) unstable; urgency=low
+transmission (0.93.dfsg-2) unstable; urgency=low
 
   * Added missing build-dependency (python).
   * debian/control: switching to Homepage, Vcs-Browser and Vcs-Svn official
