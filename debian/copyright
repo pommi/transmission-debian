@@ -1,7 +1,7 @@
 This package was downloaded from http://download.m0k.org/transmission/files/
 
 Files: *
-Copyright: © 2005-2007 Transmission authors and contributors
+Copyright: Â© 2005-2007 Transmission authors and contributors
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@ License: MIT
 
 Files libtransmission/basename.*, libtransmission/dirname.*,
       libtransmission/strlcat.*, libtransmission/strlcpy.*
-Copyright: © 1997, 1998, 2004 Todd C. Miller <Todd.Miller@courtesan.com>
+Copyright: Â© 1997, 1998, 2004 Todd C. Miller <Todd.Miller@courtesan.com>
 License: MIT
  Permission to use, copy, modify, and distribute this software for any
  purpose with or without fee is hereby granted, provided that the above
@@ -39,11 +39,11 @@ License: MIT
 
 Files: daemon/client.*, daemon/daemon.*, daemon/errors.*, daemon/misc.*,
        daemon/proxy.*, daemon/remote.*, daemon/server.*, daemon/torrents.*
-Copyright: © 2007 Joshua Elsasser
+Copyright: Â© 2007 Joshua Elsasser
 License: MIT
 
 Files: libtransmission/bsdtree.h
-Copyright: © 2002 Niels Provos <provos@citi.umich.edu>
+Copyright: Â© 2002 Niels Provos <provos@citi.umich.edu>
 License: MIT (2-clause version)
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
@@ -72,7 +72,7 @@ Files: libtransmission/crypto.*, libtransmission/handshake.*,
        libtransmission/tracker.*, libtransmission/trevent.*,
        gtk/actions.*, gtk/hig.*, gtk/makemeta-ui.*, gtk/tr_prefs.*,
        gtk/torrent-inspector.*
-Copyright: © 2007 Charles Kerr <charles@rebelbase.com>
+Copyright: Â© 2007 Charles Kerr <charles@rebelbase.com>
 License: MIT
  This file is licensed by the GPL version 2.  Works owned by the
  Transmission project are granted a special exemption to clause 2(b)
@@ -81,7 +81,7 @@ License: MIT
  the Transmission project.
 
 Files: daemon/bsdqueue.h
-Copyright: © 1991, 1993 The Regents of the University of California.
+Copyright: Â© 1991, 1993 The Regents of the University of California.
 License: MIT (3-clause version)
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
@@ -108,11 +108,11 @@ License: MIT (3-clause version)
  SUCH DAMAGE.
 
 Files: third-party/libevent/*
-Copyright: © 2002-2004 Niels Provos <provos@citi.umich.edu>
+Copyright: Â© 2002-2004 Niels Provos <provos@citi.umich.edu>
 License: MIT (3-clause version)
 
 Files: third-party/libevent/evdns.c
-Copyright: © 2006 Adam Langley <agl@imperialviolet.org>
+Copyright: Â© 2006 Adam Langley <agl@imperialviolet.org>
 License: PD
  This software is Public Domain. To view a copy of the public domain dedication,
  visit http://creativecommons.org/licenses/publicdomain/ or send a letter to
@@ -123,25 +123,25 @@ License: PD
       Parts developed by Adam Langley <agl@imperialviolet.org>
 
 Files: third-party/libevent/evport.*
-Copyright: © 2006 Sun Microsystems
+Copyright: Â© 2006 Sun Microsystems
 License: MIT (3-clause version)
 
 Files: third-party/libevent/log.c
-Copyright: © 2005 Nick Mathewson <nickm@freehaven.net>,
+Copyright: Â© 2005 Nick Mathewson <nickm@freehaven.net>,
 	     2000 Dug Song <dugsong@monkey.org>,
 	     1993 The Regents of the University of California
 License: MIT (3-clause version)
 
 Files: third-party/libevent/strlcpy.*
-Copyright: © 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+Copyright: Â© 1998 Todd C. Miller <Todd.Miller@courtesan.com>
 License: MIT (3-clause version)
 
 Files: wx/*
-Copyright: © 2007 Charles Kerr <charles@rebelbase.com>
+Copyright: Â© 2007 Charles Kerr <charles@rebelbase.com>
 License: GPL-2
 
 Files: debian/*
-Copyright: © 2006-2007 Philipp Benner <mail@philipp-benner.de>,
+Copyright: Â© 2006-2007 Philipp Benner <mail@philipp-benner.de>,
 	     	       Leo "costela" Antunes <costela@debian.org>
 License: GPL-2+
  The Debian packaging information is under the GPL, version 2 or later.

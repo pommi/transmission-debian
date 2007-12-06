@@ -1,6 +1,16 @@
+transmission (0.95.dfsg-2) unstable; urgency=low
+
+  * add transmission-common package, to avoid duplication on files
+  * install NEWS as changelog
+  * rename README.Debian-source to README.debian (for consistency), document 
+    current open bug about licence issues
+
+ -- Leo Costela <costela@debian.org>  Thu, 06 Dec 2007 00:46:50 +0100
+
 transmission (0.95.dfsg-1) unstable; urgency=low
 
   * New upstream release (Closes: #454127).
+  * debian/copyright: convert to UTF-8 (Leo "costela" Antunes)
 
  -- Philipp Benner <mail@philipp-benner.de>  Wed, 05 Dec 2007 14:37:05 +0100
 

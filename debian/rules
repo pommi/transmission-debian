@@ -100,8 +100,9 @@ get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs -i
-	dh_installdocs -i
+	dh_link -i
+	dh_installchangelogs -p transmission-common NEWS
+	dh_installdocs -p transmission-common
 	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
 	dh_compress -i
 	dh_fixperms -i
@@ -114,8 +115,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs -a
-	dh_installdocs -a
+	dh_link -a
 	dh_installmenu -a
 	dh_installman -a
 	dh_install -a --sourcedir=$(CURDIR)/debian/tmp

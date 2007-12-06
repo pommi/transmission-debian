@@ -4,3 +4,6 @@ license ambiguous files.
 The following directories have been removed:
 ./beos
 ./macosx
+
+Check this bug for possible updates:
+http://transmission.m0k.org/trac/ticket/528
