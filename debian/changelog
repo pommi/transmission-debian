@@ -5,7 +5,8 @@ transmission (0.95.dfsg-2) unstable; urgency=low
   * rename README.Debian-source to README.debian (for consistency), document 
     current open bug about licence issues
   * registering transmission to handle torrent files (Closes: #454801)
-  * improved portability
+    (Philipp Benner)
+  * improved portability (Philipp Benner)
 
  -- Leo Costela <costela@debian.org>  Thu, 06 Dec 2007 00:46:50 +0100
 
