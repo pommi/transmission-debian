@@ -22,8 +22,37 @@ endif
 .NOTPARALLEL:
 include /usr/share/dpatch/dpatch.make
 
-configure: configure-stamp
+config: config-stamp
+config-stamp:
+	dh_testdir
 
+	if [ -r /usr/share/misc/config.sub ] && [ ! -f config.sub.backup ]; then \
+		mv -v config.sub config.sub.backup; \
+		cp -f /usr/share/misc/config.sub $(CURDIR)/config.sub; \
+	fi
+
+	if [ -r /usr/share/misc/config.guess ] && [ ! -f config.guess.backup ]; then \
+		mv -v config.guess config.guess.backup; \
+		cp -f /usr/share/misc/config.guess $(CURDIR)/config.guess; \
+	fi
+
+	touch $@
+
+config-clean:
+	dh_testdir
+	dh_testroot
+
+	if [ -f config.sub.backup ]; then \
+		mv -fv config.sub.backup config.sub; \
+	fi
+
+	if [ -f config.guess.backup ]; then \
+		mv -fv config.guess.backup config.guess; \
+	fi
+
+	$(RM) config-stamp
+
+configure: configure-stamp
 configure-stamp:
 	dh_testdir
 
@@ -33,8 +62,7 @@ configure-stamp:
 
 	touch $@
 
-build: patch build-stamp
-
+build: config patch build-stamp
 build-stamp: configure
 	dh_testdir
 
@@ -43,17 +71,17 @@ build-stamp: configure
 	touch $@
 
 distclean:
-	# touch config.status to prefent execution of autoconf
+#	# touch config.status to prefent execution of autoconf
 	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
 
-clean: distclean unpatch
+clean: config-clean distclean unpatch
 	dh_testdir
 	dh_testroot
 
-	# <bugfix>
+#	# <bugfix>
 	$(RM) third-party/libevent/test/regress.gen.c
 	$(RM) third-party/libevent/test/regress.gen.h
-	# </bugfix>
+#	# </bugfix>
 
 	$(RM) build-stamp 
 	$(RM) configure-stamp 
@@ -67,13 +95,13 @@ install: build
 	dh_installdirs
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
-	# <bugfix>rename manpage</bugfix>	
+#	# <bugfix>rename manpage</bugfix>	
 	rename s/transmissioncli.1/transmission-cli.1/ $(CURDIR)/debian/tmp/usr/share/man/man1/transmissioncli.1
 
-	# clean RPATH from transmission binary (costela - 2007-10-27)
+#	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
 
-	# Install icons and desktop file
+#	# Install icons and desktop file
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
@@ -130,4 +158,4 @@ binary-arch: build install
 	dh_builddeb -a
 
 binary: binary-indep binary-arch
-.PHONY: configure build clean binary-indep binary-arch binary install
+.PHONY: config config-clean configure build clean binary-indep binary-arch binary install
