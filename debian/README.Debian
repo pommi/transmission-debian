@@ -15,6 +15,6 @@ Mime Types
 To make transmission your default torrent client add the following line to
 your ~/.mailcap file:
 
-application/x-bittorrent; transmission
+application/x-bittorrent; transmission %s
 
- -- Philipp Benner <mail@philipp-benner.de>, Sat,  8 Dec 2007 14:59:58 +0100
+ -- Philipp Benner <mail@philipp-benner.de>, Sat,  8 Dec 2007 17:48:25 +0100
