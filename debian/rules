@@ -101,9 +101,9 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_link -i
+	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
-	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
@@ -116,9 +116,10 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_link -a
+	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
 	dh_installmenu -a
 	dh_installman -a
-	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
+	dh_desktop -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a

@@ -4,6 +4,7 @@ transmission (0.95.dfsg-2) unstable; urgency=low
   * install NEWS as changelog
   * rename README.Debian-source to README.debian (for consistency), document 
     current open bug about licence issues
+  * registering transmission to handle torrent files (Closes: #454801)
 
  -- Leo Costela <costela@debian.org>  Thu, 06 Dec 2007 00:46:50 +0100
 
