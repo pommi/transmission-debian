@@ -71,7 +71,7 @@ build-stamp: configure
 	touch $@
 
 distclean:
-#	# touch config.status to prefent execution of autoconf
+#	# touch config.status to prevent execution of autoconf
 	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
 
 clean: config-clean distclean unpatch
