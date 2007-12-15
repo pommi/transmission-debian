@@ -1,3 +1,11 @@
+transmission (0.96.dfsg-1) unstable; urgency=low
+
+  * New upstream release (Closes: #456228).
+  * Added transmission-gtk.mime (Closes: #454801).
+  * Fixed typo (Closes: #456036).
+
+ -- Philipp Benner <mail@philipp-benner.de>  Sat, 15 Dec 2007 20:42:31 +0100
+
 transmission (0.95.dfsg-2) unstable; urgency=low
 
   * add transmission-common package, to avoid duplication on files

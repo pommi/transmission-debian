@@ -42,7 +42,7 @@ Package: transmission-gtk
 Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version})
 Replaces: transmission (<< 0.6.1.dfsg-2)
-Description: free, lightweight BitTorrent client (grafical interface)
+Description: free, lightweight BitTorrent client (graphical interface)
  Transmission-gtk is a GTK-based BitTorrent client. It features a
  very simple, intuitive interface on top on an efficient,
  cross-platform back-end.

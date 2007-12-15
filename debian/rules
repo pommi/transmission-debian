@@ -106,7 +106,7 @@ install: build
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
-UPSTREAM_VERSION=0.95
+UPSTREAM_VERSION=0.96
 
 transmission-$(UPSTREAM_VERSION).tar.bz2:
 	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
@@ -116,7 +116,7 @@ transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.bz2
 transmission-$(UPSTREAM_VERSION).dfsg.orig: transmission-$(UPSTREAM_VERSION)
 	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).dfsg.orig
 transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSION).dfsg.orig
-	# remove license ambiguous parts
+#	# remove license ambiguous parts
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
 	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
 	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
@@ -147,6 +147,7 @@ binary-arch: build install
 	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
 	dh_installmenu -a
 	dh_installman -a
+	dh_installmime -a
 	dh_desktop -a
 	dh_strip -a
 	dh_compress -a
