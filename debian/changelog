@@ -2,6 +2,14 @@ transmission (1.00-1) unstable; urgency=low
 
   * New upstream release
     (Closes: #458942, #457825, #458202, #452440, #456038, #454802, #458075).
+  * updated maintainer email
+  * debian/patches: removed unneeded patches (dealt with DSFG dirs, see below)
+  * debian/control: 
+      - updated upstream homepage
+      - add DM-upload:yes 
+  * debian/rules: 
+      - update get-orig-source to not remove dirs, DFSG status resolved upstream
+      - don't rename transmissioncli manpage, renamed upstream
 
  -- Philipp Benner <pbenner@uni-osnabrueck.de>  Sat, 05 Jan 2008 09:16:52 +0100
 

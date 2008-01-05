@@ -111,16 +111,16 @@ transmission-$(UPSTREAM_VERSION).tar.bz2:
 		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.bz2
 transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.bz2
 	tar -xjvf transmission-$(UPSTREAM_VERSION).tar.bz2
-transmission-$(UPSTREAM_VERSION).dfsg.orig: transmission-$(UPSTREAM_VERSION)
-	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).dfsg.orig
-transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSION).dfsg.orig
+transmission-$(UPSTREAM_VERSION).orig: transmission-$(UPSTREAM_VERSION)
+	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).orig
+transmission_$(UPSTREAM_VERSION).orig.tar.gz: transmission-$(UPSTREAM_VERSION).orig
 #	# remove license ambiguous parts
 #	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
 #	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
-	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
-get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
+	tar -cf - transmission-$(UPSTREAM_VERSION).orig | gzip -9 > transmission_$(UPSTREAM_VERSION).orig.tar.gz
+get-orig-source: transmission_$(UPSTREAM_VERSION).orig.tar.gz
 	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2
-	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig
+	$(RM) -r transmission-$(UPSTREAM_VERSION).orig
 
 # Build architecture-independent files here.
 binary-indep: build install
