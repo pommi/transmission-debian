@@ -61,7 +61,7 @@ configure-stamp:
 
 	touch $@
 
-build: config patch build-stamp
+build: config build-stamp
 build-stamp: configure
 	dh_testdir
 
@@ -73,7 +73,7 @@ distclean:
 #	# touch config.status to prevent execution of autoconf
 	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
 
-clean: config-clean distclean unpatch
+clean: config-clean distclean
 	dh_testdir
 	dh_testroot
 
