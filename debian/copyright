@@ -141,7 +141,7 @@ Copyright: © 2007 Charles Kerr <charles@rebelbase.com>
 License: GPL-2
 
 Files: debian/*
-Copyright: © 2006-2007 Philipp Benner <mail@philipp-benner.de>,
+Copyright: © 2006-2007 Philipp Benner <pbenner@uni-osnabrueck.de>,
 	     	       Leo "costela" Antunes <costela@debian.org>
 License: GPL-2+
  The Debian packaging information is under the GPL, version 2 or later.

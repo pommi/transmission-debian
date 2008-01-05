@@ -95,8 +95,6 @@ install: build
 	dh_installdirs
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
-#	# <bugfix>rename manpage</bugfix>	
-	rename s/transmissioncli.1/transmission-cli.1/ $(CURDIR)/debian/tmp/usr/share/man/man1/transmissioncli.1
 
 #	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
@@ -106,7 +104,7 @@ install: build
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
-UPSTREAM_VERSION=0.96
+UPSTREAM_VERSION=1.00
 
 transmission-$(UPSTREAM_VERSION).tar.bz2:
 	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
@@ -117,8 +115,8 @@ transmission-$(UPSTREAM_VERSION).dfsg.orig: transmission-$(UPSTREAM_VERSION)
 	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).dfsg.orig
 transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz: transmission-$(UPSTREAM_VERSION).dfsg.orig
 #	# remove license ambiguous parts
-	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
-	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
+#	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
+#	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
 	tar -cf - transmission-$(UPSTREAM_VERSION).dfsg.orig | gzip -9 > transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 get-orig-source: transmission_$(UPSTREAM_VERSION).dfsg.orig.tar.gz
 	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2

@@ -1,4 +1,4 @@
-usr/bin/transmission-cli
+usr/bin/transmissioncli
 usr/bin/transmission-daemon
 usr/bin/transmission-proxy
 usr/bin/transmission-remote
