@@ -20,7 +20,6 @@ else
 endif
 
 .NOTPARALLEL:
-include /usr/share/dpatch/dpatch.make
 
 config: config-stamp
 config-stamp:
