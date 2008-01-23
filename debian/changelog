@@ -1,3 +1,9 @@
+transmission (1.02-1) unstable; urgency=low
+
+  * New upstream release (Closes: #461237, #461778).
+
+ -- Philipp Benner <pbenner@uni-osnabrueck.de>  Wed, 23 Jan 2008 13:08:22 +0100
+
 transmission (1.00-1) unstable; urgency=low
 
   * New upstream release
