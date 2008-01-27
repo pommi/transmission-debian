@@ -104,7 +104,7 @@ install: build
 	install -m644 debian/transmission-gtk.xpm \
 		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
-UPSTREAM_VERSION=1.02
+UPSTREAM_VERSION=$(shell dpkg-parsechangelog | perl -ne '{ print $$1."\n" if /Version: (.*)-.*/; }')
 
 transmission-$(UPSTREAM_VERSION).tar.bz2:
 	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
