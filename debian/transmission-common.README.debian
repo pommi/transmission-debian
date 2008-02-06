@@ -1,18 +1,6 @@
 Transmission for Debian
 --------------------------------------------------------------------------------
 
-Source Tarball
---------------
-The original source tarball has been modified since it contains
-license ambiguous files.
-
-The following directories have been removed:
-./beos
-./macosx
-
-Check this bug for possible updates:
-http://transmission.m0k.org/trac/ticket/528
-
 Mime Types
 ----------
 To make transmission your default torrent client add the following line to
@@ -20,4 +8,4 @@ your ~/.mailcap file:
 
 application/x-bittorrent; transmission %s
 
- -- Philipp Benner <pbenner@uni-osnabrueck.de>, Sat,  8 Dec 2007 17:48:25 +0100
+ -- Philipp Benner <pbenner@uni-osnabrueck.de>, Wed,  6 Feb 2008 09:07:37 +0100
