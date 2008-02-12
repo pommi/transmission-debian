@@ -4,22 +4,31 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+CFLAGS = -Wall -g
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+# DEB_BUILD_OPTIONS
+################################################################################
 
-CFLAGS = -Wall -g
-
+# noop
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
+ CFLAGS += -O0
 else
-	CFLAGS += -O2
+ CFLAGS += -O2
 endif
 
-.NOTPARALLEL:
+# parallel
+ifneq (,$(findstring parallel,$(DEB_BUILD_OPTIONS)))
+ TRANSMISSION_MAKEFLAGS += -j$(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+
+# nostrip is handled by dh_strip
+
+################################################################################
 
 config: config-stamp
 config-stamp:
@@ -56,6 +65,7 @@ configure-stamp:
 	dh_testdir
 
 	./configure \
+		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
 		--mandir=/usr/share/man \
 		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
@@ -66,7 +76,7 @@ build: config build-stamp
 build-stamp: configure
 	dh_testdir
 
-	$(MAKE)
+	$(MAKE) $(TRANSMISSION_MAKEFLAGS)
 
 	touch $@
 
@@ -110,24 +120,19 @@ transmission-$(UPSTREAM_VERSION).tar.bz2:
 	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
 		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.bz2
 transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.bz2
-	tar -xjvf transmission-$(UPSTREAM_VERSION).tar.bz2
-transmission-$(UPSTREAM_VERSION).orig: transmission-$(UPSTREAM_VERSION)
-	mv transmission-$(UPSTREAM_VERSION) transmission-$(UPSTREAM_VERSION).orig
-transmission_$(UPSTREAM_VERSION).orig.tar.gz: transmission-$(UPSTREAM_VERSION).orig
-#	# remove license ambiguous parts
-#	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/beos
-#	$(RM) -r transmission-$(UPSTREAM_VERSION).dfsg.orig/macosx
-	tar -cf - transmission-$(UPSTREAM_VERSION).orig | gzip -9 > transmission_$(UPSTREAM_VERSION).orig.tar.gz
+	tar -xjf transmission-$(UPSTREAM_VERSION).tar.bz2
+transmission_$(UPSTREAM_VERSION).orig.tar.gz: transmission-$(UPSTREAM_VERSION)
+	tar -cf - transmission-$(UPSTREAM_VERSION) | gzip -9 > transmission_$(UPSTREAM_VERSION).orig.tar.gz
 get-orig-source: transmission_$(UPSTREAM_VERSION).orig.tar.gz
 	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2
-	$(RM) -r transmission-$(UPSTREAM_VERSION).orig
+	$(RM) -r transmission-$(UPSTREAM_VERSION)
 
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_link -i
-	dh_install -i --sourcedir=$(CURDIR)/debian/tmp
+	dh_install -i --sourcedir=debian/tmp
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
 	dh_compress -i
@@ -142,7 +147,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_link -a
-	dh_install -a --sourcedir=$(CURDIR)/debian/tmp
+	dh_install -a --sourcedir=debian/tmp
 	dh_installmenu -a
 	dh_installman -a
 	dh_installmime -a
