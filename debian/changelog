@@ -1,3 +1,9 @@
+transmission (1.05-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Leo Costela <costela@debian.org>  Wed, 13 Feb 2008 16:44:52 +0100
+
 transmission (1.04-1) unstable; urgency=low
 
   * new upstream release
