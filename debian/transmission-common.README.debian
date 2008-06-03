@@ -1,6 +1,9 @@
 Transmission for Debian
 --------------------------------------------------------------------------------
 
+The upstream bug tracking system can be found at
+http://trac.transmissionbt.com/
+
 Mime Types
 ----------
 To make transmission your default torrent client add the following line to

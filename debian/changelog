@@ -2,6 +2,7 @@ transmission (1.21-1) unstable; urgency=low
 
   * New upstream release (Closes: #482539)
   * Leo Costela is now the official maintainer
+  * Mentioning the upstream bts in README.debian (Closes: #466761)
 
  -- Philipp Benner <pbenner@uni-osnabrueck.de>  Tue, 03 Jun 2008 19:09:22 +0200
 
