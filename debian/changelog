@@ -1,3 +1,24 @@
+transmission (1.21-1) unstable; urgency=low
+
+  * New upstream release (Closes: #482539)
+  * Leo Costela is now the official maintainer
+
+ -- Philipp Benner <pbenner@uni-osnabrueck.de>  Tue, 03 Jun 2008 19:09:22 +0200
+
+transmission (1.20-1) unstable; urgency=low
+
+  * new upstream release (closes: #481065):
+    - add build-dep on libcurl-dev
+  * debian/transmission-gtk.menu: better describe menu item (closes: #478212)
+  * debian/control, debian/compat: bump debhelper v7
+  * debian/rules:
+    - some small changes and cleanups for debhelper v7, preparing for a 
+      possible migration to dh
+    - add dh_icon (from Ubuntu, thanks Fávio Martins)
+  * debian/transmission-gtk.install: added usr/share/icons (see above)
+
+ -- Leo Costela <costela@debian.org>  Fri, 16 May 2008 18:05:32 +0200
+
 transmission (1.11-1) unstable; urgency=low
 
   * new upstream release

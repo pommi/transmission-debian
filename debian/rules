@@ -93,21 +93,22 @@ clean: config-clean distclean
 	$(RM) third-party/libevent/test/regress.gen.h
 #	# </bugfix>
 
-	$(RM) build-stamp 
-	$(RM) configure-stamp 
-
 	dh_clean 
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 
 #	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
+	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-daemon
+	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-proxy
+	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-remote
+	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmissioncli
 
 #	# Install icons and desktop file
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
@@ -132,7 +133,7 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_link -i
-	dh_install -i --sourcedir=debian/tmp
+	dh_install -i
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
 	dh_compress -i
@@ -147,11 +148,12 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_link -a
-	dh_install -a --sourcedir=debian/tmp
+	dh_install -a
 	dh_installmenu -a
 	dh_installman -a
 	dh_installmime -a
 	dh_desktop -a
+	dh_icons -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
