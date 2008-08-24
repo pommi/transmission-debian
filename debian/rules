@@ -68,7 +68,7 @@ configure-stamp:
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
 		--mandir=/usr/share/man \
-		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
+		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs,--as-needed"
 
 	touch $@
 
@@ -88,10 +88,10 @@ clean: config-clean distclean
 	dh_testdir
 	dh_testroot
 
-#	# <bugfix>
-	$(RM) third-party/libevent/test/regress.gen.c
-	$(RM) third-party/libevent/test/regress.gen.h
-#	# </bugfix>
+	# <bugfix>
+	#$(RM) third-party/libevent/test/regress.gen.c
+	#$(RM) third-party/libevent/test/regress.gen.h
+	# </bugfix>
 
 	dh_clean 
 
@@ -106,7 +106,6 @@ install: build
 #	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-daemon
-	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-proxy
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-remote
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmissioncli
 
@@ -133,7 +132,7 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_link -i
-	dh_install -i
+	dh_install -i -X LICENSE # extra copy in web dir - costela 2008-08-15
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
 	dh_compress -i

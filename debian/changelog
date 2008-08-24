@@ -1,3 +1,17 @@
+transmission (1.32-1) unstable; urgency=low
+
+  * New upstream release (Closes: #494438, #487355)
+  * debian/rules, debian/transmissioncli.{install,manpages}: 
+    - transmission-proxy is no longer shipped
+    - add --as-needed to LDFLAGS
+  * debian/transmission-common.install: add web directory
+    (including upstream jquery since it includes plugins not available
+    in libjs-jquery)
+  * debian/copyright: updates from upstream and corrections (many GPL 
+    files had Licence:MIT fields) (thanks Kevin Bortis for the heads-up)
+
+ -- Leo Costela <costela@debian.org>  Fri, 15 Aug 2008 19:33:02 +0200
+
 transmission (1.22-1) unstable; urgency=low
 
   * New upstream release (Closes: #486274)
