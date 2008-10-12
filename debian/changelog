@@ -1,3 +1,12 @@
+transmission (1.33-2) unstable; urgency=low
+
+  * debian/rules: add quilt patch support
+  * debian/control: add build-dep on quilt
+  * debian/patches/rev_6749.diff: Backport fix for memory leak 
+    (closes: #499828)
+
+ -- Leo Costela <costela@debian.org>  Mon, 22 Sep 2008 22:47:32 +0200
+
 transmission (1.33-1) unstable; urgency=low
 
   * New upstream release (Closes: #496325)
