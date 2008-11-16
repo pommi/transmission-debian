@@ -1,8 +1,0 @@
---- old/libtransmission/webseed.c (revision 6631)
-+++ new/libtransmission/webseed.c (revision 6749)
-@@ -131,4 +131,5 @@
-                     break;
-             }
-+            str++;
-         }
-     }

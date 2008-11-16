@@ -1,3 +1,12 @@
+transmission (1.34-1) unstable; urgency=low
+
+  * New upstream release (closes: #499851)
+  * debian/{rules,control,patches}: removed patch added on last upload (since
+    I already messed up uploading a new version to unstable, might as well
+    keep it up-to-date)
+
+ -- Leo Costela <costela@debian.org>  Sun, 12 Oct 2008 18:01:20 +0200
+
 transmission (1.33-2) unstable; urgency=low
 
   * debian/rules: add quilt patch support
