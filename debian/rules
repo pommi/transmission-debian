@@ -145,6 +145,7 @@ binary-arch: build install
 	dh_testroot
 	dh_link -a
 	dh_install -a
+	dh_installinit -a
 	dh_installmenu -a
 	dh_installman -a
 	dh_installmime -a
