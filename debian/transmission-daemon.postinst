@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+test $DEBIAN_SCRIPT_DEBUG && set -v -x
+
+case "$1" in
+  configure|upgrade)
+    getent passwd debian-transmission > /dev/null || adduser --system --no-create-home debian-transmission
+    if ! dpkg-statoverride --list /var/lib/transmission-daemon/downloads > /dev/null ; then
+      dpkg-statoverride --quiet --update --add debian-transmission debian-transmission 4750 /var/lib/transmission-daemon/info
+    fi
+    if ! dpkg-statoverride --list /var/lib/transmission-daemon/downloads > /dev/null ; then
+      dpkg-statoverride --quiet --update --add debian-transmission debian-transmission 4775 /var/lib/transmission-daemon/downloads
+    fi
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0;
