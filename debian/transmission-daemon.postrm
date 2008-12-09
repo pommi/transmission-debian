@@ -4,7 +4,7 @@ set -e
 
 case "$1" in
   remove|purge)
-    getent passwd debian-transmission > /dev/null 2>&1 && deluser --system debian-transmission
+    getent passwd debian-transmission > /dev/null 2>&1 && deluser --system --quiet debian-transmission
     dpkg-statoverride --quiet --remove /var/lib/transmission-daemon/info || true
     dpkg-statoverride --quiet --remove /var/lib/transmission-daemon/downloads || true
   ;;

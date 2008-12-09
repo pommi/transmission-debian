@@ -39,7 +39,7 @@ case "$1" in
     stop)
         log_daemon_msg "Stopping bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
-            --exec $DAEMON \
+            --exec $DAEMON --retry 2 \
             --oknodo
         log_end_msg 0
         ;;

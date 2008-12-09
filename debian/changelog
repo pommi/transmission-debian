@@ -1,3 +1,14 @@
+transmission (1.40-2) unstable; urgency=low
+
+  * debian/transmission-daemon.postinst: add --group to adduser call 
+    and add workaround for the lack of the flag in 1.40-1 (closes: #507766)
+  * debian/control: make transmission-cli recommend transmission-daemon,
+    instead of depending
+  * debian/transmission-daemon.init: add --retry to stop action to avoid
+    race condition during install
+
+ -- Leo Costela <costela@debian.org>  Thu, 04 Dec 2008 13:54:19 +0100
+
 transmission (1.40-1) unstable; urgency=low
 
   * New upstream release (closes: #505846)
