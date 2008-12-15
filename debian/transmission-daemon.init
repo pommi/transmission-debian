@@ -13,6 +13,7 @@ DAEMON=/usr/bin/$NAME
 USER=debian-transmission
 # FIXME: no pidfile support; forks, so --make-pidfile doesn't work either
 #PIDFILE=/var/run/$NAME.pid
+STOP_TIMEOUT=3
 
 [ -x $DAEMON ] || exit 0
 
@@ -39,23 +40,22 @@ case "$1" in
     stop)
         log_daemon_msg "Stopping bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
-            --exec $DAEMON --retry 2 \
+            --exec $DAEMON --retry $STOP_TIMEOUT \
             --oknodo
         log_end_msg 0
         ;;
-    reload|force-reload)
+    reload)
         log_daemon_msg "Reloading bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
             --exec $DAEMON \
             --oknodo --signal 1
         log_end_msg 0
         ;;
-    restart)
+    restart|force-reload)
         log_daemon_msg "Restarting bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
-            --exec $DAEMON \
+            --exec $DAEMON --retry $STOP_TIMEOUT \
             --oknodo
-        sleep 1
         start_daemon
         log_end_msg 0
         ;;

@@ -1,3 +1,27 @@
+transmission (1.40-5) unstable; urgency=low
+
+  * debian/transmission-daemon.{links,install}: fix the conf link 
+    (closes: #508750)
+  * debian/transmission-daemon.preinst: add workaround for old configs 
+    in /var/lib/transmission-daemon/info
+  * debian/transmission-daemon.postrm: add cleanup for /var/lib/ dirs on
+    purge
+
+ -- Leo Costela <costela@debian.org>  Sun, 15 Dec 2008 16:46:47 +0100
+
+transmission (1.40-4) unstable; urgency=low
+
+  * debian/transmission-daemon.init: add forgotten --retry in restart action 
+    (closes: #508718)
+
+ -- Leo Costela <costela@debian.org>  Sun, 14 Dec 2008 18:50:40 +0100
+
+transmission (1.40-3) unstable; urgency=low
+
+  * debian/transmission-daemon.postinst: fix copy/paste error (closes: #508310)
+
+ -- Leo Costela <costela@debian.org>  Tue, 09 Dec 2008 22:28:24 +0100
+
 transmission (1.40-2) unstable; urgency=low
 
   * debian/transmission-daemon.postinst: add --group to adduser call 
