@@ -3,9 +3,9 @@ Section: net
 Priority: optional
 Maintainer: Leo Costela <costela@debian.org>
 Uploaders: Philipp Benner <pbenner@uni-osnabrueck.de>
-XS-DM-Upload-Allowed: yes
+DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7), autotools-dev, libgtk2.0-dev, libevent-dev,
- libglib2.0-dev, libnotify-dev, libssl-dev, libcurl-dev, chrpath, python, intltool (>= 0.23)
+ libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev | libcurl-dev, chrpath, python, intltool (>= 0.23)
 Standards-Version: 3.8.0
 Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/transmission/
 Vcs-Svn: svn://svn.debian.org/collab-maint/deb-maint/transmission/
@@ -34,7 +34,7 @@ Package: transmission-cli
 Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version})
 Recommends: transmission-daemon (= ${binary:Version})
-Replaces: transmission (<< 0.6.1.dfsg-2)
+Replaces: transmission (<< 0.6.1.dfsg-2), transmission-daemon (<< 1.50-1)
 Description: lightweight BitTorrent client (command line interface)
  Transmission-cli is a lightweight command-line BitTorrent client. It
  features a very simple, intuitive interface on top on an efficient,
@@ -55,6 +55,8 @@ Architecture: any
 Pre-Depends: adduser
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), lsb-base (>= 3.0)
 Replaces: transmission-cli (<< 1.40-1)
+# moving transmission-remote to -cli
+Recommends: transmission-cli (>= 1.50-1)
 Description: lightweight BitTorrent client (daemon)
  Transmission is a simple BitTorrent client. It features a very simple,
  intuitive interface (gui and command-line) on top on an efficient,

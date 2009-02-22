@@ -1,3 +1,2 @@
 usr/bin/transmission-daemon
-usr/bin/transmission-remote
 debian/settings.json etc/transmission-daemon
