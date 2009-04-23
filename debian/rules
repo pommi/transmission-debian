@@ -23,6 +23,10 @@ else
  CFLAGS += -O2
 endif
 
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+ CFLAGS += --ggdb3
+endif
+
 # parallel
 ifneq (,$(findstring parallel,$(DEB_BUILD_OPTIONS)))
  TRANSMISSION_MAKEFLAGS += -j$(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
