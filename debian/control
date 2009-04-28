@@ -33,7 +33,7 @@ Description: lightweight BitTorrent client (common files)
 Package: transmission-cli
 Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version})
-Recommends: transmission-daemon (= ${binary:Version})
+Suggests: transmission-daemon (= ${binary:Version}), transmission-gtk (= ${binary:Version})
 Replaces: transmission (<< 0.6.1.dfsg-2), transmission-daemon (<< 1.50-1)
 Description: lightweight BitTorrent client (command line interface)
  Transmission-cli is a lightweight command-line BitTorrent client. It

@@ -1,3 +1,13 @@
+transmission (1.52-1) unstable; urgency=low
+
+  * new upstream release 
+    - fixes creation of spurious Downloads dir (closes: #518792)
+  * debian/control:
+    - transmission-cli Suggests both transmission and transmission-daemon
+  * debian/transmission-daemon.default: minor comment correction
+
+ -- Leo Costela <costela@debian.org>  Thu, 23 Apr 2009 10:11:34 +0200
+
 transmission (1.51-1) unstable; urgency=low
 
   * new upstream release (closes: #518094)

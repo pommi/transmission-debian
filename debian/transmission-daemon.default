@@ -1,7 +1,7 @@
 # defaults for transmission-daemon
 # sourced by /etc/init.d/transmission-daemon
 
-# change to 1 to enable daemon
+# change to 0 to disable daemon
 ENABLE_DAEMON=1
 
 # this directory stores some runtime information, like torrent files and config
