@@ -4,7 +4,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-#include /usr/share/quilt/quilt.make
+include /usr/share/quilt/quilt.make
 
 CFLAGS = -Wall -g
 
@@ -78,7 +78,7 @@ configure-stamp:
 
 	touch $@
 
-build: config build-stamp
+build: config build-stamp $(QUILT_STAMPFN)
 build-stamp: configure
 	dh_testdir
 
@@ -86,14 +86,22 @@ build-stamp: configure
 
 	touch $@
 
+# FIXME: hack to build QT
+#build-qt: build-qt-stamp
+#build-qt-stamp: build
+#	( cd qt && qmake-qt4 qtr.pro && $(MAKE) && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
+
 distclean:
 #	# touch config.status to prevent execution of autoconf
 	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
 
-clean: config-clean distclean
+clean: config-clean distclean unpatch
 	dh_testdir
 	dh_testroot
-
+	
+#	# FIXME: QT stuff
+#	[ ! -f qt/Makefile ] || ( cd qt && $(MAKE) clean )
+	
 	dh_clean 
 
 install: build
@@ -136,6 +144,7 @@ binary-indep: build install
 	dh_install -i -X LICENSE # extra copy in web dir - costela 2008-08-15
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
+	dh_installexamples -p transmission-common
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
@@ -148,11 +157,11 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_link -a
-	dh_install -a
 	dh_installinit -a
 	dh_installmenu -a
 	dh_installman -a
 	dh_installmime -a
+	dh_install -a
 	dh_desktop -a
 	dh_icons -a
 	dh_strip -a

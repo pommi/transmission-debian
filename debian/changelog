@@ -1,3 +1,24 @@
+transmission (1.60-2) unstable; urgency=low
+
+  * debian/rules: actually add the example script to transmission-common
+  * debian/copyright: add example script copyright
+
+ -- Leo Costela <costela@debian.org>  Sun, 10 May 2009 18:11:55 +0200
+
+transmission (1.60-1) unstable; urgency=low
+
+  * new upstream release
+  * debian/{rules,control}: add quilt support
+  * debian/patches: 
+      - include fix to pt_BR translation (thanks Flamarion Jorge) 
+      (closes: #525944)
+      - include fix for ipv6 (thanks Peng tao) (closes: #526256)
+  * debian/transmission-cli.examples: add email script by Alexander 
+    Galanin (closes: #526876)
+  * debian/control: bump policy to 3.8.1 (no changes)
+
+ -- Leo Costela <costela@debian.org>  Sun, 10 May 2009 14:11:57 +0200
+
 transmission (1.52-1) unstable; urgency=low
 
   * new upstream release 

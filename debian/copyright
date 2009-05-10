@@ -130,6 +130,10 @@ Files: third-party/libevent/strlcpy.*
 Copyright: © 1998 Todd C. Miller <Todd.Miller@courtesan.com>
 License: MIT (3-clause version)
 
+Files: debian/examples/checkFinishedTransmissionDownloads.sh
+Copyright: © 2009 Alexander Galanin <gaa.nnov@mail.ru>
+Licence: Public Domain
+
 Files: debian/*
 Copyright: © 2006-2007 Philipp Benner <pbenner@uni-osnabrueck.de>,
 	     	       Leo "costela" Antunes <costela@debian.org>
