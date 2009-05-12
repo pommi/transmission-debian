@@ -1,3 +1,10 @@
+transmission (1.61-1) unstable; urgency=low
+
+  * new upstream release: fixes potential security hole for web clients
+  * debian/patches: remove pt_BR.patch, included upstream
+
+ -- Leo Costela <costela@debian.org>  Tue, 12 May 2009 12:55:53 +0200
+
 transmission (1.60-2) unstable; urgency=low
 
   * debian/rules: actually add the example script to transmission-common
