@@ -1,3 +1,9 @@
+transmission (1.61-2) unstable; urgency=low
+
+  * debian/patches: remove ipv6.patch, was causing other problems
+
+ -- Leo Costela <costela@debian.org>  Sun, 17 May 2009 19:39:51 +0200
+
 transmission (1.61-1) unstable; urgency=low
 
   * new upstream release: fixes potential security hole for web clients
