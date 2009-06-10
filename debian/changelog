@@ -1,3 +1,15 @@
+transmission (1.71-1) unstable; urgency=low
+
+  * new upstream release: (closes:#532007)
+    - uses system-wide libevent, if available (closes: #529372)
+    - transmission-remote now returns !0 on error (closes: #526703)
+    - fixed torrent adding in the web interface (closes: #529717)
+    - fix properties screen (closes: #530669)
+    - javascript speed fixes (closes: #531162)
+  * debian/transmission-daemon.default: comment typo (closes: #528253)
+
+ -- Leo Costela <costela@debian.org>  Wed, 10 Jun 2009 22:46:01 +0200
+
 transmission (1.61-2) unstable; urgency=low
 
   * debian/patches: remove ipv6.patch, was causing other problems
