@@ -1,3 +1,13 @@
+transmission (1.72-1) unstable; urgency=low
+
+  * new upstream release: (closes:#533423)
+    - Can now sort the file list by priority, download, and completeness 
+      (closes: #517872)
+    - fixed race condition adding file from browser (closes: #500195)
+  * debian/control: policy 3.8.2 (no changes)
+
+ -- Leo Costela <costela@debian.org>  Wed, 17 Jun 2009 22:47:27 +0200
+
 transmission (1.71-1) unstable; urgency=low
 
   * new upstream release: (closes:#532007)
