@@ -77,6 +77,9 @@ configure-stamp:
 		--mandir=/usr/share/man \
 		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs,--as-needed"
 
+	# Qt client
+	( cd qt && qmake-qt4 qtr.pro )
+
 	touch $@
 
 build: config build-stamp
@@ -84,13 +87,11 @@ build-stamp: configure
 	dh_testdir
 
 	$(MAKE) $(TRANSMISSION_MAKEFLAGS)
+	
+	# Qt client
+	( cd qt && $(MAKE) )
 
 	touch $@
-
-# FIXME: hack to build QT
-#build-qt: build-qt-stamp
-#build-qt-stamp: build
-#	( cd qt && qmake-qt4 qtr.pro && $(MAKE) && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
 
 distclean:
 #	# touch config.status to prevent execution of autoconf
@@ -101,8 +102,8 @@ clean: config-clean distclean unpatch
 	dh_testdir
 	dh_testroot
 	
-#	# FIXME: QT stuff
-#	[ ! -f qt/Makefile ] || ( cd qt && $(MAKE) clean )
+	# QT client
+	[ ! -f qt/Makefile ] || ( cd qt && $(MAKE) clean )
 	
 	dh_clean 
 
@@ -114,16 +115,14 @@ install: build
 
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 
+	# Qt client
+	( cd qt && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
+
 #	# clean RPATH from transmission binary (costela - 2007-10-27)
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-daemon
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-remote
 	chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmissioncli
-
-#	# Install icons and desktop file
-	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps
-	install -m644 debian/transmission-gtk.xpm \
-		$(CURDIR)/debian/tmp/usr/share/pixmaps/transmission.xpm
 
 UPSTREAM_VERSION=$(shell dpkg-parsechangelog | perl -ne '{ print $$1."\n" if /Version: (.*)-.*/; }')
 
@@ -143,10 +142,10 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_link -i
-	dh_install -i -X LICENSE # extra copy in web dir - costela 2008-08-15
 	dh_installchangelogs -p transmission-common NEWS
 	dh_installdocs -p transmission-common
 	dh_installexamples -p transmission-common
+	dh_install -i -X LICENSE # extra copy in web dir - costela 2008-08-15
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
@@ -163,7 +162,7 @@ binary-arch: build install
 	dh_installmenu -a
 	dh_installman -a
 	dh_installmime -a
-	dh_install -a
+	dh_install --list-missing -a
 	dh_icons -a
 	dh_strip -a
 	dh_compress -a

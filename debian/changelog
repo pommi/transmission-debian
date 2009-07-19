@@ -1,3 +1,10 @@
+transmission (1.73-2) unstable; urgency=low
+
+  * debian/{rules,control,transmission-qt.*}: build Qt client in
+    transmission-qt (closes: #528074)
+
+ -- Leo Costela <costela@debian.org>  Sun, 19 Jul 2009 19:11:05 +0200
+
 transmission (1.73-1) unstable; urgency=low
 
   * New upstream release
