@@ -1,3 +1,15 @@
+transmission (1.73-1) unstable; urgency=low
+
+  * New upstream release
+    - Fix bug where user-configured peer limits could be exceeded 
+      (closes: #535346)
+    - fix rounding issues (closes: #536677)
+    - fix creation of torrent files with cli interface (closes: #533609)
+  * debian/patches: fix build issue by escaping slash in updateminiupnp.sh
+  * debian/rules: remove deprecated dh_desktop
+
+ -- Leo Costela <costela@debian.org>  Sun, 19 Jul 2009 17:37:35 +0200
+
 transmission (1.72-1) unstable; urgency=low
 
   * new upstream release: (closes:#533423)

@@ -4,7 +4,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-#include /usr/share/quilt/quilt.make
+include /usr/share/quilt/quilt.make
 
 CFLAGS = -Wall -g
 
@@ -66,7 +66,8 @@ config-clean:
 
 	$(RM) config-stamp
 
-configure: configure-stamp
+configure: configure-stamp patch
+#configure: configure-stamp
 configure-stamp:
 	dh_testdir
 
@@ -78,7 +79,6 @@ configure-stamp:
 
 	touch $@
 
-#build: config build-stamp $(QUILT_STAMPFN)
 build: config build-stamp
 build-stamp: configure
 	dh_testdir
@@ -96,8 +96,8 @@ distclean:
 #	# touch config.status to prevent execution of autoconf
 	[ ! -f Makefile ] || ( touch config.status && $(MAKE) distclean )
 
-#clean: config-clean distclean unpatch
-clean: config-clean distclean
+clean: config-clean distclean unpatch
+#clean: config-clean distclean
 	dh_testdir
 	dh_testroot
 	
@@ -164,7 +164,6 @@ binary-arch: build install
 	dh_installman -a
 	dh_installmime -a
 	dh_install -a
-	dh_desktop -a
 	dh_icons -a
 	dh_strip -a
 	dh_compress -a
