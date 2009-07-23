@@ -1,2 +1,2 @@
 updateminiupnpcstrings_double_escape_slash.patch
-
+qt_client_use_system_libevent.patch
