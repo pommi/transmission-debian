@@ -1,0 +1,6 @@
+# Compulsory line, this is a version 3 file
+version=3
+
+opts=dversionmangle=s/\.dfsg$// \
+	http://download.m0k.org/transmission/files/transmission-(.*)\.tar\.(?:bz2|gz) \
+	debian uupdate

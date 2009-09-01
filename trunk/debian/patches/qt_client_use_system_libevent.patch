@@ -1,0 +1,11 @@
+--- transmission/qt/qtr.pro	2009-07-18 03:20:54.000000000 +0200
++++ transmission.new/qt/qtr.pro	2009-07-19 19:03:54.000000000 +0200
+@@ -17,7 +17,7 @@
+ LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
+ LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
+ LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
+-LIBS += $${TRANSMISSION_TOP}/third-party/libevent/.libs/libevent.a
++LIBS += -levent
+ 
+ TRANSLATIONS += transmission_en.ts
+ 
