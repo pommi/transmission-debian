@@ -1,3 +1,4 @@
 updateminiupnpcstrings_double_escape_slash.patch
 qt_client_use_system_libevent.patch
 libnatpmp_freebsd_ftbfs.patch
+dont_build_libevent.patch

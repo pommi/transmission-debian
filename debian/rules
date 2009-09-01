@@ -66,7 +66,7 @@ config-clean:
 
 	$(RM) config-stamp
 
-configure: configure-stamp patch
+configure: patch configure-stamp
 #configure: configure-stamp
 configure-stamp:
 	dh_testdir
