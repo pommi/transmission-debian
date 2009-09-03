@@ -1,3 +1,15 @@
+transmission (1.74-1) unstable; urgency=low
+
+  * new upstream release 
+    - update miniupnp scripts (closes: #539098)
+  * debian/patches: drop miniupnp patch (see above: fixed upstream)
+  * debian/watch: remove old dfsg mangle, check only bz2 (upstream 
+    stopped using gz and is using only bz2/lzma) 
+  * debian/control: bump policy to 3.8.3 (no changes)
+  * debian/README.source: added to shut lintian up
+
+ -- Leo Costela <costela@debian.org>  Wed, 02 Sep 2009 00:58:14 +0200
+
 transmission (1.73-5) unstable; urgency=low
 
   * debian/rules: patch before configure
