@@ -1,3 +1,13 @@
+transmission (1.75-1) unstable; urgency=low
+
+  * new upstream release 
+    - fixes UTF-8 string truncation (closes: #547423)
+  * debian/watch: mangle the "b[0-9]+" suffix, used sometimes to mark
+    beta versions. Should avoid DEHS thinking there's a new release.
+  * debian/lintian: add comments to the overrides
+
+ -- Leo Costela <costela@debian.org>  Sun, 20 Sep 2009 22:49:12 +0200
+
 transmission (1.74-1) unstable; urgency=low
 
   * new upstream release 
