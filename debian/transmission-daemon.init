@@ -15,6 +15,8 @@ USER=debian-transmission
 #PIDFILE=/var/run/$NAME.pid
 STOP_TIMEOUT=3
 
+export PATH="${PATH:+$PATH:}/sbin"
+
 [ -x $DAEMON ] || exit 0
 
 [ -e /etc/default/$NAME ] && . /etc/default/$NAME

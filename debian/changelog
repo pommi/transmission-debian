@@ -1,3 +1,21 @@
+transmission (1.77-1) unstable; urgency=medium
+
+  * new upstream release (closes: #563747)
+    - fixes GIcon memory leak (closes: #551558)
+    - medium urgency because it fixes a security issue. From upstream:
+      - Fix potential data loss by maliciously-crafted .torrent files
+  * convert to 3.0 (quilt)
+  * debian/patches:
+    - add fr.po.patch: fixes french translation (closes: #563262) 
+      (thanks Guillaume Delacour)
+    - refresh qt patch
+  * debian/transmission-daemon.init: add sbin to PATH (closes: #561392)
+  * debian/control: add misc:Depends to all packages
+  * debian/watch: don't mangle upstream version, just ignore beta 
+    releases using a stricter regex.
+
+ -- Leo Costela <costela@debian.org>  Tue, 05 Jan 2010 18:02:22 +0100
+
 transmission (1.76-1) unstable; urgency=low
 
   * new upstream release
