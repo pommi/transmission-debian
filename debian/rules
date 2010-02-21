@@ -72,6 +72,7 @@ configure-stamp:
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
 		--prefix=/usr \
 		--mandir=/usr/share/man \
+		--disable-libcanberra --disable-libgconf \
 		CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs,--as-needed"
 
 	# Qt client

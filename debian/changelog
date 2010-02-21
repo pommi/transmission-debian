@@ -1,3 +1,14 @@
+transmission (1.90-1) unstable; urgency=low
+  
+  * new upstream release
+  * debian/transmission-daemon.postrm: remove statoverride after deleting 
+    group (closes: #569238)
+  * debian/{control,rules}: drop libcanberra-dev and libgconf-dev build-deps
+    and ensure we build without them. Please check the bug log for a more
+    complete rationalle behind the decision. (closes: #570416)
+
+ -- Leo Costela <costela@debian.org>  Sun, 21 Feb 2010 21:38:22 +0100
+
 transmission (1.83-2) unstable; urgency=low
   
   * debian/control: bump build-dep on libevent-dev to >= 1.4 (closes: #568544)
