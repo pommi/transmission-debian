@@ -1,3 +1,35 @@
+transmission (1.83-2) unstable; urgency=low
+  
+  * debian/control: bump build-dep on libevent-dev to >= 1.4 (closes: #568544)
+
+ -- Leo Costela <costela@debian.org>  Sun, 07 Feb 2010 17:31:13 +0100
+
+transmission (1.83-1) unstable; urgency=low
+  
+  * new upstream version
+  * bump policy to 3.8.4 (no changes)
+
+ -- Leo Costela <costela@debian.org>  Mon, 01 Feb 2010 14:50:35 +0100
+
+transmission (1.82-2) unstable; urgency=low
+
+  * debian/control
+    - drop python build-dep, not needed for some time
+    - bump intltool build-dep to >= 0.40 (closes: #566875)
+    - add libcanberra-gtk and libgconf build-deps
+
+ -- Leo Costela <costela@debian.org>  Tue, 26 Jan 2010 23:39:47 +0100
+
+transmission (1.82-1) unstable; urgency=low
+
+  * new upstream release
+    - stop creating non-existent watch dir (closes: #554903)
+    - daemon can now reload conf on SIGHUP (closes: #539936)
+    - multiple tracker announce (closes: #509040)
+  * debian/patches: drop fr.po.patch (merged upstream)
+
+ -- Leo Costela <costela@debian.org>  Sat, 23 Jan 2010 18:02:27 +0100
+
 transmission (1.77-1) unstable; urgency=medium
 
   * new upstream release (closes: #563747)
