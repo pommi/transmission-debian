@@ -1,3 +1,11 @@
+transmission (1.91-1) unstable; urgency=low
+  
+  * new upstream release
+  * debian/transmission-daemon.postrm: don't remove statoverride on 
+    purge (closes: #571934)
+
+ -- Leo Costela <costela@debian.org>  Sun, 28 Feb 2010 13:26:07 +0100
+
 transmission (1.90-1) unstable; urgency=low
   
   * new upstream release
