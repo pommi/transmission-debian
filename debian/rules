@@ -123,16 +123,9 @@ install: build
 
 UPSTREAM_VERSION=$(shell dpkg-parsechangelog | perl -ne '{ print $$1."\n" if /Version: (.*)-.*/; }')
 
-transmission-$(UPSTREAM_VERSION).tar.bz2:
-	[ ! -f transmission-$(UPSTREAM_VERSION).tar.gz ] \
+get-orig-source:
+	[ ! -f transmission-$(UPSTREAM_VERSION).tar.bz2 ] \
 		&& wget http://download.m0k.org/transmission/files/transmission-$(UPSTREAM_VERSION).tar.bz2
-transmission-$(UPSTREAM_VERSION): transmission-$(UPSTREAM_VERSION).tar.bz2
-	tar -xjf transmission-$(UPSTREAM_VERSION).tar.bz2
-transmission_$(UPSTREAM_VERSION).orig.tar.gz: transmission-$(UPSTREAM_VERSION)
-	tar -cf - transmission-$(UPSTREAM_VERSION) | gzip -9 > transmission_$(UPSTREAM_VERSION).orig.tar.gz
-get-orig-source: transmission_$(UPSTREAM_VERSION).orig.tar.gz
-	$(RM) transmission-$(UPSTREAM_VERSION).tar.bz2
-	$(RM) -r transmission-$(UPSTREAM_VERSION)
 
 # Build architecture-independent files here.
 binary-indep: build install

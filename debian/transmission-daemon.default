@@ -8,4 +8,4 @@ ENABLE_DAEMON=1
 CONFIG_DIR="/var/lib/transmission-daemon/info" 
 
 # default options for daemon, see transmission-daemon(1) for more options
-OPTIONS="--auth --config-dir $CONFIG_DIR"
+OPTIONS="--config-dir $CONFIG_DIR"

@@ -1,3 +1,13 @@
+transmission (1.92-1) unstable; urgency=low
+  
+  * new upstream release 
+    - fix possible data corruption (closes: #574507)
+  * debian/transmission-daemon.default: drop --auth to avoid overriding
+    saved settings (closes: #575828)
+  * debian/rules: finally clean up get-orig-source (closes: #573568)
+
+ -- Leo Costela <costela@debian.org>  Mon, 29 Mar 2010 19:36:09 +0200
+
 transmission (1.91-1) unstable; urgency=low
   
   * new upstream release
