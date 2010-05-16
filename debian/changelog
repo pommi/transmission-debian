@@ -1,3 +1,23 @@
+transmission (1.93-2) unstable; urgency=low
+  
+  * change permission from /etc/transmission-daemon to enable config
+    update by daemon itself (closes: #579998, #579304)
+  * debian/transmission-daemon.{postinst,postrm}:
+    - rework the dpkg-statoverride usage, don't add overrides ourselves
+    - don't delete overrides on package remove, we're not setting them
+      anymore
+    - remove old overrides if they're the ones set by the package
+
+ -- Leo Costela <costela@debian.org>  Sun, 16 May 2010 17:13:34 +0200
+
+transmission (1.93-1) unstable; urgency=low
+  
+  * new upstream release 
+    - don't overwrite settings.json symlink (closes: #579304)
+  * debian/patches: refresh dont_build_libevent.patch
+
+ -- Leo Costela <costela@debian.org>  Sun, 02 May 2010 04:37:04 +0200
+
 transmission (1.92-1) unstable; urgency=low
   
   * new upstream release 
