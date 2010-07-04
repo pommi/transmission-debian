@@ -1,3 +1,12 @@
+transmission (2.00-1) unstable; urgency=low
+  
+  * new upstream release (closes: #586503)
+  * debian/patches: 
+    - dropped libevent-build-related patches (integrated upstream)
+    - refresh libnatpmp_freebsd patch
+
+ -- Leo Costela <costela@debian.org>  Sun, 20 Jun 2010 14:23:44 +0200
+
 transmission (1.93-2) unstable; urgency=low
   
   * change permission from /etc/transmission-daemon to enable config

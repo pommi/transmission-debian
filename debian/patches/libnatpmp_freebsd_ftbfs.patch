@@ -1,9 +1,11 @@
---- transmission/third-party/libnatpmp/getgateway.c
-+++ transmission.new/third-party/libnatpmp/getgateway.c
-@@ -31,7 +31,7 @@
+Index: transmission-2.00/third-party/libnatpmp/getgateway.c
+===================================================================
+--- transmission-2.00.orig/third-party/libnatpmp/getgateway.c	2010-06-17 17:10:58.000000000 +0200
++++ transmission-2.00/third-party/libnatpmp/getgateway.c	2010-06-20 14:48:09.000000000 +0200
+@@ -35,7 +35,7 @@
  #undef USE_SYSCTL_NET_ROUTE
  #endif
-
+ 
 -#ifdef BSD
 +#if defined(BSD) || defined(__FreeBSD_kernel__)
  #undef USE_PROC_NET_ROUTE
