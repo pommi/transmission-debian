@@ -1,3 +1,14 @@
+transmission (2.01-1) unstable; urgency=low
+  
+  * new upstream release
+  * debian/transmission-daemon.postinst:
+    - don't choke if the config file isn't there (closes: #588010)
+  * debian/control: 
+    - bump policy to 3.9.0: use Breaks for file moved between packages
+    - remove old conflicts for versions older than the ones in stable
+
+ -- Leo Costela <costela@debian.org>  Thu, 15 Jul 2010 17:21:54 +0200
+
 transmission (2.00-1) unstable; urgency=low
   
   * new upstream release (closes: #586503)

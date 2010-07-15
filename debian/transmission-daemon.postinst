@@ -7,8 +7,10 @@ test $DEBIAN_SCRIPT_DEBUG && set -v -x
 chperms() {
 	# chperms <user> <group> <perms> <file>
 	if ! OVERRIDE=`dpkg-statoverride --list $4 2>&1`; then
-		chown $1:$2 $4
-		chmod $3 $4
+		if [ -e $4 ]; then
+			chown $1:$2 $4
+			chmod $3 $4
+		fi
 	else
 		# remove old stat-overrides if they're the ones set by the package
 		# this should be removed as soon as >=1.93-2 hits stable
