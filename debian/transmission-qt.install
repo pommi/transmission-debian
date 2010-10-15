@@ -1,3 +1,4 @@
 usr/bin/transmission-qt
-debian/transmission-qt.desktop usr/share/applications/
+usr/share/applications
+usr/share/icons
 debian/lintian/transmission-qt usr/share/lintian/overrides
