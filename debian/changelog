@@ -1,13 +1,22 @@
-transmission (2.10-1) unstable; urgency=low
+transmission (2.10-1) experimental; urgency=low
   
-  * new upstream release
+  * new upstream release (closes: #592835)
+    - link to online help has been fixed (closes: #592960)
   * imported work into git repo
   * debian/control:
     - remove Philipp Benner from Uploaders
+    - change VCS headers to point to new git repo
     - bump debhelper version to 8
-  * update debian/copyright
-  * debian/qtr.1: dropped, upstream now has its own manpage
+    - bump policy to 3.9.1 (no changes needed)
+    - rewrite long description to better explain the multiple 
+      incarnations of transmission, also correcting to which package
+      transmission-remote actually belongs. (closes: #595411,#595412)
+  * debian/copyright: long-needed refresh
+  * debian/qtr.1, debian/transmission-qt.desktop: dropped, upstream now
+    has them both
   * debian/watch: updated to reflect new download link
+  * debian/NEWS.Debian: added to announce the binary name changes
+  * debian/rules: rewrite to use compact dh style
 
  -- Leo Costela <costela@debian.org>  Wed, 13 Oct 2010 22:34:00 +0200
 

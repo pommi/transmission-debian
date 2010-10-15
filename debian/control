@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 8), autotools-dev, libgtk2.0-dev, libevent-dev
  (>= 1.4), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev | 
  libcurl-dev, chrpath, intltool (>= 0.40), qt4-qmake, libqt4-dev, 
 # libcanberra-gtk-dev, libgconf2-dev
-Standards-Version: 3.9.0
+Standards-Version: 3.9.1
 Vcs-Browser: http://git.debian.org/collab-maint/transmission/
 Vcs-Git: git://git.debian.org/git/collab-maint/transmission.git
 Homepage: http://www.transmissionbt.com/
@@ -16,11 +16,11 @@ Package: transmission
 Architecture: all
 Depends: transmission-cli (>= ${binary:Version}), transmission-gtk (>= ${binary:Version}), transmission-common (= ${source:Version}), ${misc:Depends}
 Description: lightweight BitTorrent client
- Transmission is a simple BitTorrent client. It features a very simple,
- intuitive interface (gui and command-line) on top on an efficient,
- cross-platform back-end.
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive 
+ interface on top on an efficient, cross-platform back-end.
  .
- This package installs both CLI and GUI versions of transmission.
+ This package installs both (deprecated) CLI and GUI versions of transmission.
 
 Package: transmission-common
 Architecture: all
@@ -29,11 +29,12 @@ Depends: ${misc:Depends}
 Replaces: transmission-gtk (<= 1.73-1)
 Breaks: transmission-gtk (<= 1.73-1)
 Description: lightweight BitTorrent client (common files)
- Transmission is a simple BitTorrent client. It features a very simple,
- intuitive interface (gui and command-line) on top on an efficient,
- cross-platform back-end.
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive
+ interface on top on an efficient, cross-platform back-end.
  .
- This package contains the common files for the different transmission versions.
+ This package contains the common files for the different transmission 
+ versions.
 
 Package: transmission-cli
 Architecture: any
@@ -41,28 +42,36 @@ Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), ${misc:De
 Suggests: transmission-daemon (= ${binary:Version}), transmission-gtk (= ${binary:Version})
 Replaces: transmission-daemon (<< 1.50-1)
 Breaks: transmission-daemon (<< 1.50-1)
-Description: lightweight BitTorrent client (command line interface)
- Transmission-cli is a lightweight command-line BitTorrent client. It
- features a very simple, intuitive interface on top on an efficient,
- cross-platform back-end.
+Description: lightweight BitTorrent client (command line programs)
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive 
+ interface on top on an efficient, cross-platform back-end.
+ .
+ This package contains a (deprecated) stand-alone command-line client,
+ transmission-remote to interface with transmission-daemon and tools to
+ create, edit and inspect torrent files.
 
 Package: transmission-gtk
 Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), ${misc:Depends}
 Recommends: xdg-utils
 Description: lightweight BitTorrent client (GTK interface)
- Transmission-gtk is a GTK-based BitTorrent client. It features a
- very simple, intuitive interface on top on an efficient,
- cross-platform back-end.
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive 
+ interface on top on an efficient, cross-platform back-end.
+ .
+ This package contains the GTK stand-alone client.
 
 Package: transmission-qt
 Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), ${misc:Depends}
 Recommends: xdg-utils
 Description: lightweight BitTorrent client (Qt interface)
- QTransmission is a Qt-based BitTorrent client. It features a
- very simple, intuitive interface on top on an efficient,
- cross-platform back-end.
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive 
+ interface on top on an efficient, cross-platform back-end.
+ .
+ This package contains the Qt stand-alone client.
 
 Package: transmission-daemon
 Architecture: any
@@ -73,9 +82,9 @@ Breaks: transmission-cli (<< 1.40-1)
 # moving transmission-remote to -cli
 Recommends: transmission-cli (>= 1.50-1)
 Description: lightweight BitTorrent client (daemon)
- Transmission is a simple BitTorrent client. It features a very simple,
- intuitive interface (gui and command-line) on top on an efficient,
- cross-platform back-end.
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ and daemon form). All its incarnations feature a very simple, intuitive 
+ interface on top on an efficient, cross-platform back-end.
  .
- This package contains the transmission-daemon and the associated control
- interface, transmission-remote.
+ This package contains the transmission-daemon. For the associated 
+ transmission-remote, see the package transmission-cli
