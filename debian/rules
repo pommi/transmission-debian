@@ -18,6 +18,13 @@ override_dh_auto_clean:
 	[ ! -f qt/Makefile ] || ( cd qt && $(MAKE) clean )
 	dh_auto_clean
 
+override_dh_installchangelogs:
+	dh_installchangelogs -p transmission-common NEWS
+override_dh_installdocs:
+	dh_installdocs -p transmission-common
+override_dh_installexamples:
+	dh_installexamples -p transmission-common
+
 override_dh_auto_install:
 	dh_auto_install
 	( cd qt && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
