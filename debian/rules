@@ -26,11 +26,6 @@ override_dh_installexamples:
 	dh_installexamples -p transmission-common
 
 override_dh_auto_install:
-	dh_auto_install
+	dh_auto_install -- -X LICENSE # extra copy in web dir - costela 2008-08-15
 	( cd qt && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
-	# clean RPATH from transmission binary (costela - 2007-10-27)
-	#chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission
-	#chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-daemon
-	#chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmission-remote
-	#chrpath -d $(CURDIR)/debian/tmp/usr/bin/transmissioncli
 
