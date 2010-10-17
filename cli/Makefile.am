@@ -10,13 +10,13 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
     @ZLIB_LDFLAGS@
 
-bin_PROGRAMS = transmission-cli
+bin_PROGRAMS = transmissioncli
 
-dist_man_MANS = transmission-cli.1
+dist_man_MANS = transmissioncli.1
 
-transmission_cli_SOURCES = cli.c
+transmissioncli_SOURCES = cli.c
 
-transmission_cli_LDADD = \
+transmissioncli_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \

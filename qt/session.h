@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: session.h 11209 2010-09-14 06:23:48Z Longinus00 $
+ * $Id: session.h 10769 2010-06-16 02:58:44Z Longinus00 $
  */
 
 #ifndef TR_APP_SESSION_H
@@ -21,11 +21,9 @@
 #include <QString>
 #include <QUrl>
 
-class QStringList;
-
-class AddData;
-
 #include <libtransmission/transmission.h>
+
+#include "speed.h"
 
 extern "C"
 {
@@ -33,6 +31,13 @@ extern "C"
 }
 
 class Prefs;
+
+struct Reply
+{
+    QNetworkReply * networkReply;
+    QBuffer * buffer;
+};
+typedef QList<Reply> ReplyList;
 
 class Session: public QObject
 {
@@ -89,15 +94,12 @@ class Session: public QObject
         void sendTorrentRequest( const char * request, const QSet<int>& torrentIds );
         static void updateStats( struct tr_benc * d, struct tr_session_stats * stats );
         void refreshTorrents( const QSet<int>& torrentIds );
-        QNetworkAccessManager * networkAccessManager( );
 
     public:
         void torrentSet( const QSet<int>& ids, const QString& key, bool val );
         void torrentSet( const QSet<int>& ids, const QString& key, int val );
         void torrentSet( const QSet<int>& ids, const QString& key, double val );
         void torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& val );
-        void torrentSet( const QSet<int>& ids, const QString& key, const QStringList& val );
-        void torrentSet( const QSet<int>& ids, const QString& key, const QPair<int,QString>& val);
         void torrentSetLocation( const QSet<int>& ids, const QString& path, bool doMove );
 
 
@@ -109,8 +111,8 @@ class Session: public QObject
         void refreshActiveTorrents( );
         void refreshAllTorrents( );
         void initTorrents( const QSet<int>& ids = QSet<int>() );
-        void addNewlyCreatedTorrent( const QString& filename, const QString& localPath );
-        void addTorrent( const AddData& addme );
+        void addTorrent( QString filename );
+        void addTorrent( QString filename, QString localPath );
         void removeTorrents( const QSet<int>& torrentIds, bool deleteFiles=false );
         void verifyTorrents( const QSet<int>& torrentIds );
         void reannounceTorrents( const QSet<int>& torrentIds );
@@ -144,7 +146,8 @@ class Session: public QObject
         QString myConfigDir;
         QString mySessionId;
         QUrl myUrl;
-        QNetworkAccessManager * myNAM;
+        QNetworkAccessManager myNAM;
+        ReplyList myReplies;
         struct tr_session_stats myStats;
         struct tr_session_stats myCumulativeStats;
         QString mySessionVersion;

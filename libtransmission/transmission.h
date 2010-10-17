@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: transmission.h 11190 2010-09-01 20:54:04Z charles $
+ * $Id: transmission.h 10958 2010-07-07 00:44:52Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -63,9 +63,7 @@ extern "C" {
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
-/* assuming a 16 KiB block, a 32-bit block index gives us a maximum torrent size of 63 TiB.
- * if we ever need to grow past that, change this to uint64_t ;) */
-typedef uint32_t tr_block_index_t;
+typedef uint64_t tr_block_index_t;
 typedef uint16_t tr_port;
 typedef uint8_t tr_bool;
 
@@ -156,8 +154,8 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR        "60"
 
 #define TR_PREFS_KEY_ALT_SPEED_ENABLED             "alt-speed-enabled"
-#define TR_PREFS_KEY_ALT_SPEED_UP_KBps             "alt-speed-up"
-#define TR_PREFS_KEY_ALT_SPEED_DOWN_KBps           "alt-speed-down"
+#define TR_PREFS_KEY_ALT_SPEED_UP                  "alt-speed-up"
+#define TR_PREFS_KEY_ALT_SPEED_DOWN                "alt-speed-down"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_BEGIN          "alt-speed-time-begin"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED        "alt-speed-time-enabled"
 #define TR_PREFS_KEY_ALT_SPEED_TIME_END            "alt-speed-time-end"
@@ -165,13 +163,10 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV4             "bind-address-ipv4"
 #define TR_PREFS_KEY_BIND_ADDRESS_IPV6             "bind-address-ipv6"
 #define TR_PREFS_KEY_BLOCKLIST_ENABLED             "blocklist-enabled"
-#define TR_PREFS_KEY_MAX_CACHE_SIZE_MB             "cache-size-mb"
 #define TR_PREFS_KEY_DHT_ENABLED                   "dht-enabled"
 #define TR_PREFS_KEY_LPD_ENABLED                   "lpd-enabled"
 #define TR_PREFS_KEY_DOWNLOAD_DIR                  "download-dir"
 #define TR_PREFS_KEY_ENCRYPTION                    "encryption"
-#define TR_PREFS_KEY_IDLE_LIMIT                    "idle-seeding-limit"
-#define TR_PREFS_KEY_IDLE_LIMIT_ENABLED            "idle-seeding-limit-enabled"
 #define TR_PREFS_KEY_INCOMPLETE_DIR                "incomplete-dir"
 #define TR_PREFS_KEY_INCOMPLETE_DIR_ENABLED        "incomplete-dir-enabled"
 #define TR_PREFS_KEY_LAZY_BITFIELD                 "lazy-bitfield-enabled"
@@ -208,10 +203,10 @@ const char* tr_getDefaultDownloadDir( void );
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_FILENAME  "script-torrent-done-filename"
 #define TR_PREFS_KEY_SCRIPT_TORRENT_DONE_ENABLED   "script-torrent-done-enabled"
 #define TR_PREFS_KEY_RPC_WHITELIST                 "rpc-whitelist"
-#define TR_PREFS_KEY_DSPEED_KBps                   "speed-limit-down"
+#define TR_PREFS_KEY_DSPEED                        "speed-limit-down"
 #define TR_PREFS_KEY_DSPEED_ENABLED                "speed-limit-down-enabled"
-#define TR_PREFS_KEY_USPEED_KBps                   "speed-limit-up"
 #define TR_PREFS_KEY_USPEED_ENABLED                "speed-limit-up-enabled"
+#define TR_PREFS_KEY_USPEED                        "speed-limit-up"
 #define TR_PREFS_KEY_UMASK                         "umask"
 #define TR_PREFS_KEY_UPLOAD_SLOTS_PER_TORRENT      "upload-slots-per-torrent"
 #define TR_PREFS_KEY_START                         "start-added-torrents"
@@ -591,23 +586,26 @@ void tr_sessionClearStats( tr_session * session );
  * PEX is always disabled in private torrents regardless of this.
  * In public torrents, PEX is enabled by default.
  */
-void     tr_sessionSetPexEnabled( tr_session  * session, tr_bool isEnabled );
-tr_bool  tr_sessionIsPexEnabled( const tr_session * session );
+void tr_sessionSetPexEnabled( tr_session  * session, tr_bool isEnabled );
 
-tr_bool  tr_sessionIsDHTEnabled( const tr_session * session );
-void     tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
+tr_bool            tr_sessionIsPexEnabled( const tr_session * session );
 
-tr_bool  tr_sessionIsLPDEnabled( const tr_session * session );
-void     tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
+tr_bool            tr_sessionIsDHTEnabled( const tr_session * session );
 
-void     tr_sessionSetCacheLimit_MB( tr_session * session, int mb );
-int      tr_sessionGetCacheLimit_MB( const tr_session * session );
+void               tr_sessionSetDHTEnabled( tr_session * session, tr_bool );
 
-void     tr_sessionSetLazyBitfieldEnabled( tr_session * session, tr_bool enabled );
-tr_bool  tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
+tr_bool            tr_sessionIsLPDEnabled( const tr_session * session );
+
+void               tr_sessionSetLPDEnabled( tr_session * session, tr_bool enabled );
+
+void               tr_sessionSetLazyBitfieldEnabled( tr_session * session,
+                                                     tr_bool       enabled );
+
+tr_bool            tr_sessionIsLazyBitfieldEnabled( const tr_session * session );
 
 tr_encryption_mode tr_sessionGetEncryption( tr_session * session );
-void               tr_sessionSetEncryption( tr_session * session,
+
+void               tr_sessionSetEncryption( tr_session          * session,
                                             tr_encryption_mode    mode );
 
 
@@ -659,8 +657,8 @@ tr_direction;
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_KBps( tr_session *, tr_direction, int KBps );
-int tr_sessionGetSpeedLimit_KBps( const tr_session *, tr_direction );
+void     tr_sessionSetSpeedLimit      ( tr_session *, tr_direction, int KB_s );
+int      tr_sessionGetSpeedLimit      ( const tr_session *, tr_direction );
 
 void     tr_sessionLimitSpeed         ( tr_session *, tr_direction, tr_bool );
 tr_bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
@@ -670,8 +668,8 @@ tr_bool  tr_sessionIsSpeedLimited     ( const tr_session *, tr_direction );
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps( tr_session *, tr_direction, int Bps );
-int  tr_sessionGetAltSpeed_KBps( const tr_session *, tr_direction );
+void     tr_sessionSetAltSpeed        ( tr_session *, tr_direction, int KB_s );
+int      tr_sessionGetAltSpeed        ( const tr_session *, tr_direction );
 
 void     tr_sessionUseAltSpeed        ( tr_session *, tr_bool );
 tr_bool  tr_sessionUsesAltSpeed       ( const tr_session * );
@@ -708,28 +706,24 @@ void     tr_sessionClearAltSpeedFunc  ( tr_session * );
 void     tr_sessionSetAltSpeedFunc    ( tr_session *, tr_altSpeedFunc *, void * );
 
 
-tr_bool  tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
-                                             tr_direction        dir,
-                                             double            * setme );
+tr_bool      tr_sessionGetActiveSpeedLimit( const tr_session  * session,
+                                            tr_direction        dir,
+                                            int               * setme );
+
 
 /***
 ****
 ***/
 
-double     tr_sessionGetRawSpeed_KBps  ( const tr_session *, tr_direction );
-double     tr_sessionGetPieceSpeed_KBps( const tr_session *, tr_direction );
+double     tr_sessionGetRawSpeed      ( const tr_session *, tr_direction );
+double     tr_sessionGetPieceSpeed    ( const tr_session *, tr_direction );
+
 
 void       tr_sessionSetRatioLimited  ( tr_session *, tr_bool isLimited );
 tr_bool    tr_sessionIsRatioLimited   ( const tr_session * );
 
 void       tr_sessionSetRatioLimit    ( tr_session *, double desiredRatio );
 double     tr_sessionGetRatioLimit    ( const tr_session * );
-
-void       tr_sessionSetIdleLimited  ( tr_session *, tr_bool isLimited );
-tr_bool    tr_sessionIsIdleLimited   ( const tr_session * );
-
-void       tr_sessionSetIdleLimit ( tr_session *, uint16_t idleMinutes );
-uint16_t   tr_sessionGetIdleLimit ( const tr_session * );
 
 void       tr_sessionSetPeerLimit( tr_session *, uint16_t maxGlobalPeers );
 uint16_t   tr_sessionGetPeerLimit( const tr_session * );
@@ -779,22 +773,20 @@ void tr_sessionSetTorrentDoneScript( tr_session *, const char * scriptFilename )
 ** Message Logging
 */
 
-typedef enum
+enum
 {
     TR_MSG_ERR = 1,
     TR_MSG_INF = 2,
     TR_MSG_DBG = 3
-}
-tr_msg_level;
+};
+void tr_setMessageLevel( int );
 
-void tr_setMessageLevel( tr_msg_level );
-
-tr_msg_level tr_getMessageLevel( void );
+int  tr_getMessageLevel( void );
 
 typedef struct tr_msg_list
 {
     /* TR_MSG_ERR, TR_MSG_INF, or TR_MSG_DBG */
-    tr_msg_level level;
+    uint8_t level;
 
     /* The line number in the source file where this message originated */
     int line;
@@ -1132,8 +1124,8 @@ char* tr_torrentFindFile( const tr_torrent * tor, tr_file_index_t fileNo );
 ****
 ***/
 
-void     tr_torrentSetSpeedLimit_KBps  ( tr_torrent *, tr_direction, int KBps );
-int      tr_torrentGetSpeedLimit_KBps  ( const tr_torrent *, tr_direction );
+void     tr_torrentSetSpeedLimit      ( tr_torrent *, tr_direction, int KB_s );
+int      tr_torrentGetSpeedLimit      ( const tr_torrent *, tr_direction );
 
 void     tr_torrentUseSpeedLimit      ( tr_torrent *, tr_direction, tr_bool );
 tr_bool  tr_torrentUsesSpeedLimit     ( const tr_torrent *, tr_direction );
@@ -1166,32 +1158,6 @@ double        tr_torrentGetRatioLimit( const tr_torrent  * tor );
 
 
 tr_bool       tr_torrentGetSeedRatio( const tr_torrent *, double * ratio );
-
-
-/****
-*****  Idle Time Limits
-****/
-
-typedef enum
-{
-    TR_IDLELIMIT_GLOBAL    = 0, /* follow the global settings */
-    TR_IDLELIMIT_SINGLE    = 1, /* override the global settings, seeding until a certain idle time */
-    TR_IDLELIMIT_UNLIMITED = 2  /* override the global settings, seeding regardless of activity */
-}
-tr_idlelimit;
-
-void          tr_torrentSetIdleMode ( tr_torrent         * tor,
-                                      tr_idlelimit         mode );
-
-tr_idlelimit  tr_torrentGetIdleMode ( const tr_torrent   * tor );
-
-void          tr_torrentSetIdleLimit( tr_torrent         * tor,
-                                      uint16_t             idleMinutes );
-
-uint16_t      tr_torrentGetIdleLimit( const tr_torrent   * tor );
-
-
-tr_bool       tr_torrentGetSeedIdle( const tr_torrent *, uint16_t * idleMinutes );
 
 /****
 *****  Peer Limits
@@ -1310,10 +1276,10 @@ typedef enum
 }
 tr_completeness;
 
-/**
- * @param wasRunning whether or not the torrent was running when
- *                   it changed its completeness state
- */
+/** 
+* @param wasRunning whether or not the torrent was running when
+*                   it changed its completeness state
+*/
 typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
                                                tr_completeness    completeness,
                                                tr_bool            wasRunning,
@@ -1321,10 +1287,6 @@ typedef void ( tr_torrent_completeness_func )( tr_torrent       * torrent,
 
 typedef void ( tr_torrent_ratio_limit_hit_func )( tr_torrent   * torrent,
                                                   void         * user_data );
-
-typedef void ( tr_torrent_idle_limit_hit_func )( tr_torrent   * torrent,
-                                                 void         * user_data );
-
 
 /**
  * Register to be notified whenever a torrent's "completeness"
@@ -1375,20 +1337,6 @@ void tr_torrentSetRatioLimitHitCallback(
 
 void tr_torrentClearRatioLimitHitCallback( tr_torrent * torrent );
 
-/**
- * Register to be notified whenever a torrent's idle limit
- * has been hit. This will be called when the seeding torrent's
- * idle time has met or exceeded the designated idle limit.
- *
- * Has the same restrictions as tr_torrentSetCompletenessCallback
- */
-void tr_torrentSetIdleLimitHitCallback(
-     tr_torrent                          * torrent,
-     tr_torrent_idle_limit_hit_func        func,
-     void                                * user_data );
-
-void tr_torrentClearIdleLimitHitCallback( tr_torrent * torrent );
-
 
 /**
  * MANUAL ANNOUNCE
@@ -1432,8 +1380,8 @@ typedef struct tr_peer_stat
     char     flagStr[32];
 
     float    progress;
-    double   rateToPeer_KBps;
-    double   rateToClient_KBps;
+    float    rateToPeer;
+    float    rateToClient;
 
 
 /***
@@ -1472,18 +1420,18 @@ typedef enum
 {
     /* we won't (announce,scrape) this torrent to this tracker because
      * the torrent is stopped, or because of an error, or whatever */
-    TR_TRACKER_INACTIVE = 0,
+    TR_TRACKER_INACTIVE,
 
     /* we will (announce,scrape) this torrent to this tracker, and are
      * waiting for enough time to pass to satisfy the tracker's interval */
-    TR_TRACKER_WAITING = 1,
+    TR_TRACKER_WAITING,
 
     /* it's time to (announce,scrape) this torrent, and we're waiting on a
      * a free slot to open up in the announce manager */
-    TR_TRACKER_QUEUED = 2,
+    TR_TRACKER_QUEUED,
 
     /* we're (announcing,scraping) this torrent right now */
-    TR_TRACKER_ACTIVE = 3
+    TR_TRACKER_ACTIVE
 }
 tr_tracker_state;
 
@@ -1503,9 +1451,6 @@ typedef struct
 
     /* the full announce URL */
     char announce[1024];
-
-    /* the full scrape URL */
-    char scrape[1024];
 
     /* Transmission uses one tracker per tier,
      * and the others are kept as backups */
@@ -1599,7 +1544,7 @@ void tr_torrentTrackersFree( tr_tracker_stat * trackerStats,
  *         return -1 instead of 0 KiB/s.
  *         NOTE: always free this array with tr_free() when you're done with it.
  */
-double*  tr_torrentWebSpeeds_KBps( const tr_torrent * torrent );
+float*         tr_torrentWebSpeeds( const tr_torrent * torrent );
 
 typedef struct tr_file_stat
 {
@@ -1771,57 +1716,55 @@ typedef struct tr_stat
         @see error */
     char errorString[512];
 
-    /** When tr_stat.activity is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
+    /** When tr_stat.status is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
         this is the percentage of how much of the files has been
         verified.  When it gets to 1, the verify process is done.
         Range is [0..1]
-        @see tr_stat.activity */
-    double recheckProgress;
+        @see tr_stat.status */
+    float    recheckProgress;
 
     /** How much has been downloaded of the entire torrent.
         Range is [0..1] */
-    double percentComplete;
+    float    percentComplete;
 
     /** How much of the metadata the torrent has.
         For torrents added from a .torrent this will always be 1.
         For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
         Range is [0..1] */
-    double metadataPercentComplete;
+    float    metadataPercentComplete;
 
     /** How much has been downloaded of the files the user wants.  This differs
         from percentComplete if the user wants only some of the torrent's files.
         Range is [0..1]
         @see tr_stat.leftUntilDone */
-    double percentDone;
+    float    percentDone;
 
     /** How much has been uploaded to satisfy the seed ratio.
         This is 1 if the ratio is reached or the torrent is set to seed forever.
         Range is [0..1] */
-    double seedRatioPercentDone;
+    float    seedRatioPercentDone;
 
-    /** Speed all data being sent for this torrent.
+    /** Speed all data being sent for this torrent. (KiB/s)
         This includes piece data, protocol messages, and TCP overhead */
-    double rawUploadSpeed_KBps;
+    double rawUploadSpeed;
 
-    /** Speed all data being received for this torrent.
+    /** Speed all data being received for this torrent. (KiB/s)
         This includes piece data, protocol messages, and TCP overhead */
-    double rawDownloadSpeed_KBps;
+    double rawDownloadSpeed;
 
-    /** Speed all piece being sent for this torrent.
+    /** Speed all piece being sent for this torrent. (KiB/s)
         This ONLY counts piece data. */
-    double pieceUploadSpeed_KBps;
+    double pieceUploadSpeed;
 
-    /** Speed all piece being received for this torrent.
+    /** Speed all piece being received for this torrent. (KiB/s)
         This ONLY counts piece data. */
-    double pieceDownloadSpeed_KBps;
+    double pieceDownloadSpeed;
 
 #define TR_ETA_NOT_AVAIL -1
 #define TR_ETA_UNKNOWN -2
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
     int    eta;
-    /** If seeding, number of seconds left until the idle time limit is reached. */
-    int    etaIdle;
 
     /** Number of peers that the tracker says this torrent has */
     int    peersKnown;
@@ -1900,10 +1843,6 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t    activityDate;
     
-    /** Number of seconds since the last activity (or since started).
-        -1 if activity is not seeding or downloading. */
-    int    idleSecs;
-
     /** A torrent is considered finished if it has met its seed ratio.
         As a result, only paused torrents can be finished. */
     tr_bool   finished;

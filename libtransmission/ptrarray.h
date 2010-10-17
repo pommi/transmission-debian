@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: ptrarray.h 10798 2010-06-19 14:25:11Z charles $
+ * $Id: ptrarray.h 10030 2010-01-28 13:31:54Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -65,9 +65,6 @@ static inline void* tr_ptrArrayBack( tr_ptrArray * array )
                               : NULL;
 }
 
-void tr_ptrArrayErase( tr_ptrArray * t, int begin, int end );
-
-
 
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek( tr_ptrArray * array, int * size );
@@ -102,11 +99,6 @@ static inline tr_bool tr_ptrArrayEmpty( const tr_ptrArray * a )
 {
     return tr_ptrArraySize(a) == 0;
 }
-
-int tr_ptrArrayLowerBound( const tr_ptrArray * array,
-                           const void * key,
-                           int compare( const void * arrayItem, const void * key ),
-                           tr_bool * exact_match );
 
 /** @brief Insert a pointer into the array at the position determined by the sort function
     @return the index of the stored pointer */

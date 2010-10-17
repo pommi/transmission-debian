@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: torrent-model.cc 11092 2010-08-01 20:36:13Z charles $
+ * $Id: torrent-model.cc 10771 2010-06-16 03:02:17Z Longinus00 $
  */
 
 #include <cassert>
@@ -119,7 +119,7 @@ TorrentModel :: onTorrentChanged( int torrentId )
     const int row( myIdToRow.value( torrentId, -1 ) );
     if( row >= 0 ) {
         QModelIndex qmi( index( row, 0 ) );
-        emit dataChanged( qmi, qmi );
+        dataChanged( qmi, qmi );
     }
 }
 

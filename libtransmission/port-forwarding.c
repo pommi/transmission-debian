@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: port-forwarding.c 10945 2010-07-05 21:04:17Z charles $
+ * $Id: port-forwarding.c 10662 2010-05-19 16:17:51Z charles $
  */
 
 #include <assert.h>
@@ -66,11 +66,10 @@ getNatStateStr( int state )
 }
 
 static void
-natPulse( tr_shared * s, tr_bool do_check )
+natPulse( tr_shared * s, tr_bool doPortCheck )
 {
-    const tr_port private_peer_port = s->session->private_peer_port;
-    const int is_enabled = s->isEnabled && !s->isShuttingDown;
-    tr_port public_peer_port;
+    const tr_port port = s->session->peerPort;
+    const int isEnabled = s->isEnabled && !s->isShuttingDown;
     int oldStatus;
     int newStatus;
 
@@ -80,13 +79,8 @@ natPulse( tr_shared * s, tr_bool do_check )
         s->upnp = tr_upnpInit( );
 
     oldStatus = tr_sharedTraversalStatus( s );
-
-    s->natpmpStatus = tr_natpmpPulse( s->natpmp, private_peer_port, is_enabled, &public_peer_port );
-    if( s->natpmpStatus == TR_PORT_MAPPED )
-        s->session->public_peer_port = public_peer_port;
-
-    s->upnpStatus = tr_upnpPulse( s->upnp, private_peer_port, is_enabled, do_check );
-
+    s->natpmpStatus = tr_natpmpPulse( s->natpmp, port, isEnabled );
+    s->upnpStatus = tr_upnpPulse( s->upnp, port, isEnabled, doPortCheck );
     newStatus = tr_sharedTraversalStatus( s );
 
     if( newStatus != oldStatus )

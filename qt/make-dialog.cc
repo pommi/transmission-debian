@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: make-dialog.cc 11098 2010-08-02 20:55:11Z charles $
+ * $Id: make-dialog.cc 9868 2010-01-04 21:00:47Z charles $
  */
 
 #include <cassert>
@@ -34,10 +34,10 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 
-#include "formatter.h"
 #include "hig.h"
 #include "make-dialog.h"
 #include "session.h"
+#include "utils.h"
 
 /***
 ****
@@ -58,7 +58,7 @@ MakeDialog :: onNewButtonBoxClicked( QAbstractButton * button )
     {
         case QDialogButtonBox::Open:
 std::cerr << "calling mySession.addTorrent( " << qPrintable(myTarget) << ", " << qPrintable(QFileInfo(myBuilder->top).dir().path()) << ')' << std::endl;
-            mySession.addNewlyCreatedTorrent( myTarget, QFileInfo(myBuilder->top).dir().path() );
+            mySession.addTorrent( myTarget, QFileInfo(myBuilder->top).dir().path() );
             break;
         case QDialogButtonBox::Abort:
             myBuilder->abortFlag = true;
@@ -177,15 +177,12 @@ MakeDialog :: onFileClicked( )
 void
 MakeDialog :: onFileSelected( const QStringList& list )
 {
-    if( !list.empty( ) )
-        onFileSelected( list.front( ) );
-}
-void
-MakeDialog :: onFileSelected( const QString& filename )
-{
-    myFile = filename;
-    myFileButton->setText( QFileInfo(myFile).fileName() );
-    onSourceChanged( );
+    if( list.size() == 1 )
+    {
+        myFile = list.first( );
+        myFileButton->setText( QFileInfo(myFile).fileName() );
+        onSourceChanged( );
+    }
 }
 
 void
@@ -200,15 +197,12 @@ MakeDialog :: onFolderClicked( )
 void
 MakeDialog :: onFolderSelected( const QStringList& list )
 {
-    if( !list.empty( ) )
-        onFolderSelected( list.front( ) );
-}
-void
-MakeDialog :: onFolderSelected( const QString& filename )
-{
-    myFolder = filename;
-    myFolderButton->setText( QFileInfo(myFolder).fileName() );
-    onSourceChanged( );
+    if( list.size() == 1 )
+    {
+        myFolder = list.first();
+        myFolderButton->setText( QFileInfo(myFolder).fileName() );
+        onSourceChanged( );
+    }
 }
 
 void
@@ -223,14 +217,11 @@ MakeDialog :: onDestinationClicked( )
 void
 MakeDialog :: onDestinationSelected( const QStringList& list )
 {
-    if( !list.empty( ) )
-        onDestinationSelected( list.front() );
-}
-void
-MakeDialog :: onDestinationSelected( const QString& filename )
-{
-    myDestination = filename;
-    myDestinationButton->setText( QFileInfo(myDestination).fileName() );
+    if( list.size() == 1 )
+    {
+        myDestination = list.first( );
+        myDestinationButton->setText( QFileInfo(myDestination).fileName() );
+    }
 }
 
 void
@@ -291,10 +282,10 @@ MakeDialog :: onSourceChanged( )
         QString files = tr( "%Ln File(s)", 0, myBuilder->fileCount );
         QString pieces = tr( "%Ln Piece(s)", 0, myBuilder->pieceCount );
         text = tr( "%1 in %2; %3 @ %4" )
-                 .arg( Formatter::sizeToString( myBuilder->totalSize ) )
+                 .arg( Utils::sizeToString( myBuilder->totalSize ) )
                  .arg( files )
                  .arg( pieces )
-                 .arg( Formatter::sizeToString( myBuilder->pieceSize ) );
+                 .arg( Utils::sizeToString( myBuilder->pieceSize ) );
     }
 
     mySourceLabel->setText( text );
@@ -315,8 +306,6 @@ MakeDialog :: MakeDialog( Session & session, QWidget * parent ):
     mySession( session ),
     myBuilder( 0 )
 {
-    setAcceptDrops( true );
-
     connect( &myTimer, SIGNAL(timeout()), this, SLOT(onProgress()) );
 
     setWindowTitle( tr( "New Torrent" ) );
@@ -406,38 +395,4 @@ MakeDialog :: ~MakeDialog( )
 {
     if( myBuilder )
         tr_metaInfoBuilderFree( myBuilder );
-}
-
-/***
-****
-***/
-
-void
-MakeDialog :: dragEnterEvent( QDragEnterEvent * event )
-{
-    const QMimeData * mime = event->mimeData( );
-
-    if( mime->urls().size() && QFile(mime->urls().front().path()).exists( ) )
-        event->acceptProposedAction();
-}
-
-void
-MakeDialog :: dropEvent( QDropEvent * event )
-{
-    const QString filename = event->mimeData()->urls().front().path();
-    const QFileInfo fileInfo( filename );
-
-    if( fileInfo.exists( ) )
-    {
-        if( fileInfo.isDir( ) )
-        {
-            myFolderRadio->setChecked( true );
-            onFolderSelected( filename  );
-        }
-        else // it's a file
-        {
-            myFileRadio->setChecked( true );
-            onFileSelected( filename );
-        }
-    }
 }

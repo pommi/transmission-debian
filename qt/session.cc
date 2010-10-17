@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: session.cc 11289 2010-10-02 15:18:07Z Longinus00 $
+ * $Id: session.cc 10868 2010-06-26 17:16:46Z Longinus00 $
  */
 
 #include <cassert>
@@ -22,7 +22,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QSet>
-#include <QStringList>
 #include <QStyle>
 #include <QTextStream>
 
@@ -33,8 +32,8 @@
 #include <libtransmission/utils.h> /* tr_free */
 #include <libtransmission/version.h> /* LONG_VERSION */
 
-#include "add-data.h"
 #include "prefs.h"
+#include "qticonloader.h"
 #include "session.h"
 #include "session-dialog.h"
 #include "torrent.h"
@@ -145,8 +144,6 @@ Session :: updatePref( int key )
         case Prefs :: DOWNLOAD_DIR:
         case Prefs :: DSPEED:
         case Prefs :: DSPEED_ENABLED:
-        case Prefs :: IDLE_LIMIT:
-        case Prefs :: IDLE_LIMIT_ENABLED:
         case Prefs :: INCOMPLETE_DIR:
         case Prefs :: INCOMPLETE_DIR_ENABLED:
         case Prefs :: LPD_ENABLED:
@@ -192,7 +189,7 @@ Session :: updatePref( int key )
 
         case Prefs :: RPC_AUTH_REQUIRED:
             if( mySession )
-                tr_sessionSetRPCPasswordEnabled( mySession, myPrefs.getBool(key) );
+                tr_sessionSetRPCEnabled( mySession, myPrefs.getBool(key) );
             break;
         case Prefs :: RPC_ENABLED:
             if( mySession )
@@ -233,8 +230,7 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myBlocklistSize( -1 ),
     myPrefs( prefs ),
     mySession( 0 ),
-    myConfigDir( configDir ),
-    myNAM( 0 )
+    myConfigDir( configDir )
 {
     myStats.ratio = TR_RATIO_NA;
     myStats.uploadedBytes = 0;
@@ -244,29 +240,14 @@ Session :: Session( const char * configDir, Prefs& prefs ):
     myStats.secondsActive = 0;
     myCumulativeStats = myStats;
 
+    connect( &myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onFinished(QNetworkReply*)) );
+    connect( &myNAM, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SIGNAL(httpAuthenticationRequired()) );
     connect( &myPrefs, SIGNAL(changed(int)), this, SLOT(updatePref(int)) );
 }
 
 Session :: ~Session( )
 {
     stop( );
-}
-
-QNetworkAccessManager *
-Session :: networkAccessManager( )
-{
-    if( myNAM == 0 )
-    {
-        myNAM = new QNetworkAccessManager;
-
-        connect( myNAM, SIGNAL(finished(QNetworkReply*)),
-                 this, SLOT(onFinished(QNetworkReply*)) );
-
-        connect( myNAM, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                 this, SIGNAL(httpAuthenticationRequired()) );
-    }
-
-    return myNAM;
 }
 
 /***
@@ -276,12 +257,8 @@ Session :: networkAccessManager( )
 void
 Session :: stop( )
 {
-    if( myNAM != 0 )
-    {
-        myNAM->deleteLater( );
-        myNAM = 0;
-    }
-
+    foreach( Reply myReply, myReplies )
+        myReply.networkReply->abort();
     myUrl.clear( );
 
     if( mySession )
@@ -303,15 +280,20 @@ Session :: start( )
 {
     if( myPrefs.get<bool>(Prefs::SESSION_IS_REMOTE) )
     {
+        const int port( myPrefs.get<int>(Prefs::SESSION_REMOTE_PORT) );
+        const bool auth( myPrefs.get<bool>(Prefs::SESSION_REMOTE_AUTH) );
+        const QString host( myPrefs.get<QString>(Prefs::SESSION_REMOTE_HOST) );
+        const QString user( myPrefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME) );
+        const QString pass( myPrefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD) );
+
         QUrl url;
         url.setScheme( "http" );
-        url.setHost( myPrefs.get<QString>(Prefs::SESSION_REMOTE_HOST) );
-        url.setPort( myPrefs.get<int>(Prefs::SESSION_REMOTE_PORT) );
+        url.setHost( host );
+        url.setPort( port );
         url.setPath( "/transmission/rpc" );
-        if( myPrefs.get<bool>(Prefs::SESSION_REMOTE_AUTH) )
-        {
-            url.setUserName( myPrefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME) );
-            url.setPassword( myPrefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD) );
+        if( auth ) {
+            url.setUserName( user );
+            url.setPassword( pass );
         }
         myUrl = url;
     }
@@ -422,21 +404,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, bool value )
 }
 
 void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const QStringList& value )
-{
-    tr_benc top;
-    tr_bencInitDict( &top, 2 );
-    tr_bencDictAddStr( &top, "method", "torrent-set" );
-    tr_benc * args = tr_bencDictAddDict( &top, "arguments", 2 );
-    addOptionalIds( args, ids );
-    tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
-    foreach( const QString str, value )
-        tr_bencListAddStr( list, str.toUtf8().constData() );
-    exec( &top );
-    tr_bencFree( &top );
-}
-
-void
 Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int>& value )
 {
     tr_benc top;
@@ -447,21 +414,6 @@ Session :: torrentSet( const QSet<int>& ids, const QString& key, const QList<int
     tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), value.size( ) ) );
     foreach( int i, value )
         tr_bencListAddInt( list, i );
-    exec( &top );
-    tr_bencFree( &top );
-}
-
-void
-Session :: torrentSet( const QSet<int>& ids, const QString& key, const QPair<int,QString>& value )
-{
-    tr_benc top;
-    tr_bencInitDict( &top, 2 );
-    tr_bencDictAddStr( &top, "method", "torrent-set" );
-    tr_benc * args( tr_bencDictAddDict( &top, "arguments", 2 ) );
-    addOptionalIds( args, ids );
-    tr_benc * list( tr_bencDictAddList( args, key.toUtf8().constData(), 2 ) );
-    tr_bencListAddInt( list, value.first );
-    tr_bencListAddStr( list, value.second.toUtf8().constData() );
     exec( &top );
     tr_bencFree( &top );
 }
@@ -631,8 +583,6 @@ Session :: localSessionCallback( tr_session * session, const char * json, size_t
     ((Session*)self)->parseResponse( json, len );
 }
 
-#define REQUEST_DATA_PROPERTY_KEY "requestData"
-
 void
 Session :: exec( const char * json )
 {
@@ -649,12 +599,17 @@ Session :: exec( const char * json )
         if( !mySessionId.isEmpty( ) )
             request.setRawHeader( TR_RPC_SESSION_ID_HEADER, mySessionId.toAscii() );
 
-        const QByteArray requestData( json );
-        QNetworkReply * reply = networkAccessManager()->post( request, requestData );
-        reply->setProperty( REQUEST_DATA_PROPERTY_KEY, requestData );
+        QBuffer * reqbuf = new QBuffer;
+        reqbuf->setData( QByteArray( json ) );
+
+        QNetworkReply * reply = myNAM.post( request, reqbuf );
         connect( reply, SIGNAL(downloadProgress(qint64,qint64)), this, SIGNAL(dataReadProgress()));
         connect( reply, SIGNAL(uploadProgress(qint64,qint64)), this, SIGNAL(dataSendProgress()));
 
+        Reply myReply;
+        myReply.networkReply = reply;
+        myReply.buffer = reqbuf;
+        myReplies << myReply;
 #ifdef DEBUG_HTTP
         std::cerr << "sending " << "POST " << qPrintable( myUrl.path() ) << std::endl;
         foreach( QByteArray b, request.rawHeaderList() )
@@ -670,6 +625,17 @@ Session :: exec( const char * json )
 void
 Session :: onFinished( QNetworkReply * reply )
 {
+    QBuffer * buffer;
+    for( QList<Reply>::iterator i = myReplies.begin(); i != myReplies.end(); ++i )
+    {
+        if( reply == i->networkReply )
+        {
+            buffer = i->buffer;
+            myReplies.erase( i );
+            break;
+        }
+    }
+
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;
     foreach( QByteArray b, reply->rawHeaderList() )
@@ -686,7 +652,7 @@ Session :: onFinished( QNetworkReply * reply )
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
         mySessionId = QString( reply->rawHeader( TR_RPC_SESSION_ID_HEADER ) );
-        exec( reply->property( REQUEST_DATA_PROPERTY_KEY ).toByteArray( ).constData( ) );
+        exec( buffer->buffer().constData() );
     }
     else if( reply->error() != QNetworkReply::NoError )
     {
@@ -701,6 +667,7 @@ Session :: onFinished( QNetworkReply * reply )
         parseResponse( json, jsonLength );
     }
 
+    delete buffer;
     reply->deleteLater();
 }
 
@@ -785,6 +752,12 @@ Session :: parseResponse( const char * json, size_t jsonLength )
                                                            QString::fromUtf8(str),
                                                            QMessageBox::Close,
                                                            QApplication::activeWindow());
+                        QPixmap pixmap;
+                        QIcon icon = QtIconLoader :: icon( "dialog-information" );
+                        if( !icon.isNull( ) ) {
+                            const int size = QApplication::style()->pixelMetric( QStyle::PM_LargeIconSize );
+                            d->setIconPixmap( icon.pixmap( size, size ) );
+                        }
                         connect( d, SIGNAL(rejected()), d, SLOT(deleteLater()) );
                         d->show( );
                     }
@@ -934,38 +907,54 @@ Session :: setBlocklistSize( int64_t i )
 }
 
 void
-Session :: addTorrent( const AddData& addMe )
+Session :: addTorrent( QString filename )
 {
-    const QByteArray b64 = addMe.toBase64();
+    addTorrent( filename, myPrefs.getString( Prefs::DOWNLOAD_DIR ) );
+}
 
-    tr_benc top, *args;
-    tr_bencInitDict( &top, 2 );
-    tr_bencDictAddStr( &top, "method", "torrent-add" );
-    args = tr_bencDictAddDict( &top, "arguments", 2 );
-    tr_bencDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
-    switch( addMe.type ) {
-        case AddData::MAGNET:   tr_bencDictAddStr( args, "filename", addMe.magnet.toUtf8().constData() ); break;
-        case AddData::URL:      tr_bencDictAddStr( args, "filename", addMe.url.toString().toUtf8().constData() ); break;
-        case AddData::FILENAME: /* fall-through */
-        case AddData::METAINFO: tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() ); break;
-        default: std::cerr << "Unhandled AddData type: " << addMe.type << std::endl;
+namespace
+{
+    bool isLink( const QString& str )
+    {
+        return Utils::isMagnetLink(str) || Utils::isURL(str);
     }
-    exec( &top );
-    tr_bencFree( &top );
 }
 
 void
-Session :: addNewlyCreatedTorrent( const QString& filename, const QString& localPath )
+Session :: addTorrent( QString key, QString localPath )
 {
-    const QByteArray b64 = AddData(filename).toBase64();
-
     tr_benc top, *args;
     tr_bencInitDict( &top, 2 );
     tr_bencDictAddStr( &top, "method", "torrent-add" );
     args = tr_bencDictAddDict( &top, "arguments", 3 );
     tr_bencDictAddStr( args, "download-dir", qPrintable(localPath) );
     tr_bencDictAddBool( args, "paused", !myPrefs.getBool( Prefs::START ) );
-    tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
+
+    // figure out what to do with "key"....
+    bool keyHandled = false;
+    if( !keyHandled && isLink( key  )) {
+        tr_bencDictAddStr( args, "filename", key.toUtf8().constData() );
+        keyHandled = true; // it's a URL or magnet link...
+    }
+    if( !keyHandled ) {
+        QFile file( key );
+        file.open( QIODevice::ReadOnly );
+        const QByteArray raw( file.readAll( ) );
+        file.close( );
+        if( !raw.isEmpty( ) ) {
+            int b64len = 0;
+            char * b64 = tr_base64_encode( raw.constData(), raw.size(), &b64len );
+            tr_bencDictAddRaw( args, "metainfo", b64, b64len  );
+            tr_free( b64 );
+            keyHandled = true; // it's a local file...
+        }
+    }
+    if( !keyHandled ) {
+        const QByteArray tmp = key.toUtf8();
+        tr_bencDictAddRaw( args, "metainfo", tmp.constData(), tmp.length() );
+        keyHandled = true; // treat it as base64
+    }
+
     exec( &top );
     tr_bencFree( &top );
 }

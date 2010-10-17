@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 /* Windows DLL stuff */
-#if defined(WIN32) && !defined(STATICLIB)
+#ifdef _WIN32
 #	ifdef JSON_PARSER_DLL_EXPORTS
 #		define JSON_PARSER_DLL_API __declspec(dllexport)
 #	else

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: ratecontrol.c 10998 2010-07-11 20:49:19Z charles $
+ * $Id: ratecontrol.c 7618 2009-01-05 04:27:54Z charles $
  *
  * Copyright (c) 2006-2008 Transmission authors and contributors
  *
@@ -30,13 +30,13 @@
 #include "utils.h"
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
-static int
+static float
 rateForInterval( const tr_ratecontrol * r,
                  int                    interval_msec,
                  uint64_t               now )
 {
     uint64_t       bytes = 0;
-    const uint64_t cutoff = (now?now:tr_time_msec()) - interval_msec;
+    const uint64_t cutoff = (now?now:tr_date()) - interval_msec;
     int            i = r->newest;
 
     for( ; ; )
@@ -50,17 +50,17 @@ rateForInterval( const tr_ratecontrol * r,
         if( i == r->newest ) break; /* we've come all the way around */
     }
 
-    return bytes * ( 1000.0 / interval_msec );
+    return ( bytes / 1024.0 ) * ( 1000.0 / interval_msec );
 }
 
 /***
 ****
 ***/
 
-int
-tr_rcRate_Bps( const tr_ratecontrol * r, uint64_t now )
+float
+tr_rcRate( const tr_ratecontrol * r, uint64_t now )
 {
-    int ret = 0;
+    float ret = 0.0f;
 
     if( r )
         ret = rateForInterval( r, TR_RC_HISTORY_MSEC, now );
@@ -76,7 +76,7 @@ void
 tr_rcTransferred( tr_ratecontrol * r,
                   size_t           size )
 {
-    const uint64_t now = tr_time_msec ( );
+    const uint64_t now = tr_date ( );
 
     if( r->transfers[r->newest].date + TR_RC_GRANULARITY_MSEC >= now )
         r->transfers[r->newest].size += size;

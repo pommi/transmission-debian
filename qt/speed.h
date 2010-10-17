@@ -1,36 +1,35 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: speed.h 11092 2010-08-01 20:36:13Z charles $
+ * $Id: speed.h 9868 2010-01-04 21:00:47Z charles $
  */
 
 #ifndef QTR_SPEED_H
 #define QTR_SPEED_H
 
-#include "formatter.h"
-
 class Speed
 {
     private:
-        int _Bps;
-        Speed( int Bps ): _Bps(Bps) { }
+        double _kbps;
+        Speed( double kbps ): _kbps(kbps) { }
     public:
-        Speed( ): _Bps(0) { }
-        double KBps( ) const;
-        int Bps( ) const { return _Bps; }
-        bool isZero( ) const { return _Bps == 0; }
-        static Speed fromKBps( double KBps );
-        static Speed fromBps( int Bps ) { return Speed( Bps ); }
-        void setBps( int Bps ) { _Bps = Bps; }
-        Speed& operator+=( const Speed& that ) { _Bps += that._Bps; return *this; }
-        Speed operator+( const Speed& that ) const { return Speed( _Bps + that._Bps ); }
-        bool operator<( const Speed& that ) const { return _Bps < that._Bps; }
+        Speed( ): _kbps(0) { }
+        double kbps( ) const { return _kbps; }
+        double bps( ) const { return kbps()*1024.0; }
+        bool isZero( ) const { return _kbps < 0.001; }
+        static Speed fromKbps( double kbps ) { return Speed( kbps ); }
+        static Speed fromBps( double bps ) { return Speed( bps/1024.0 ); }
+        void setKbps( double kbps ) { _kbps = kbps; }
+        void setBps( double bps ) { _kbps = bps/1024.0; }
+        Speed operator+( const Speed& that ) const { return Speed( kbps() + that.kbps() ); }
+        Speed& operator+=( const Speed& that ) { _kbps += that._kbps; return *this; }
+        bool operator<( const Speed& that ) const { return kbps() < that.kbps(); }
 };
 
 #endif

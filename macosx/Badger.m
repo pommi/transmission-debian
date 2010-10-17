@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: Badger.m 10949 2010-07-06 03:40:34Z livings124 $
+ * $Id: Badger.m 9844 2010-01-01 21:12:04Z livings124 $
  *
  * Copyright (c) 2006-2010 Transmission authors and contributors
  *
@@ -55,10 +55,10 @@
 
 - (void) updateBadge
 {
-    const double downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
-                                ? tr_sessionGetPieceSpeed_KBps(fLib, TR_DOWN) : 0.0;
-    const double uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
-                                ? tr_sessionGetPieceSpeed_KBps(fLib, TR_UP) : 0.0;
+    const float downloadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+                                ? tr_sessionGetPieceSpeed(fLib, TR_DOWN) : 0.0;
+    const float uploadRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
+                                ? tr_sessionGetPieceSpeed(fLib, TR_UP) : 0.0;
     
     //only update if the badged values change
     if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: downloadRate upload: uploadRate])

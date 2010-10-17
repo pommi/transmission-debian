@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: NSStringAdditions.m 11207 2010-09-12 22:20:19Z livings124 $
+ * $Id: NSStringAdditions.m 10522 2010-04-23 16:59:14Z charles $
  *
  * Copyright (c) 2005-2010 Transmission authors and contributors
  *
@@ -28,12 +28,6 @@
 #import <transmission.h>
 #import "utils.h"
 
-@interface NSString (Private)
-
-+ (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb;
-
-@end
-
 @implementation NSString (NSStringAdditions)
 
 + (NSString *) ellipsis
@@ -48,10 +42,7 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
-    const NSInteger baseInt = [NSApp isOnSnowLeopardOrBetter] ? 1000 : 1024;
-    
-    if (size < baseInt)
+    if (size < 1024)
     {
         if (size != 1)
             return [NSString stringWithFormat: @"%lld %@", size, NSLocalizedString(@"bytes", "File size - bytes")];
@@ -61,24 +52,24 @@
 
     CGFloat convertedSize;
     NSString * unit;
-    if (size < pow(baseInt, 2))
+    if (size < pow(1024, 2))
     {
-        convertedSize = size / baseFloat;
+        convertedSize = size / 1024.0;
         unit = NSLocalizedString(@"KB", "File size - kilobytes");
     }
-    else if (size < pow(baseInt, 3))
+    else if (size < pow(1024, 3))
     {
-        convertedSize = size / pow(baseFloat, 2);
+        convertedSize = size / (CGFloat)pow(1024, 2);
         unit = NSLocalizedString(@"MB", "File size - megabytes");
     }
-    else if (size < pow(baseInt, 4))
+    else if (size < pow(1024, 4))
     {
-        convertedSize = size / pow(baseFloat, 3);
+        convertedSize = size / (CGFloat)pow(1024, 3);
         unit = NSLocalizedString(@"GB", "File size - gigabytes");
     }
     else
     {
-        convertedSize = size / pow(baseFloat, 4);
+        convertedSize = size / (CGFloat)pow(1024, 4);
         unit = NSLocalizedString(@"TB", "File size - terabytes");
     }
     
@@ -89,15 +80,22 @@
 
 + (NSString *) stringForSpeed: (CGFloat) speed
 {
-    return [self stringForSpeed: speed
-                kb: NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)")
-                mb: NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)")
-                gb: NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)")];
+    return [[self stringForSpeedAbbrev: speed] stringByAppendingString: NSLocalizedString(@"B/s", "Transfer speed (Bytes per second)")];
 }
 
 + (NSString *) stringForSpeedAbbrev: (CGFloat) speed
 {
-    return [self stringForSpeed: speed kb: @"K" mb: @"M" gb: @"G"];
+    if (speed <= 999.95) //0.0 K to 999.9 K
+        return [NSString localizedStringWithFormat: @"%.1f K", speed];
+    
+    speed /= 1024.0;
+    
+    if (speed <= 99.995) //0.98 M to 99.99 M
+        return [NSString localizedStringWithFormat: @"%.2f M", speed];
+    else if (speed <= 999.95) //100.0 M to 999.9 M
+        return [NSString localizedStringWithFormat: @"%.1f M", speed];
+    else //insane speeds
+        return [NSString localizedStringWithFormat: @"%.2f G", (speed / 1024.0)];
 }
 
 + (NSString *) stringForRatio: (CGFloat) ratio
@@ -116,16 +114,6 @@
         else
             return [NSString localizedStringWithFormat: @"%.0f", tr_truncd(ratio, 0)];
     }
-}
-
-+ (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals
-{
-    if (progress >= 1.0)
-        return @"100%";
-    else if (longDecimals)
-        return [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
-    else
-        return [NSString localizedStringWithFormat: @"%.1f%%", tr_truncd(progress * 100.0, 1)];
 }
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds
@@ -185,27 +173,6 @@
 {
     const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
     return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
-}
-
-@end
-
-@implementation NSString (Private)
-
-+ (NSString *) stringForSpeed: (CGFloat) speed kb: (NSString *) kb mb: (NSString *) mb gb: (NSString *) gb
-{
-    const CGFloat baseFloat = [NSApp isOnSnowLeopardOrBetter] ? 1000.0 : 1024.0;
-    
-    if (speed <= 999.95) //0.0 KB/s to 999.9 KB/s
-        return [NSString localizedStringWithFormat: @"%.1f %@", speed, kb];
-    
-    speed /= baseFloat;
-    
-    if (speed <= 99.995) //1.00 MB/s to 99.99 MB/s
-        return [NSString localizedStringWithFormat: @"%.2f %@", speed, mb];
-    else if (speed <= 999.95) //100.0 MB/s to 999.9 MB/s
-        return [NSString localizedStringWithFormat: @"%.1f %@", speed, mb];
-    else //insane speeds
-        return [NSString localizedStringWithFormat: @"%.2f %@", (speed / baseFloat), gb];
 }
 
 @end

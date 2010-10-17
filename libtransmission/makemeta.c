@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: makemeta.c 11272 2010-09-30 05:22:33Z Longinus00 $
+ * $Id: makemeta.c 10971 2010-07-07 22:50:22Z charles $
  */
 
 #include <assert.h>
@@ -23,7 +23,6 @@
 
 #include "transmission.h"
 #include "crypto.h" /* tr_sha1 */
-#include "fdlimit.h" /* tr_open_file_for_scanning() */
 #include "session.h"
 #include "bencode.h"
 #include "makemeta.h"
@@ -88,12 +87,12 @@ getFiles( const char *      dir,
     return list;
 }
 
-static uint32_t
+static int
 bestPieceSize( uint64_t totalSize )
 {
-    const uint32_t GiB = 1073741824;
-    const uint32_t MiB = 1048576;
-    const uint32_t KiB = 1024;
+    const uint64_t GiB = 1073741824;
+    const uint64_t MiB = 1048576;
+    const uint64_t KiB = 1024;
 
     if( totalSize >=   ( 2 * GiB ) ) return 2 * MiB;
     if( totalSize >=   ( 1 * GiB ) ) return 1 * MiB;
@@ -204,7 +203,7 @@ getHashInfo( tr_metainfo_builder * b )
     uint8_t *buf;
     uint64_t totalRemain;
     uint64_t off = 0;
-    int fd;
+    FILE *   fp;
 
     if( !b->totalSize )
         return ret;
@@ -212,8 +211,8 @@ getHashInfo( tr_metainfo_builder * b )
     buf = tr_valloc( b->pieceSize );
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
-    fd = tr_open_file_for_scanning( b->files[fileIndex].filename );
-    if( fd < 0 )
+    fp = fopen( b->files[fileIndex].filename, "rb" );
+    if( !fp )
     {
         b->my_errno = errno;
         tr_strlcpy( b->errfile,
@@ -226,28 +225,30 @@ getHashInfo( tr_metainfo_builder * b )
     }
     while( totalRemain )
     {
-        uint8_t * bufptr = buf;
-        const uint32_t thisPieceSize = (uint32_t) MIN( b->pieceSize, totalRemain );
-        uint32_t leftInPiece = thisPieceSize;
+        uint8_t *      bufptr = buf;
+        const uint64_t thisPieceSize =
+            MIN( (uint32_t)b->pieceSize, totalRemain );
+        uint64_t       pieceRemain = thisPieceSize;
 
         assert( b->pieceIndex < b->pieceCount );
 
-        while( leftInPiece )
+        while( pieceRemain )
         {
-            const size_t n_this_pass = (size_t) MIN( ( b->files[fileIndex].size - off ), leftInPiece );
-            read( fd, bufptr, n_this_pass );
+            const uint64_t n_this_pass =
+                MIN( ( b->files[fileIndex].size - off ), pieceRemain );
+            fread( bufptr, 1, n_this_pass, fp );
             bufptr += n_this_pass;
             off += n_this_pass;
-            leftInPiece -= n_this_pass;
+            pieceRemain -= n_this_pass;
             if( off == b->files[fileIndex].size )
             {
                 off = 0;
-                tr_close_file( fd );
-                fd = -1;
+                fclose( fp );
+                fp = NULL;
                 if( ++fileIndex < b->fileCount )
                 {
-                    fd = tr_open_file_for_scanning( b->files[fileIndex].filename );
-                    if( fd < 0 )
+                    fp = fopen( b->files[fileIndex].filename, "rb" );
+                    if( !fp )
                     {
                         b->my_errno = errno;
                         tr_strlcpy( b->errfile,
@@ -263,7 +264,7 @@ getHashInfo( tr_metainfo_builder * b )
         }
 
         assert( bufptr - buf == (int)thisPieceSize );
-        assert( leftInPiece == 0 );
+        assert( pieceRemain == 0 );
         tr_sha1( walk, buf, thisPieceSize, NULL );
         walk += SHA_DIGEST_LENGTH;
 
@@ -281,8 +282,8 @@ getHashInfo( tr_metainfo_builder * b )
           || ( walk - ret == (int)( SHA_DIGEST_LENGTH * b->pieceCount ) ) );
     assert( b->abortFlag || !totalRemain );
 
-    if( fd >= 0 )
-        tr_close_file( fd );
+    if( fp )
+        fclose( fp );
 
     tr_free( buf );
     return ret;
@@ -339,11 +340,9 @@ makeInfoDict( tr_benc *             dict,
 
     tr_bencDictReserve( dict, 5 );
 
-    if( builder->isSingleFile )
-    {
+    if( builder->fileCount == 1 )
         tr_bencDictAddInt( dict, "length", builder->files[0].size );
-    }
-    else /* root node is a directory */
+    else
     {
         uint32_t  i;
         tr_benc * list = tr_bencDictAddList( dict, "files",
@@ -525,7 +524,8 @@ tr_makeMetaInfo( tr_metainfo_builder *   builder,
     builder->pieceIndex = 0;
     builder->trackerCount = trackerCount;
     builder->trackers = tr_new0( tr_tracker_info, builder->trackerCount );
-    for( i = 0; i < builder->trackerCount; ++i ) {
+    for( i = 0; i < builder->trackerCount; ++i )
+    {
         builder->trackers[i].tier = trackers[i].tier;
         builder->trackers[i].announce = tr_strdup( trackers[i].announce );
     }

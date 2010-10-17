@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: file-tree.cc 11092 2010-08-01 20:36:13Z charles $
+ * $Id: file-tree.cc 10684 2010-05-24 05:29:36Z Longinus00 $
  */
 
 #include <cassert>
@@ -17,13 +17,11 @@
 #include <QHeaderView>
 #include <QPainter>
 #include <QResizeEvent>
-#include <QSortFilterProxyModel>
 #include <QStringList>
 
 #include <libtransmission/transmission.h> // priorities
 
 #include "file-tree.h"
-#include "formatter.h"
 #include "hig.h"
 #include "torrent.h" // FileList
 #include "utils.h" // mime icons
@@ -124,7 +122,7 @@ FileTreeItem :: fileSizeName( ) const
     uint64_t have(0), total(0);
     QString str;
     getSubtreeSize( have, total );
-    str = QString( name() + " (%1)" ).arg( Formatter::sizeToString( total ) );
+    str = QString( name() + " (%1)" ).arg( Utils::sizeToString( total ) );
     return str;
 }
 
@@ -506,45 +504,13 @@ FileTreeModel :: clicked( const QModelIndex& index )
 *****
 ****/
 
-QSize
-FileTreeDelegate :: sizeHint( const QStyleOptionViewItem& item, const QModelIndex& index ) const
-{
-    QSize size;
-
-    switch( index.column( ) )
-    {
-        case COL_NAME: {
-            const QFontMetrics fm( item.font );
-            const QString text = index.data().toString();
-            const int iconSize = QApplication::style()->pixelMetric( QStyle::PM_SmallIconSize );
-            size.rwidth() = HIG::PAD_SMALL + iconSize;
-            size.rheight() = std::max( iconSize, fm.height( ) );
-            break;
-        }
-
-        case COL_PROGRESS:
-        case COL_WANTED:
-            size = QSize( 20, 1 );
-            break;
-
-        default: {
-            const QFontMetrics fm( item.font );
-            const QString text = index.data().toString();
-            size = fm.size( 0, text );
-            break;
-        }
-    }
-
-    size.rheight() += 8; // make the spacing a little nicer
-    return size;
-}
-
 void
 FileTreeDelegate :: paint( QPainter                    * painter,
                            const QStyleOptionViewItem  & option,
                            const QModelIndex           & index ) const
 {
     const int column( index.column( ) );
+
 
     if( ( column != COL_PROGRESS ) && ( column != COL_WANTED ) && ( column != COL_NAME ) )
     {
@@ -571,7 +537,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
             icon = style->standardIcon( QStyle::StandardPixmap( QStyle::SP_DirOpenIcon ) );
         else
         {
-            QString name = index.data().toString();
+            QString name = index.model()->data(index).toString();
             icon = Utils :: guessMimeIcon( name.left( name.lastIndexOf( " (" ) ) );
         }
         icon.paint( painter, iconArea, Qt::AlignCenter, QIcon::Normal, QIcon::On );
@@ -588,14 +554,14 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         p.state = option.state | QStyle::State_Small;
         p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
-        p.rect.setSize( QSize( option.rect.width()-2, option.rect.height()-8 ) );
+        p.rect.setSize( QSize( option.rect.width()-2, option.rect.height()-2 ) );
         p.rect.moveCenter( option.rect.center( ) );
         p.fontMetrics = QApplication::fontMetrics();
         p.minimum = 0;
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;
         p.textVisible = true;
-        p.progress = (int)(100.0*index.data().toDouble());
+        p.progress = (int)(100.0*index.model()->data(index).toDouble());
         p.text = QString( ).sprintf( "%d%%", p.progress );
         style->drawControl( QStyle::CE_ProgressBar, &p, painter );
     }
@@ -607,7 +573,7 @@ FileTreeDelegate :: paint( QPainter                    * painter,
         o.rect.setSize( QSize( 20, option.rect.height( ) ) );
         o.rect.moveCenter( option.rect.center( ) );
         o.fontMetrics = QApplication::fontMetrics();
-        switch( index.data().toInt() ) {
+        switch( index.model()->data(index).toInt() ) {
             case Qt::Unchecked: o.state |= QStyle::State_Off; break;
             case Qt::Checked:   o.state |= QStyle::State_On; break;
             default:            o.state |= QStyle::State_NoChange;break;
@@ -627,43 +593,27 @@ FileTreeDelegate :: paint( QPainter                    * painter,
 FileTreeView :: FileTreeView( QWidget * parent ):
     QTreeView( parent ),
     myModel( this ),
-    myProxy( new QSortFilterProxyModel( ) ),
     myDelegate( this )
 {
-    setSortingEnabled( true );
     setAlternatingRowColors( true );
     setSelectionBehavior( QAbstractItemView::SelectRows );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
-    myProxy->setSourceModel( &myModel );
-    setModel( myProxy );
+    setModel( &myModel );
     setItemDelegate( &myDelegate );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    sortByColumn( COL_NAME, Qt::AscendingOrder );
     installEventFilter( this );
 
     for( int i=0; i<=NUM_COLUMNS; ++i )
         header()->setResizeMode( i, QHeaderView::Fixed );
 
-    connect( this, SIGNAL(clicked(const QModelIndex&)),
-             this, SLOT(onClicked(const QModelIndex&)) );
+    connect( this,     SIGNAL(clicked(const QModelIndex&)),
+             &myModel,   SLOT(clicked(const QModelIndex&)));
 
     connect( &myModel, SIGNAL(priorityChanged(const QSet<int>&, int)),
              this,     SIGNAL(priorityChanged(const QSet<int>&, int)));
 
     connect( &myModel, SIGNAL(wantedChanged(const QSet<int>&, bool)),
              this,     SIGNAL(wantedChanged(const QSet<int>&, bool)));
-}
-
-FileTreeView :: ~FileTreeView( )
-{
-    myProxy->deleteLater();
-}
-
-void
-FileTreeView :: onClicked( const QModelIndex& proxyIndex )
-{
-    const QModelIndex modelIndex = myProxy->mapToSource( proxyIndex );
-    myModel.clicked( modelIndex );
 }
 
 bool
@@ -711,7 +661,7 @@ FileTreeView :: update( const FileList& files, bool torrentChanged )
         QList<QModelIndex> added;
         myModel.addFile( file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, torrentChanged );
         foreach( QModelIndex i, added )
-            expand( myProxy->mapFromSource( i ) );
+            expand( i );
     }
 }
 

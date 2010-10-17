@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: utils.h 11092 2010-08-01 20:36:13Z charles $
+ * $Id: utils.h 10722 2010-06-04 01:00:27Z Longinus00 $
  */
 
 #ifndef QTR_UTILS
@@ -26,9 +26,12 @@ class Utils: public QObject
     public:
         Utils( ) { }
         virtual ~Utils( ) { }
-
     public:
         static QString remoteFileChooser( QWidget * parent, const QString& title, const QString& myPath, bool dir, bool local );
+        static QString sizeToString( double size );
+        static QString speedToString( const Speed& speed );
+        static QString ratioToString( double ratio );
+        static QString timeToString( int seconds );
         static const QIcon& guessMimeIcon( const QString& filename );
 
         // meh

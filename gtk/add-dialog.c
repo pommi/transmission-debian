@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: add-dialog.c 11044 2010-07-24 02:57:39Z charles $
+ * $Id: add-dialog.c 10644 2010-05-13 13:12:27Z charles $
  */
 
 #include <glib/gi18n.h>
@@ -125,7 +125,7 @@ addResponseCB( GtkDialog * dialog,
         {
             tr_torrent * tor = tr_torrent_handle( data->gtor );
 
-            tr_torrentSetPriority( tor, gtr_priority_combo_get_value( GTK_COMBO_BOX( data->priority_combo ) ) );
+            tr_torrentSetPriority( tor, gtr_priority_combo_get_value( data->priority_combo ) );
 
             if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( data->run_check ) ) )
                 tr_torrentStart( tor );
@@ -297,8 +297,8 @@ addSingleTorrentDialog( GtkWindow * parent, TrCore * core, tr_ctor * ctor )
     str = _( "_Start when added" );
     data->run_check = gtk_check_button_new_with_mnemonic( str );
 
-    w = data->priority_combo = gtr_priority_combo_new( );
-    gtr_priority_combo_set_value( GTK_COMBO_BOX( w ), TR_PRI_NORMAL );
+    data->priority_combo = gtr_priority_combo_new( );
+    gtr_priority_combo_set_value( data->priority_combo, TR_PRI_NORMAL );
 
     g_signal_connect( G_OBJECT( d ), "response",
                       G_CALLBACK( addResponseCB ), data );
@@ -544,7 +544,6 @@ addURLDialog( GtkWindow * parent, TrCore * core )
     t = hig_workarea_create( );
     hig_workarea_add_section_title( t, &row, _( "Add torrent from URL" ) );
     e = gtk_entry_new( );
-    gtk_widget_set_size_request( e, 400, -1 );
     paste_clipboard_url_into_entry( e );
     g_object_set_data( G_OBJECT( w ), "url-entry", e );
     hig_workarea_add_row( t, &row, _( "_URL" ), e, NULL );

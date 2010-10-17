@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: blocklist.h 10920 2010-07-01 15:14:35Z charles $
+ * $Id: blocklist.h 9868 2010-01-04 21:00:47Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -21,7 +21,7 @@ struct tr_address;
 typedef struct tr_blocklist tr_blocklist;
 
 tr_blocklist* _tr_blocklistNew         ( const char              * filename,
-                                         tr_bool                   isEnabled );
+                                         int                       isEnabled );
 
 int           _tr_blocklistExists      ( const tr_blocklist      * b );
 

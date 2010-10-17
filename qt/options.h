@@ -1,19 +1,17 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: options.h 11092 2010-08-01 20:36:13Z charles $
+ * $Id: options.h 10080 2010-02-02 07:52:57Z charles $
  */
 
 #ifndef OPTIONS_DIALOG_H
 #define OPTIONS_DIALOG_H
-
-#include <iostream>
 
 #include <QDialog>
 #include <QEvent>
@@ -22,14 +20,12 @@
 #include <QVector>
 #include <QMap>
 #include <QPushButton>
-#include <QString>
 #include <QStringList>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QTimer>
 
-#include "add-data.h" // AddData
-#include "file-tree.h" // FileList
+#include "file-tree.h"
 
 class FileTreeView;
 class Prefs;
@@ -43,16 +39,21 @@ class FileAdded: public QObject
 {
         Q_OBJECT
         const int64_t myTag;
-        QString myName;
         QString myDelFile;
 
     public:
-        FileAdded( int tag, const QString& name ): myTag(tag), myName(name) { }
+        FileAdded( int tag, const QString file ): myTag(tag), myDelFile(file) { }
         ~FileAdded( ) { }
-        void setFileToDelete( const QString& file ) { myDelFile = file; }
 
     public slots:
-        void executed( int64_t tag, const QString& result, struct tr_benc * arguments );
+        void executed( int64_t tag, const QString& result, struct tr_benc * arguments ) {
+            Q_UNUSED( arguments );
+            if( tag == myTag ) {
+                if( result == "success" )
+                    QFile( myDelFile ).remove( );
+                deleteLater();
+            }
+        }
 };
 
 class Options: public QDialog
@@ -60,7 +61,7 @@ class Options: public QDialog
         Q_OBJECT
 
     public:
-        Options( Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0 );
+        Options( Session& session, const Prefs& prefs, const QString& filename, QWidget * parent = 0 );
         ~Options( );
 
     private:
@@ -72,7 +73,7 @@ class Options: public QDialog
 
     private:
         Session& mySession;
-        AddData myAdd;
+        QString myFile;
         QDir myDestination;
         bool myHaveInfo;
         tr_info myInfo;

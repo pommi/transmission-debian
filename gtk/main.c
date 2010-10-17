@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: main.c 11281 2010-10-01 13:50:23Z charles $
+ * $Id: main.c 11007 2010-07-13 14:09:24Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -59,8 +59,7 @@
 #include "util.h"
 #include "ui.h"
 
-#define MY_CONFIG_NAME "transmission"
-#define MY_READABLE_NAME "transmission-gtk"
+#define MY_NAME "transmission"
 
 #if GTK_CHECK_VERSION( 2, 8, 0 )
  #define SHOW_LICENSE
@@ -200,6 +199,18 @@ static void           winsetup( struct cbdata * cbdata,
                                 TrWindow *      wind );
 
 static void           wannaquit( gpointer vdata );
+
+static void           setupdrag( GtkWidget *    widget,
+                                 struct cbdata *data );
+
+static void           gotdrag( GtkWidget *       widget,
+                               GdkDragContext *  dc,
+                               gint              x,
+                               gint              y,
+                               GtkSelectionData *sel,
+                               guint             info,
+                               guint             time,
+                               gpointer          gdata );
 
 static void coreerr( TrCore *, guint, const char *, struct cbdata * );
 
@@ -446,42 +457,9 @@ onRPCChanged( tr_session            * session,
             break;
         }
 
-        case TR_RPC_SESSION_CHANGED: {
-            int i;
-            tr_benc tmp;
-            tr_benc * newval;
-            tr_benc * oldvals = pref_get_all( );
-            const char * key;
-            GSList * l;
-            GSList * changed_keys = NULL;
-            tr_bencInitDict( &tmp, 100 );
-            tr_sessionGetSettings( session, &tmp );
-            for( i=0; tr_bencDictChild( &tmp, i, &key, &newval ); ++i )
-            {
-                tr_bool changed;
-                tr_benc * oldval = tr_bencDictFind( oldvals, key );
-                if( !oldval )
-                    changed = TRUE;
-                else {
-                    char * a = tr_bencToStr( oldval, TR_FMT_BENC, NULL );
-                    char * b = tr_bencToStr( newval, TR_FMT_BENC, NULL );
-                    changed = strcmp( a, b ) != 0;
-                    tr_free( b );
-                    tr_free( a );
-                }
-
-                if( changed )
-                    changed_keys = g_slist_append( changed_keys, (gpointer)key );
-            }
-            tr_sessionGetSettings( session, oldvals );
-
-            for( l=changed_keys; l!=NULL; l=l->next )
-                prefschanged( cbdata->core, key, cbdata );
-
-            g_slist_free( changed_keys );
-            tr_bencFree( &tmp );
+        case TR_RPC_SESSION_CHANGED:
+            tr_sessionGetSettings( session, pref_get_all( ) );
             break;
-        }
 
         case TR_RPC_TORRENT_CHANGED:
         case TR_RPC_TORRENT_MOVED:
@@ -539,7 +517,7 @@ main( int argc, char ** argv )
     gboolean showversion = FALSE;
     gboolean startpaused = FALSE;
     gboolean startminimized = FALSE;
-    const char * domain = MY_READABLE_NAME;
+    const char * domain = MY_NAME;
     char * configDir = NULL;
     gtr_lockfile_state_t tr_state;
 
@@ -564,9 +542,6 @@ main( int argc, char ** argv )
     bind_textdomain_codeset( domain, "UTF-8" );
     textdomain( domain );
     g_set_application_name( _( "Transmission" ) );
-    tr_formatter_mem_init( mem_K, _(mem_K_str), _(mem_M_str), _(mem_G_str), _(mem_T_str) );
-    tr_formatter_size_init( disk_K, _(disk_K_str), _(disk_M_str), _(disk_G_str), _(disk_T_str) );
-    tr_formatter_speed_init( speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str) );
 
     /* initialize gtk */
     if( !g_thread_supported( ) )
@@ -583,12 +558,12 @@ main( int argc, char ** argv )
 
     if( showversion )
     {
-        fprintf( stderr, "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING );
+        fprintf( stderr, "%s %s\n", g_get_application_name( ), LONG_VERSION_STRING );
         return 0;
     }
 
     if( configDir == NULL )
-        configDir = (char*) tr_getDefaultConfigDir( MY_CONFIG_NAME );
+        configDir = (char*) tr_getDefaultConfigDir( MY_NAME );
 
     tr_notify_init( );
     didinit = cf_init( configDir, NULL ); /* must come before actions_init */
@@ -669,7 +644,7 @@ main( int argc, char ** argv )
         actions_init ( myUIManager, cbdata );
         gtk_ui_manager_add_ui_from_string ( myUIManager, fallback_ui_file, -1, NULL );
         gtk_ui_manager_ensure_update ( myUIManager );
-        gtk_window_set_default_icon_name ( MY_CONFIG_NAME );
+        gtk_window_set_default_icon_name ( MY_NAME );
 
         /* create main window now to be a parent to any error dialogs */
         win = GTK_WINDOW( tr_window_new( myUIManager, cbdata->core ) );
@@ -709,12 +684,6 @@ main( int argc, char ** argv )
 }
 
 static void
-onCoreBusy( TrCore * core UNUSED, gboolean busy, struct cbdata * c )
-{
-    tr_window_set_busy( c->wind, busy );
-}
-
-static void
 appsetup( TrWindow *      wind,
           GSList *        torrentFiles,
           struct cbdata * cbdata,
@@ -742,11 +711,13 @@ appsetup( TrWindow *      wind,
     actions_set_core( cbdata->core );
 
     /* set up core handlers */
-    g_signal_connect( cbdata->core, "busy", G_CALLBACK( onCoreBusy ), cbdata );
-    g_signal_connect( cbdata->core, "add-error", G_CALLBACK( coreerr ), cbdata );
-    g_signal_connect( cbdata->core, "add-prompt", G_CALLBACK( onAddTorrent ), cbdata );
-    g_signal_connect( cbdata->core, "prefs-changed", G_CALLBACK( prefschanged ), cbdata );
-    g_signal_connect_swapped( cbdata->core, "quit", G_CALLBACK( wannaquit ), cbdata );
+    g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
+    g_signal_connect( cbdata->core, "add-torrent-prompt",
+                      G_CALLBACK( onAddTorrent ), cbdata );
+    g_signal_connect_swapped( cbdata->core, "quit",
+                              G_CALLBACK( wannaquit ), cbdata );
+    g_signal_connect( cbdata->core, "prefs-changed",
+                      G_CALLBACK( prefschanged ), cbdata );
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, forcepause );
@@ -884,54 +855,10 @@ rowChangedCB( GtkTreeModel  * model UNUSED,
 }
 
 static void
-on_drag_data_received( GtkWidget         * widget          UNUSED,
-                       GdkDragContext    * drag_context,
-                       gint                x               UNUSED,
-                       gint                y               UNUSED,
-                       GtkSelectionData  * selection_data,
-                       guint               info            UNUSED,
-                       guint               time_,
-                       gpointer            gdata )
+winsetup( struct cbdata * cbdata,
+          TrWindow *      wind )
 {
-    int i;
-    gboolean success = FALSE;
-    GSList * filenames = NULL;
-    struct cbdata * data = gdata;
-    char ** uris = gtk_selection_data_get_uris( selection_data );
-
-    /* try to add the filename URIs... */
-    for( i=0; uris && uris[i]; ++i )
-    {
-        const char * uri = uris[i];
-        char * filename = g_filename_from_uri( uri, NULL, NULL );
-
-        if( filename && g_file_test( filename, G_FILE_TEST_EXISTS ) )
-        {
-            filenames = g_slist_append( filenames, g_strdup( filename ) );
-            success = TRUE;
-        }
-        else if( tr_urlIsValid( uri, -1 ) || gtr_is_magnet_link( uri ) )
-        {
-            tr_core_add_from_url( data->core, uri );
-            success = TRUE;
-        }
-    }
-
-    if( filenames )
-        tr_core_add_list_defaults( data->core, g_slist_reverse( filenames ), TRUE );
-
-    tr_core_torrents_added( data->core );
-    gtk_drag_finish( drag_context, success, FALSE, time_ );
-
-    /* cleanup */
-    g_strfreev( uris );
-}
-
-static void
-winsetup( struct cbdata * cbdata, TrWindow * wind )
-{
-    GtkWidget * w;
-    GtkTreeModel * model;
+    GtkTreeModel *     model;
     GtkTreeSelection * sel;
 
     g_assert( NULL == cbdata->wind );
@@ -945,11 +872,7 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
     refreshActions( cbdata );
 
-    /* register to handle URIs that get dragged onto our main window */
-    w = GTK_WIDGET( wind );
-    gtk_drag_dest_set( w, GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY );
-    gtk_drag_dest_add_uri_targets( w );
-    g_signal_connect( w, "drag-data-received", G_CALLBACK(on_drag_data_received), cbdata );
+    setupdrag( GTK_WIDGET( wind ), cbdata );
 }
 
 static gboolean
@@ -1042,7 +965,7 @@ wannaquit( gpointer vdata )
     gtk_table_attach_defaults( GTK_TABLE( p ), w, 1, 2, 1, 2 );
 
     b = gtk_alignment_new( 0.0, 1.0, 0.01, 0.01 );
-    w = gtk_button_new_with_mnemonic( _( "_Quit Now" ) );
+    w = gtr_button_new_from_stock( GTK_STOCK_QUIT, _( "_Quit Now" ) );
     g_signal_connect( w, "clicked", G_CALLBACK( do_exit_cb ), NULL );
     gtk_container_add( GTK_CONTAINER( b ), w );
     gtk_table_attach( GTK_TABLE( p ), b, 1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 10 );
@@ -1063,6 +986,105 @@ wannaquit( gpointer vdata )
 
     /* shut down libT */
     g_thread_create( sessionCloseThreadFunc, vdata, TRUE, NULL );
+}
+
+static void
+gotdrag( GtkWidget         * widget UNUSED,
+         GdkDragContext *           dc,
+         gint                x      UNUSED,
+         gint                y      UNUSED,
+         GtkSelectionData *         sel,
+         guint               info   UNUSED,
+         guint                      time,
+         gpointer                   gdata )
+{
+    struct cbdata * data = gdata;
+    GSList *        paths = NULL;
+    GSList *        freeme = NULL;
+
+#if 0
+    int             i;
+    char *          sele = gdk_atom_name( sel->selection );
+    char *          targ = gdk_atom_name( sel->target );
+    char *          type = gdk_atom_name( sel->type );
+
+    g_message( "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i",
+               sele, targ, type, sel->format, sel->length );
+    g_free( sele );
+    g_free( targ );
+    g_free( type );
+    if( sel->format == 8 )
+    {
+        for( i = 0; i < sel->length; ++i )
+            fprintf( stderr, "%02X ", sel->data[i] );
+        fprintf( stderr, "\n" );
+    }
+#endif
+
+    if( ( sel->format == 8 )
+      && ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
+    {
+        int      i;
+        char *   str = g_strndup( (char*)sel->data, sel->length );
+        gchar ** files = g_strsplit_set( str, "\r\n", -1 );
+        for( i = 0; files && files[i]; ++i )
+        {
+            char * filename;
+            if( !*files[i] ) /* empty filename... */
+                continue;
+
+            /* decode the filename */
+            filename = decode_uri( files[i] );
+            freeme = g_slist_prepend( freeme, filename );
+            if( !g_utf8_validate( filename, -1, NULL ) )
+                continue;
+
+            /* walk past "file://", if present */
+            if( g_str_has_prefix( filename, "file:" ) ) {
+                filename += 5;
+                while( g_str_has_prefix( filename, "//" ) )
+                    ++filename;
+            }
+
+            g_debug( "got from drag: [%s]", filename );
+
+            if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
+                paths = g_slist_prepend( paths, g_strdup( filename ) );
+            else
+                tr_core_add_from_url( data->core, filename );
+        }
+
+        /* try to add any torrents we found */
+        if( paths )
+        {
+            paths = g_slist_reverse( paths );
+            tr_core_add_list_defaults( data->core, paths, TRUE );
+            tr_core_torrents_added( data->core );
+        }
+
+        freestrlist( freeme );
+        g_strfreev( files );
+        g_free( str );
+    }
+
+    gtk_drag_finish( dc, ( NULL != paths ), FALSE, time );
+}
+
+static void
+setupdrag( GtkWidget *    widget,
+           struct cbdata *data )
+{
+    GtkTargetEntry targets[] = {
+        { (char*)"STRING",          0, 0 },
+        { (char*)"text/plain",      0, 0 },
+        { (char*)"text/uri-list",   0, 0 },
+    };
+
+    g_signal_connect( widget, "drag_data_received", G_CALLBACK(
+                          gotdrag ), data );
+
+    gtk_drag_dest_set( widget, GTK_DEST_DEFAULT_ALL, targets,
+                       G_N_ELEMENTS( targets ), GDK_ACTION_COPY | GDK_ACTION_MOVE );
 }
 
 static void
@@ -1103,16 +1125,16 @@ showTorrentErrors( struct cbdata * cbdata )
 {
     if( cbdata->errqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
-                               gtr_ngettext( "Couldn't add corrupt torrent",
-                                             "Couldn't add corrupt torrents",
-                                             g_slist_length( cbdata->errqueue ) ),
+                               ngettext( "Couldn't add corrupt torrent",
+                                         "Couldn't add corrupt torrents",
+                                         g_slist_length( cbdata->errqueue ) ),
                                &cbdata->errqueue );
 
     if( cbdata->dupqueue )
         flushAddTorrentErrors( GTK_WINDOW( cbdata->wind ),
-                               gtr_ngettext( "Couldn't add duplicate torrent",
-                                             "Couldn't add duplicate torrents",
-                                             g_slist_length( cbdata->dupqueue ) ),
+                               ngettext( "Couldn't add duplicate torrent",
+                                         "Couldn't add duplicate torrents",
+                                         g_slist_length( cbdata->dupqueue ) ),
                                &cbdata->dupqueue );
 }
 
@@ -1210,17 +1232,17 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionLimitSpeed( tr, TR_DOWN, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_DSPEED_KBps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_DSPEED ) )
     {
-        tr_sessionSetSpeedLimit_KBps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_USPEED_ENABLED ) )
     {
         tr_sessionLimitSpeed( tr, TR_UP, pref_flag_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_USPEED_KBps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_USPEED ) )
     {
-        tr_sessionSetSpeedLimit_KBps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetSpeedLimit( tr, TR_UP, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_RATIO_ENABLED ) )
     {
@@ -1229,14 +1251,6 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     else if( !strcmp( key, TR_PREFS_KEY_RATIO ) )
     {
         tr_sessionSetRatioLimit( tr, pref_double_get( key ) );
-    }
-    else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT ) )
-    {
-        tr_sessionSetIdleLimit( tr, pref_int_get( key ) );
-    }
-    else if( !strcmp( key, TR_PREFS_KEY_IDLE_LIMIT_ENABLED ) )
-    {
-        tr_sessionSetIdleLimited( tr, pref_flag_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_PORT_FORWARDING ) )
     {
@@ -1314,13 +1328,13 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     {
         tr_sessionSetProxyPort( tr, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP ) )
     {
-        tr_sessionSetAltSpeed_KBps( tr, TR_UP, pref_int_get( key ) );
+        tr_sessionSetAltSpeed( tr, TR_UP, pref_int_get( key ) );
     }
-    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ) )
+    else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN ) )
     {
-        tr_sessionSetAltSpeed_KBps( tr, TR_DOWN, pref_int_get( key ) );
+        tr_sessionSetAltSpeed( tr, TR_DOWN, pref_int_get( key ) );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) )
     {
@@ -1401,9 +1415,11 @@ updatemodel( gpointer gdata )
 }
 
 static void
-onUriClicked( GtkAboutDialog * u UNUSED, const gchar * uri, gpointer u2 UNUSED )
+aboutDialogActivateLink( GtkAboutDialog * dialog    UNUSED,
+                         const gchar *              link_,
+                         gpointer         user_data UNUSED )
 {
-    gtr_open_uri( uri );
+    gtr_open_file( link_ );
 }
 
 static void
@@ -1417,20 +1433,20 @@ about( GtkWindow * parent )
         NULL
     };
 
-    const char * website_uri = "http://www.transmissionbt.com/";
+    const char *website_url = "http://www.transmissionbt.com/";
 
-    gtk_about_dialog_set_url_hook( onUriClicked, NULL, NULL );
+    gtk_about_dialog_set_url_hook( aboutDialogActivateLink, NULL, NULL );
 
     gtk_show_about_dialog( parent,
                            "name", g_get_application_name( ),
                            "comments",
                            _( "A fast and easy BitTorrent client" ),
                            "version", LONG_VERSION_STRING,
-                           "website", website_uri,
-                           "website-label", website_uri,
+                           "website", website_url,
+                           "website-label", website_url,
                            "copyright",
-                           _( "Copyright (c) The Transmission Project" ),
-                           "logo-icon-name", MY_CONFIG_NAME,
+                           _( "Copyright 2005-2009 The Transmission Project" ),
+                           "logo-icon-name", MY_NAME,
 #ifdef SHOW_LICENSE
                            "license", LICENSE,
                            "wrap-license", TRUE,
@@ -1522,7 +1538,8 @@ removeSelected( struct cbdata * data, gboolean delete_files )
 
     gtk_tree_selection_selected_foreach( s, accumulateSelectedTorrents, &l );
 
-    if( l != NULL ) {
+    if( l != NULL )
+    {
         l = g_slist_reverse( l );
         confirmRemove( data->wind, data->core, l, delete_files );
     }
@@ -1620,7 +1637,7 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp( action_name, "donate" ) )
     {
-        gtr_open_uri( "http://www.transmissionbt.com/donate.php" );
+        gtr_open_file( "http://www.transmissionbt.com/donate.php" );
     }
     else if( !strcmp( action_name, "pause-all-torrents" ) )
     {
@@ -1747,7 +1764,9 @@ doAction( const char * action_name, gpointer user_data )
     }
     else if( !strcmp ( action_name, "help" ) )
     {
-        gtr_open_uri( gtr_get_help_uri( ) );
+        char * url = gtr_get_help_url( );
+        gtr_open_file( url );
+        g_free( url );
     }
     else if( !strcmp( action_name, "toggle-main-window" ) )
     {

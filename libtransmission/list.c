@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: list.c 11023 2010-07-19 14:44:24Z charles $
+ * $Id: list.c 10524 2010-04-23 23:45:44Z charles $
  */
 
 #include "transmission.h"
@@ -142,35 +142,6 @@ tr_list_find( tr_list *         list,
             return list;
 
     return NULL;
-}
-
-void
-tr_list_insert_sorted( tr_list            ** list,
-                       void                * data,
-                       TrListCompareFunc     compare )
-{
-    /* find l, the node that we'll insert this data before */
-    tr_list * l;
-
-    for( l = *list; l != NULL; l = l->next )
-    {
-        const int c = (compare)( data, l->data );
-        if( c <= 0 )
-            break;
-    }
-
-    if( l == NULL )
-        tr_list_append( list, data );
-    else if( l == *list )
-        tr_list_prepend( list, data );
-    else {
-        tr_list * node = node_alloc( );
-        node->data = data;
-        node->prev = l->prev;
-        node->next = l;
-        node->prev->next = node;
-        node->next->prev = node;
-    }
 }
 
 int

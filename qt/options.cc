@@ -1,19 +1,18 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: options.cc 11112 2010-08-04 16:25:30Z charles $
+ * $Id: options.cc 10723 2010-06-04 01:41:47Z Longinus00 $
  */
 
 #include <cstdio>
 #include <iostream>
 
-#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -23,7 +22,6 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QSet>
@@ -34,7 +32,6 @@
 #include <libtransmission/bencode.h>
 #include <libtransmission/utils.h> /* mime64 */
 
-#include "add-data.h"
 #include "file-tree.h"
 #include "hig.h"
 #include "options.h"
@@ -47,39 +44,10 @@
 ****
 ***/
 
-void
-FileAdded :: executed( int64_t tag, const QString& result, struct tr_benc * arguments )
-{
-    Q_UNUSED( arguments );
-
-    if( tag != myTag )
-        return;
-
-    if( result == "success" )
-        if( !myDelFile.isEmpty( ) )
-            QFile( myDelFile ).remove( );
-
-    if( result != "success" ) {
-        QString text = result;
-        for( int i=0, n=text.size(); i<n; ++i )
-            if( !i || text[i-1].isSpace() )
-                text[i] = text[i].toUpper();
-        QMessageBox::warning( QApplication::activeWindow(),
-                              tr( "Error Adding Torrent" ),
-                              QString("<p><b>%1</b></p><p>%2</p>").arg(text).arg(myName) );
-    }
-
-    deleteLater();
-}
-
-/***
-****
-***/
-
-Options :: Options( Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent ):
+Options :: Options( Session& session, const Prefs& prefs, const QString& filename, QWidget * parent ):
     QDialog( parent, Qt::Dialog ),
     mySession( session ),
-    myAdd( addme ),
+    myFile( filename ),
     myHaveInfo( false ),
     myDestinationButton( 0 ),
     myVerifyButton( 0 ),
@@ -200,17 +168,7 @@ Options :: refreshButton( QPushButton * p, const QString& text, int width )
 void
 Options :: refreshFileButton( int width )
 {
-    QString text;
-
-    switch( myAdd.type )
-    {
-        case AddData::FILENAME: text = QFileInfo(myAdd.filename).baseName(); break;
-        case AddData::URL:      text = myAdd.url.toString(); break;
-        case AddData::MAGNET:   text = myAdd.magnet; break;
-        default:                break;
-    }
-
-    refreshButton( myFileButton, text, width );
+    refreshButton( myFileButton, QFileInfo(myFile).baseName(), width );
 }
 
 void
@@ -257,13 +215,10 @@ Options :: reload( )
     clearVerify( );
 
     tr_ctor * ctor = tr_ctorNew( 0 );
-
-    switch( myAdd.type ) {
-        case AddData::MAGNET:   tr_ctorSetMetainfoFromMagnetLink( ctor, myAdd.magnet.toUtf8().constData() ); break;
-        case AddData::FILENAME: tr_ctorSetMetainfoFromFile( ctor, myAdd.filename.toUtf8().constData() ); break;
-        case AddData::METAINFO: tr_ctorSetMetainfo( ctor, (const uint8_t*)myAdd.metainfo.constData(), myAdd.metainfo.size() ); break;
-        default: break;
-    }
+    if( Utils::isMagnetLink( myFile ) )
+        tr_ctorSetMetainfoFromMagnetLink( ctor, myFile.toUtf8().constData() );
+    else
+        tr_ctorSetMetainfoFromFile( ctor, myFile.toUtf8().constData() );
 
     const int err = tr_torrentParse( ctor, &myInfo );
     myHaveInfo = !err;
@@ -325,25 +280,17 @@ Options :: onAccepted( )
         tr_bencDictAddStr( args, "download-dir", myDestination.absolutePath().toUtf8().constData() );
 
     // "metainfo"
-    switch( myAdd.type )
-    {
-        case AddData::MAGNET:
-            tr_bencDictAddStr( args, "filename", myAdd.magnet.toUtf8().constData() );
-            break;
-
-        case AddData::URL:
-            tr_bencDictAddStr( args, "filename", myAdd.url.toString().toUtf8().constData() );
-            break;
-
-        case AddData::FILENAME:
-        case AddData::METAINFO: {
-            const QByteArray b64 = myAdd.toBase64( );
-            tr_bencDictAddRaw( args, "metainfo", b64.constData(), b64.size() );
-            break;
-        }
-
-        default:
-            std::cerr << "unhandled AddData.type: " << myAdd.type << std::endl;
+    if( Utils::isMagnetLink( myFile ) || Utils::isURL( myFile ) )
+        tr_bencDictAddStr( args, "filename", myFile.toUtf8().constData() );
+    else {
+        QFile file( myFile );
+        file.open( QIODevice::ReadOnly );
+        const QByteArray metainfo( file.readAll( ) );
+        file.close( );
+        int base64Size = 0;
+        char * base64 = tr_base64_encode( metainfo.constData(), metainfo.size(), &base64Size );
+        tr_bencDictAddRaw( args, "metainfo", base64, base64Size );
+        tr_free( base64 );
     }
 
     // paused
@@ -382,11 +329,11 @@ Options :: onAccepted( )
     }
 
     // maybe delete the source .torrent
-    FileAdded * fileAdded = new FileAdded( tag, myAdd.readableName() );
-    if( myTrashCheck->isChecked( ) && ( myAdd.type==AddData::FILENAME ) )
-        fileAdded->setFileToDelete( myAdd.filename );
-    connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_benc*)),
-             fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
+    if( myTrashCheck->isChecked( ) ) {
+        FileAdded * fileAdded = new FileAdded( tag, myFile );
+        connect( &mySession, SIGNAL(executed(int64_t,const QString&, struct tr_benc*)),
+                 fileAdded, SLOT(executed(int64_t,const QString&, struct tr_benc*)));
+    }
 
 //std::cerr << tr_bencToStr(&top,TR_FMT_JSON,NULL) << std::endl;
     mySession.exec( &top );
@@ -398,16 +345,13 @@ Options :: onAccepted( )
 void
 Options :: onFilenameClicked( )
 {
-    if( myAdd.type == AddData::FILENAME )
-    {
-        QFileDialog * d = new QFileDialog( this,
-                                           tr( "Add Torrent" ),
-                                           QFileInfo(myAdd.filename).absolutePath(),
-                                           tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
-        d->setFileMode( QFileDialog::ExistingFile );
-        connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)) );
-        d->show( );
-    }
+    QFileDialog * d = new QFileDialog( this,
+                                       tr( "Add Torrent" ),
+                                       QFileInfo(myFile).absolutePath(),
+                                       tr( "Torrent Files (*.torrent);;All Files (*.*)" ) );
+    d->setFileMode( QFileDialog::ExistingFile );
+    connect( d, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)) );
+    d->show( );
 }
 
 void
@@ -415,7 +359,7 @@ Options :: onFilesSelected( const QStringList& files )
 {
     if( files.size() == 1 )
     {
-        myAdd.set( files.at(0) );
+        myFile = files.at( 0 );
         refreshFileButton( );
         reload( );
     }
@@ -549,27 +493,7 @@ Options :: onTimeout( )
         myVerifyFilePos = 0;
     }
 
-    bool done = myVerifyPieceIndex >= myInfo.pieceCount;
-    if( done )
-    {
-        uint64_t have = 0;
-        foreach( const TrFile& f, myFiles )
-            have += f.have;
-
-        if( !have ) // everything failed
-        {
-            // did the user accidentally specify the child directory instead of the parent?
-            const QStringList tokens = QString(file->name).split('/');
-            if( !tokens.empty() && myDestination.dirName()==tokens.at(0) )
-            {
-                // move up one directory and try again
-                myDestination.cdUp( );
-                refreshDestinationButton( -1 );
-                onVerify( );
-                done = false;
-            }
-        }
-    }
+    const bool done = myVerifyPieceIndex >= myInfo.pieceCount;
 
     if( done )
         myVerifyTimer.stop( );

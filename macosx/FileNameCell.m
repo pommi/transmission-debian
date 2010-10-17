@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: FileNameCell.m 10976 2010-07-08 01:53:09Z livings124 $
+ * $Id: FileNameCell.m 11028 2010-07-21 03:59:08Z livings124 $
  * 
  * Copyright (c) 2007-2010 Transmission authors and contributors
  *
@@ -211,7 +211,8 @@
     FileListNode * node = (FileListNode *)[self objectValue];
     
     const CGFloat progress = [torrent fileProgress: node];
-    NSString * percentString = [NSString percentString: progress longDecimals: YES];
+    NSString * percentString = progress == 1.0 ? @"100%"
+                                : [NSString localizedStringWithFormat: @"%.2f%%", tr_truncd(progress * 100.0, 2)];
     
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@",
                             "Inspector -> Files tab -> file status string"), percentString, [NSString stringForFileSize: [node size]]];

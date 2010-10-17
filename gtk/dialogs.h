@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: dialogs.h 10993 2010-07-11 06:46:46Z charles $
+ * $Id: dialogs.h 10994 2010-07-11 06:46:48Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *

@@ -7,12 +7,14 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: msgwin.h 10863 2010-06-26 15:55:19Z charles $
+ * $Id: msgwin.h 9868 2010-01-04 21:00:47Z charles $
  */
 
 #ifndef TG_MSGWIN_H
 #define TG_MSGWIN_H
 
-GtkWidget * msgwin_new( TrCore * core );
+struct TrCore;
+
+GtkWidget * msgwin_new( struct TrCore * core );
 
 #endif

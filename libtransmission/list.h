@@ -7,11 +7,11 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: list.h 11023 2010-07-19 14:44:24Z charles $
+ * $Id: list.h 10524 2010-04-23 23:45:44Z charles $
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #ifndef TR_LIST_H
@@ -99,17 +99,6 @@ void*    tr_list_remove( tr_list **        list,
 tr_list* tr_list_find( tr_list *         list,
                        const void *      b,
                        TrListCompareFunc compare_func );
-
-/** 
- * @brief Insert in an ordered list 
- * @param list pointer to the list 
- * @param item the item to be inserted 
- * @param compare the comparison function. 
- */ 
-void tr_list_insert_sorted( tr_list          ** list,
-                            void              * data,
-                            TrListCompareFunc   compare );
-
 
 
 /* @} */

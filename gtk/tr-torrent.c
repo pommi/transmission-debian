@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: tr-torrent.c 10852 2010-06-25 17:40:55Z charles $
+ * $Id: tr-torrent.c 10885 2010-06-26 21:01:39Z charles $
  *
  * Copyright (c) 2006-2008 Transmission authors and contributors
  *
@@ -159,7 +159,8 @@ completenessChangedCallback( tr_torrent       * tor,
                              tr_bool            wasRunning,
                              void *             user_data )
 {
-    if( wasRunning && ( completeness != TR_LEECH ) && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
+    if( wasRunning && ( completeness != TR_LEECH )
+                   && ( tr_torrentStat( tor )->sizeWhenDone != 0 ) )
         gtr_idle_add( notifyInMainThread, user_data );
 }
 

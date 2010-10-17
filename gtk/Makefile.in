@@ -36,7 +36,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = transmission-gtk$(EXEEXT)
+bin_PROGRAMS = transmission$(EXEEXT)
 @WIN32_TRUE@am__append_1 = \
 @WIN32_TRUE@	transmission.res
 
@@ -62,18 +62,19 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" \
 	"$(DESTDIR)$(Productivitydir)" "$(DESTDIR)$(icondir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 =
-am_transmission_gtk_OBJECTS = actions.$(OBJEXT) add-dialog.$(OBJEXT) \
+am_transmission_OBJECTS = actions.$(OBJEXT) add-dialog.$(OBJEXT) \
 	conf.$(OBJEXT) details.$(OBJEXT) dialogs.$(OBJEXT) \
 	favicon.$(OBJEXT) file-list.$(OBJEXT) filter.$(OBJEXT) \
 	hig.$(OBJEXT) icons.$(OBJEXT) main.$(OBJEXT) \
 	makemeta-ui.$(OBJEXT) msgwin.$(OBJEXT) notify.$(OBJEXT) \
-	relocate.$(OBJEXT) stats.$(OBJEXT) \
+	relocate.$(OBJEXT) sexy-icon-entry.$(OBJEXT) \
+	sexy-marshal.$(OBJEXT) stats.$(OBJEXT) \
 	torrent-cell-renderer.$(OBJEXT) tracker-list.$(OBJEXT) \
 	tr-core.$(OBJEXT) tr-icon.$(OBJEXT) tr-prefs.$(OBJEXT) \
 	tr-torrent.$(OBJEXT) tr-window.$(OBJEXT) util.$(OBJEXT) \
 	$(am__objects_1)
-transmission_gtk_OBJECTS = $(am_transmission_gtk_OBJECTS)
-transmission_gtk_DEPENDENCIES =  \
+transmission_OBJECTS = $(am_transmission_OBJECTS)
+transmission_DEPENDENCIES =  \
 	$(top_builddir)/libtransmission/libtransmission.a \
 	$(top_builddir)/third-party/miniupnp/libminiupnp.a \
 	$(top_builddir)/third-party/libnatpmp/libnatpmp.a \
@@ -81,10 +82,9 @@ transmission_gtk_DEPENDENCIES =  \
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-transmission_gtk_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(transmission_gtk_LDFLAGS) $(LDFLAGS) \
-	-o $@
+transmission_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(transmission_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -111,8 +111,8 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(transmission_gtk_SOURCES)
-DIST_SOURCES = $(transmission_gtk_SOURCES)
+SOURCES = $(transmission_SOURCES)
+DIST_SOURCES = $(transmission_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -367,9 +367,6 @@ top_srcdir = @top_srcdir@
 transmissionlocaledir = @transmissionlocaledir@
 SUBDIRS = icons
 @TR_UNSTABLE_TRUE@GTK_EXTRA_CPPFLAGS = -DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED -DPANGO_DISABLE_DEPRECATED
-
-# these should go in GTK_EXTRA_CPPFLAGS at some point, but not yet because it breaks libnotify's headers
-# -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     -DTRANSMISSIONLOCALEDIR=\""$(transmissionlocaledir)"\" \
@@ -399,21 +396,22 @@ noinst_HEADERS = \
     details.h \
     dialogs.h \
     favicon.h \
-    file-list.h \
     filter.h \
     hig.h \
     icons.h \
-    icon-lock.h \
-    icon-logo-24.h \
-    icon-logo-48.h \
-    icon-ratio.h \
-    icon-turtle.h \
-    icon-utilities.h \
+    file-list.h \
+    lock.h \
+    logo-24.h \
+    logo-48.h \
     makemeta-ui.h \
     msgwin.h \
     notify.h \
+    options-icon.h \
+    ratio-icon.h \
     relocate.h \
     stats.h \
+    sexy-icon-entry.h \
+    sexy-marshal.h \
     torrent-cell-renderer.h \
     tracker-list.h \
     tr-core.h \
@@ -422,11 +420,12 @@ noinst_HEADERS = \
     tr-prefs.h \
     tr-torrent.h \
     tr-window.h \
+    turtles.h \
     ui.h \
     util.h
 
 dbus_generated_sources = tr-core-dbus.h
-transmission_gtk_SOURCES = \
+transmission_SOURCES = \
     actions.c \
     add-dialog.c \
     conf.c \
@@ -442,6 +441,8 @@ transmission_gtk_SOURCES = \
     msgwin.c \
     notify.c \
     relocate.c \
+    sexy-icon-entry.c \
+    sexy-marshal.c \
     stats.c \
     torrent-cell-renderer.c \
     tracker-list.c \
@@ -453,8 +454,8 @@ transmission_gtk_SOURCES = \
     util.c \
     $(dbus_generated_sources)
 
-dist_man_MANS = transmission-gtk.1
-transmission_gtk_LDADD =  \
+dist_man_MANS = transmission.1
+transmission_LDADD =  \
 	$(top_builddir)/libtransmission/libtransmission.a \
 	$(top_builddir)/third-party/miniupnp/libminiupnp.a \
 	$(top_builddir)/third-party/libnatpmp/libnatpmp.a \
@@ -462,7 +463,7 @@ transmission_gtk_LDADD =  \
 	@GIO_LIBS@ @LIBAPPINDICATOR_LIBS@ @LIBNOTIFY_LIBS@ \
 	@LIBEVENT_LIBS@ @DBUS_GLIB_LIBS@ @LIBCURL_LIBS@ @OPENSSL_LIBS@ \
 	@ZLIB_LIBS@ @PTHREAD_LIBS@ $(am__append_2)
-DESKTOP_IN_FILES = transmission-gtk.desktop.in
+DESKTOP_IN_FILES = transmission.desktop.in
 DESKTOP_FILES = $(DESKTOP_IN_FILES:.desktop.in=.desktop)
 Productivitydir = $(datadir)/applications
 Productivity_DATA = $(DESKTOP_FILES)
@@ -475,13 +476,19 @@ EXTRA_DIST = \
     transmission.png
 
 DISTCLEANFILES = \
-    transmission-gtk.desktop
+    transmission.desktop
 
 CLEANFILES = $(dbus_generated_sources) $(am__append_1)
+@WIN32_FALSE@BUILT_SOURCES = \
+@WIN32_FALSE@	sexy-marshal.h \
+@WIN32_FALSE@	sexy-marshal.c
+
 @WIN32_TRUE@BUILT_SOURCES = \
+@WIN32_TRUE@	sexy-marshal.h \
+@WIN32_TRUE@	sexy-marshal.c \
 @WIN32_TRUE@	setransmission.res
 
-@WIN32_TRUE@transmission_gtk_LDFLAGS = \
+@WIN32_TRUE@transmission_LDFLAGS = \
 @WIN32_TRUE@	-mwindows
 
 all: $(BUILT_SOURCES)
@@ -562,9 +569,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-transmission-gtk$(EXEEXT): $(transmission_gtk_OBJECTS) $(transmission_gtk_DEPENDENCIES) 
-	@rm -f transmission-gtk$(EXEEXT)
-	$(AM_V_CCLD)$(transmission_gtk_LINK) $(transmission_gtk_OBJECTS) $(transmission_gtk_LDADD) $(LIBS)
+transmission$(EXEEXT): $(transmission_OBJECTS) $(transmission_DEPENDENCIES) 
+	@rm -f transmission$(EXEEXT)
+	$(AM_V_CCLD)$(transmission_LINK) $(transmission_OBJECTS) $(transmission_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -587,6 +594,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msgwin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/notify.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relocate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sexy-icon-entry.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sexy-marshal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/torrent-cell-renderer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tr-core.Po@am__quote@
@@ -1044,6 +1053,16 @@ uninstall-man: uninstall-man1
 	uninstall-am uninstall-binPROGRAMS uninstall-iconDATA \
 	uninstall-man uninstall-man1
 
+
+# these should go in GTK_EXTRA_CPPFLAGS at some point, but not yet because it breaks libnotify's headers
+# -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES
+
+sexy-marshal.h:	marshal.list
+	glib-genmarshal --prefix=sexy_marshal ./marshal.list --header > sexy-marshal.h
+
+sexy-marshal.c:	marshal.list
+	echo '#include "sexy-marshal.h"' > sexy-marshal.c
+	glib-genmarshal --prefix=sexy_marshal ./marshal.list --body >> sexy-marshal.c
 @INTLTOOL_DESKTOP_RULE@
 
 $(srcdir)/tr-core.c: tr-core-dbus.h

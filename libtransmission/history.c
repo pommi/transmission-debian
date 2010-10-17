@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: history.c 11280 2010-10-01 13:33:39Z charles $
+ * $Id:$
  */
 
 #include "transmission.h"
@@ -16,7 +16,7 @@
 
 struct history_slice
 {
-    unsigned int n;
+    double n;
     uint64_t date;
 };
 
@@ -24,12 +24,12 @@ struct tr_recentHistory
 {
     int newest;
     int sliceCount;
-    unsigned int precision_msec;
+    int precision_msec;
     struct history_slice * slices;
 };
 
 void
-tr_historyAdd( tr_recentHistory * h, uint64_t now, unsigned int n )
+tr_historyAdd( tr_recentHistory * h, uint64_t now, double n )
 {
     if( h->slices[h->newest].date + h->precision_msec >= now )
         h->slices[h->newest].n += n;
@@ -40,11 +40,11 @@ tr_historyAdd( tr_recentHistory * h, uint64_t now, unsigned int n )
     }
 }
 
-unsigned int
-tr_historyGet( const tr_recentHistory * h, uint64_t now, unsigned int msec )
+double
+tr_historyGet( const tr_recentHistory * h, uint64_t now, int msec )
 {
-    unsigned int n = 0;
-    const uint64_t cutoff = (now?now:tr_time_msec()) - msec;
+    double n = 0;
+    const uint64_t cutoff = (now?now:tr_date()) - msec;
     int i = h->newest;
 
     for( ;; )
@@ -62,13 +62,13 @@ tr_historyGet( const tr_recentHistory * h, uint64_t now, unsigned int msec )
 }
 
 tr_recentHistory *
-tr_historyNew( unsigned int seconds, unsigned int bins_per_second )
+tr_historyNew( int seconds, int bins_per_second )
 {
     tr_recentHistory * h;
 
     h = tr_new0( tr_recentHistory, 1 );
     h->precision_msec = 1000 / bins_per_second;
-    h->sliceCount = (int)(seconds * bins_per_second);
+    h->sliceCount = seconds * bins_per_second;
     h->slices = tr_new0( struct history_slice, h->sliceCount );
 
     return h;

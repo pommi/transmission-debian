@@ -27,6 +27,7 @@ EXTRA_DIST = \
     pt_PT.lproj \
     ru.lproj \
     zh_CN.lproj \
+    zh_TW.lproj \
     AboutWindowController.h \
     AboutWindowController.m \
     AddMagnetWindowController.h \

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: Torrent.m 11225 2010-09-18 19:49:34Z livings124 $
+ * $Id: Torrent.m 10878 2010-06-26 18:52:05Z livings124 $
  *
  * Copyright (c) 2006-2010 Transmission authors and contributors
  *
@@ -31,8 +31,6 @@
 #import "transmission.h" // required by utils.h
 #import "utils.h" // tr_new()
 
-#define ETA_IDLE_DISPLAY_SEC (2*60)
-
 @interface Torrent (Private)
 
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
@@ -47,10 +45,8 @@
 
 - (void) completenessChange: (NSDictionary *) statusInfo;
 - (void) ratioLimitHit;
-- (void) idleLimitHit;
 - (void) metadataRetrieved;
 
-- (BOOL) shouldShowEta;
 - (NSString *) etaString;
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path;
@@ -67,11 +63,6 @@ void completenessChangeCallback(tr_torrent * torrent, tr_completeness status, tr
 void ratioLimitHitCallback(tr_torrent * torrent, void * torrentData)
 {
     [(Torrent *)torrentData performSelectorOnMainThread: @selector(ratioLimitHit) withObject: nil waitUntilDone: NO];
-}
-
-void idleLimitHitCallback(tr_torrent * torrent, void * torrentData)
-{
-    [(Torrent *)torrentData performSelectorOnMainThread: @selector(idleLimitHit) withObject: nil waitUntilDone: NO];
 }
 
 void metadataCallback(tr_torrent * torrent, void * torrentData)
@@ -301,7 +292,7 @@ int trashDataFile(const char * filename)
         tr_torrentStart(fHandle);
         [self update];
         
-        //capture, specifically, stop-seeding settings changing to unlimited
+        //capture, specifically, ratio setting changing to unlimited
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
     }
 }
@@ -386,30 +377,14 @@ int trashDataFile(const char * filename)
     tr_torrentSetRatioLimit(fHandle, limit);
 }
 
+- (BOOL) seedRatioSet
+{
+    return tr_torrentGetSeedRatio(fHandle, NULL);
+}
+
 - (CGFloat) progressStopRatio
 {
     return fStat->seedRatioPercentDone;
-}
-
-- (tr_idlelimit) idleSetting
-{
-    return tr_torrentGetIdleMode(fHandle);
-}
-
-- (void) setIdleSetting: (tr_idlelimit) setting
-{
-    tr_torrentSetIdleMode(fHandle, setting);
-}
-
-- (NSUInteger) idleLimitMinutes
-{
-    return tr_torrentGetIdleLimit(fHandle);
-}
-
-- (void) setIdleLimitMinutes: (NSUInteger) limit
-{
-    NSAssert(limit > 0, @"Idle limit must be greater than zero");
-    tr_torrentSetIdleLimit(fHandle, limit);
 }
 
 - (BOOL) usesSpeedLimit: (BOOL) upload
@@ -424,12 +399,12 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) speedLimit: (BOOL) upload
 {
-    return tr_torrentGetSpeedLimit_KBps(fHandle, upload ? TR_UP : TR_DOWN);
+    return tr_torrentGetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
 - (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload
 {
-    tr_torrentSetSpeedLimit_KBps(fHandle, upload ? TR_UP : TR_DOWN, limit);
+    tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
 
 - (BOOL) usesGlobalSpeedLimit
@@ -814,6 +789,11 @@ int trashDataFile(const char * filename)
     return fStat->recheckProgress;
 }
 
+- (NSInteger) eta
+{
+    return fStat->eta;
+}
+
 - (CGFloat) availableDesired
 {
     return (CGFloat)fStat->desiredAvailable / [self sizeLeft];
@@ -903,9 +883,9 @@ int trashDataFile(const char * filename)
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
         
         if (peer->isUploadingTo)
-            [dict setObject: [NSNumber numberWithDouble: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->rateToPeer] forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
-            [dict setObject: [NSNumber numberWithDouble: peer->rateToClient_KBps] forKey: @"DL From Rate"];
+            [dict setObject: [NSNumber numberWithFloat: peer->rateToClient] forKey: @"DL From Rate"];
         
         [peerDicts addObject: dict];
     }
@@ -924,7 +904,7 @@ int trashDataFile(const char * filename)
 {
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: fInfo->webseedCount];
     
-    double * dlSpeeds = tr_torrentWebSpeeds_KBps(fHandle);
+    float * dlSpeeds = tr_torrentWebSpeeds(fHandle);
     
     for (NSInteger i = 0; i < fInfo->webseedCount; i++)
     {
@@ -949,8 +929,8 @@ int trashDataFile(const char * filename)
     if ([self isMagnet])
     {
         NSString * progressString = fStat->metadataPercentComplete > 0.0
-                    ? [NSString stringWithFormat: NSLocalizedString(@"%@ of torrent metadata retrieved",
-                        "Torrent -> progress string"), [NSString percentString: fStat->metadataPercentComplete longDecimals: YES]]
+                    ? [NSString localizedStringWithFormat: NSLocalizedString(@"%.2f%% of torrent metadata retrieved",
+                        "Torrent -> progress string"), tr_truncd(100.0 * fStat->metadataPercentComplete, 2)]
                     : NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
         
         return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
@@ -966,16 +946,16 @@ int trashDataFile(const char * filename)
         {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected", "Torrent -> progress string"),
                         [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self totalSizeSelected]]];
-            progress = [self progressDone];
+            progress = 100.0 * [self progressDone];
         }
         else
         {
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
                         [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
-            progress = [self progress];
+            progress = 100.0 * [self progress];
         }
         
-        string = [string stringByAppendingFormat: @" (%@)", [NSString percentString: progress longDecimals: YES]];
+        string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)", string, tr_truncd(progress, 2)];
     }
     else
     {
@@ -989,8 +969,9 @@ int trashDataFile(const char * filename)
             {
                 downloadString = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "Torrent -> progress string"),
                                     [NSString stringForFileSize: [self haveTotal]], [NSString stringForFileSize: [self size]]];
-                downloadString = [downloadString stringByAppendingFormat: @" (%@)",
-                                    [NSString percentString: [self progress] longDecimals: YES]];
+                
+                downloadString = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
+                                    downloadString, tr_truncd(100.0 * [self progress], 2)];
             }
         }
         else
@@ -1003,8 +984,8 @@ int trashDataFile(const char * filename)
         string = [downloadString stringByAppendingFormat: @", %@", uploadString];
     }
     
-    //add time when downloading or seed limit set
-    if ([self shouldShowEta])
+    //add time when downloading
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
         string = [string stringByAppendingFormat: @" - %@", [self etaString]];
     
     return string;
@@ -1050,9 +1031,9 @@ int trashDataFile(const char * filename)
                 break;
 
             case TR_STATUS_CHECK:
-                string = [NSString stringWithFormat: @"%@ (%@)",
+                string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
                             NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
-                            [NSString percentString: [self checkingProgress] longDecimals: YES]];
+                                tr_truncd(100.0 * [self checkingProgress], 2)];
                 break;
 
             case TR_STATUS_DOWNLOAD:
@@ -1130,9 +1111,9 @@ int trashDataFile(const char * filename)
             break;
 
         case TR_STATUS_CHECK:
-            string = [NSString stringWithFormat: @"%@ (%@)",
+            string = [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
                         NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
-                        [NSString percentString: [self checkingProgress] longDecimals: YES]];
+                            tr_truncd(100.0 * [self checkingProgress], 2)];
             break;
         
         case TR_STATUS_DOWNLOAD:
@@ -1152,7 +1133,7 @@ int trashDataFile(const char * filename)
 
 - (NSString *) remainingTimeString
 {
-    if ([self shouldShowEta])
+    if (fStat->activity == TR_STATUS_DOWNLOAD || ([self isSeeding] && [self seedRatioSet]))
         return [self etaString];
     else
         return [self shortStatusString];
@@ -1184,9 +1165,9 @@ int trashDataFile(const char * filename)
             return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
 
         case TR_STATUS_CHECK:
-            return [NSString stringWithFormat: @"%@ (%@)",
+            return [NSString localizedStringWithFormat: @"%@ (%.2f%%)",
                     NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
-                    [NSString percentString: [self checkingProgress] longDecimals: YES]];
+                        tr_truncd(100.0 * [self checkingProgress], 2)];
 
         case TR_STATUS_DOWNLOAD:
             return NSLocalizedString(@"Downloading", "Torrent -> status string");
@@ -1253,12 +1234,12 @@ int trashDataFile(const char * filename)
 
 - (CGFloat) downloadRate
 {
-    return fStat->pieceDownloadSpeed_KBps;
+    return fStat->pieceDownloadSpeed;
 }
 
 - (CGFloat) uploadRate
 {
-    return fStat->pieceUploadSpeed_KBps;
+    return fStat->pieceUploadSpeed;
 }
 
 - (CGFloat) totalRate
@@ -1502,10 +1483,16 @@ int trashDataFile(const char * filename)
 
 - (NSInteger) stalledMinutes
 {
-    if (fStat->idleSecs == -1)
+    const time_t start = fStat->startDate;
+    if (start == 0)
         return -1;
     
-    return fStat->idleSecs / 60;
+    NSDate * started = [NSDate dateWithTimeIntervalSince1970: start],
+            * activity = [self dateActivity];
+    
+    NSDate * laterDate = activity ? [started laterDate: activity] : started;
+    
+    return ABS([laterDate timeIntervalSinceNow]) / 60;
 }
 
 - (BOOL) isStalled
@@ -1636,7 +1623,6 @@ int trashDataFile(const char * filename)
     
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
-    tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, self);
     tr_torrentSetMetadataCallback(fHandle, metadataCallback, self);
     
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
@@ -1770,8 +1756,8 @@ int trashDataFile(const char * filename)
     {
         case TR_SEED:
         case TR_PARTIAL_SEED:
-            //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self
+            //simpler to create a new dictionary than to use statusInfo - avoids retention chicanery 
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self 
                 userInfo: [NSDictionary dictionaryWithObject: [statusInfo objectForKey: @"WasRunning"] forKey: @"WasRunning"]];
             break;
         
@@ -1789,14 +1775,7 @@ int trashDataFile(const char * filename)
 {
     fStat = tr_torrentStat(fHandle);
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
-}
-
-- (void) idleLimitHit
-{
-    fStat = tr_torrentStat(fHandle);
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
 }
 
 - (void) metadataRetrieved
@@ -1808,48 +1787,18 @@ int trashDataFile(const char * filename)
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self];
 }
 
-- (BOOL) shouldShowEta
-{
-    if (fStat->activity == TR_STATUS_DOWNLOAD)
-        return YES;
-    else if ([self isSeeding])
-    {
-        //ratio: show if it's set at all
-        if (tr_torrentGetSeedRatio(fHandle, NULL))
-            return YES;
-        
-        //idle: show only if remaining time is less than cap
-        if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
-            return YES;
-    }
-    
-    return NO;
-}
-
 - (NSString *) etaString
 {
-    NSInteger eta;
-    BOOL fromIdle;
-    //don't check for both, since if there's a regular ETA, the torrent isn't idle so it's meaningless
-    if (fStat->eta != TR_ETA_NOT_AVAIL && fStat->eta != TR_ETA_UNKNOWN)
+    const NSInteger eta = [self eta];
+    switch (eta)
     {
-        eta = fStat->eta;
-        fromIdle = NO;
+        case TR_ETA_NOT_AVAIL:
+        case TR_ETA_UNKNOWN:
+            return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
+        default:
+            return [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
+                        [NSString timeString: eta showSeconds: YES maxFields: 2]];
     }
-    else if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
-    {
-        eta = fStat->etaIdle;
-        fromIdle = YES;
-    }
-    else
-        return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
-    
-    NSString * idleString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "Torrent -> eta string"),
-                                [NSString timeString: eta showSeconds: YES maxFields: 2]];
-    if (fromIdle)
-        idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
-    
-    return idleString;
 }
 
 - (void) setTimeMachineExclude: (BOOL) exclude forPath: (NSString *) path

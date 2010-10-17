@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: torrent.cc 11240 2010-09-20 13:46:08Z charles $
+ * $Id: torrent.cc 10873 2010-06-26 17:48:57Z Longinus00 $
  */
 
 #include <cassert>
@@ -19,7 +19,6 @@
 #include <QSet>
 #include <QString>
 #include <QStyle>
-#include <QUrl>
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
@@ -33,7 +32,6 @@
 
 
 Torrent :: Torrent( Prefs& prefs, int id ):
-    magnetTorrent( false ),
     myPrefs( prefs )
 {
     for( int i=0; i<PROPERTY_COUNT; ++i )
@@ -55,8 +53,8 @@ Torrent :: Property
 Torrent :: myProperties[] =
 {
     { ID, "id", QVariant::Int, INFO, },
-    { UPLOAD_SPEED, "rateUpload", QVariant::ULongLong, STAT } /* Bps */,
-    { DOWNLOAD_SPEED, "rateDownload", QVariant::ULongLong, STAT }, /* Bps */
+    { UPLOAD_SPEED, "rateUpload", QVariant::Int, STAT } /* B/s */,
+    { DOWNLOAD_SPEED, "rateDownload", QVariant::Int, STAT }, /* B/s */
     { DOWNLOAD_DIR, "downloadDir", QVariant::String, STAT },
     { ACTIVITY, "status", QVariant::Int, STAT },
     { NAME, "name", QVariant::String, INFO },
@@ -86,16 +84,14 @@ Torrent :: myProperties[] =
     { DOWNLOADED_EVER, "downloadedEver", QVariant::ULongLong, STAT },
     { UPLOADED_EVER, "uploadedEver", QVariant::ULongLong, STAT },
     { FAILED_EVER, "corruptEver", QVariant::ULongLong, STAT_EXTRA },
-    { TRACKERS, "trackers", QVariant::StringList, STAT },
+    { TRACKERS, "trackers", QVariant::StringList, INFO },
     { TRACKERSTATS, "trackerStats", TrTypes::TrackerStatsList, STAT_EXTRA },
     { MIME_ICON, "ccc", QVariant::Icon, DERIVED },
     { SEED_RATIO_LIMIT, "seedRatioLimit", QVariant::Double, STAT },
     { SEED_RATIO_MODE, "seedRatioMode", QVariant::Int, STAT },
-    { SEED_IDLE_LIMIT, "seedIdleLimit", QVariant::Int, STAT_EXTRA },
-    { SEED_IDLE_MODE, "seedIdleMode", QVariant::Int, STAT_EXTRA },
-    { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */
+    { DOWN_LIMIT, "downloadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
     { DOWN_LIMITED, "downloadLimited", QVariant::Bool, STAT_EXTRA },
-    { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KB/s */
+    { UP_LIMIT, "uploadLimit", QVariant::Int, STAT_EXTRA }, /* KiB/s */
     { UP_LIMITED, "uploadLimited", QVariant::Bool, STAT_EXTRA },
     { HONORS_SESSION_LIMITS, "honorsSessionLimits", QVariant::Bool, STAT_EXTRA },
     { PEER_LIMIT, "peer-limit", QVariant::Int, STAT_EXTRA },
@@ -342,7 +338,7 @@ Torrent :: getSeedRatio( double& ratio ) const
                 ratio = myPrefs.getDouble( Prefs :: RATIO );
             break;
 
-        default: // TR_RATIOLIMIT_UNLIMITED:
+        case TR_RATIOLIMIT_UNLIMITED:
             isLimited = false;
             break;
     }
@@ -545,12 +541,9 @@ Torrent :: update( tr_benc * d )
         int i = 0;
         QStringList list;
         tr_benc * child;
-        while(( child = tr_bencListChild( trackers, i++ ))) {
-            if( tr_bencDictFindStr( child, "announce", &str )) {
-                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl(str) );
+        while(( child = tr_bencListChild( trackers, i++ )))
+            if( tr_bencDictFindStr( child, "announce", &str ))
                 list.append( QString::fromUtf8( str ) );
-            }
-        }
         if( myValues[TRACKERS] != list ) {
             myValues[TRACKERS].setValue( list );
             changed = true;
@@ -567,10 +560,8 @@ Torrent :: update( tr_benc * d )
             int64_t i;
             const char * str;
             TrackerStat trackerStat;
-            if( tr_bencDictFindStr( child, "announce", &str ) ) {
+            if( tr_bencDictFindStr( child, "announce", &str ) )
                 trackerStat.announce = QString::fromUtf8( str );
-                dynamic_cast<MyApp*>(QApplication::instance())->favicons.add( QUrl( trackerStat.announce ) );
-            }
             if( tr_bencDictFindInt( child, "announceState", &i ) )
                 trackerStat.announceState = i;
             if( tr_bencDictFindInt( child, "downloadCount", &i ) )
@@ -587,8 +578,8 @@ Torrent :: update( tr_benc * d )
                 trackerStat.isBackup = b;
             if( tr_bencDictFindInt( child, "lastAnnouncePeerCount", &i ) )
                 trackerStat.lastAnnouncePeerCount = i;
-            if( tr_bencDictFindStr( child, "lastAnnounceResult", &str ) )
-                trackerStat.lastAnnounceResult = str;
+            if( tr_bencDictFindInt( child, "lastAnnounceResult", &i ) )
+                trackerStat.lastAnnounceResult = i;
             if( tr_bencDictFindInt( child, "lastAnnounceStartTime", &i ) )
                 trackerStat.lastAnnounceStartTime = i;
             if( tr_bencDictFindBool( child, "lastAnnounceSucceeded", &b ) )
@@ -708,11 +699,3 @@ Torrent :: getError( ) const
 
     return s;
 }
-
-QPixmap
-TrackerStat :: getFavicon( ) const
-{
-    MyApp * myApp = dynamic_cast<MyApp*>(QApplication::instance());
-    return myApp->favicons.find( QUrl( announce ) );
-}
-

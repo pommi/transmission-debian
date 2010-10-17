@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-io.c 10931 2010-07-03 00:25:22Z charles $
+ * $Id: peer-io.c 10694 2010-05-26 15:23:21Z charles $
  */
 
 #include <assert.h>
@@ -38,13 +38,6 @@
 
 #define MAGIC_NUMBER 206745
 
-#ifdef WIN32
- #define EAGAIN       WSAEWOULDBLOCK
- #define EINTR        WSAEINTR
- #define EINPROGRESS  WSAEINPROGRESS
- #define EPIPE        WSAECONNRESET
-#endif
-
 static size_t
 guessPacketOverhead( size_t d )
 {
@@ -66,7 +59,7 @@ guessPacketOverhead( size_t d )
      */
     const double assumed_payload_data_rate = 94.0;
 
-    return (unsigned int)( d * ( 100.0 / assumed_payload_data_rate ) - d );
+    return (size_t)( d * ( 100.0 / assumed_payload_data_rate ) - d );
 }
 
 /**
@@ -90,14 +83,14 @@ struct tr_datatype
 ***/
 
 static void
-didWriteWrapper( tr_peerIo * io, unsigned int bytes_transferred )
+didWriteWrapper( tr_peerIo * io, size_t bytes_transferred )
 {
      while( bytes_transferred && tr_isPeerIo( io ) )
      {
         struct tr_datatype * next = io->outbuf_datatypes->data;
 
-        const unsigned int payload = MIN( next->length, bytes_transferred );
-        const unsigned int overhead = guessPacketOverhead( payload );
+        const size_t payload = MIN( next->length, bytes_transferred );
+        const size_t overhead = guessPacketOverhead( payload );
 
         tr_bandwidthUsed( &io->bandwidth, TR_UP, payload, next->isPieceData );
 
@@ -206,10 +199,10 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     tr_peerIo * io = vio;
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
-    unsigned int howmuch;
-    unsigned int curlen;
+    size_t howmuch;
     const tr_direction dir = TR_DOWN;
-    const unsigned int max = 256 * 1024;
+    const size_t max = 256 * 1024;
+    size_t curlen;
 
     assert( tr_isPeerIo( io ) );
 
@@ -228,9 +221,9 @@ event_read_cb( int fd, short event UNUSED, void * vio )
         return;
     }
 
-    EVUTIL_SET_SOCKET_ERROR( 0 );
-    res = evbuffer_read( io->inbuf, fd, (int)howmuch );
-    e = EVUTIL_SOCKET_ERROR( );
+    errno = 0;
+    res = evbuffer_read( io->inbuf, fd, howmuch );
+    e = errno;
 
     if( res > 0 )
     {
@@ -241,7 +234,6 @@ event_read_cb( int fd, short event UNUSED, void * vio )
     }
     else
     {
-        char errstr[512];
         short what = EVBUFFER_READ;
 
         if( res == 0 ) /* EOF */
@@ -254,8 +246,7 @@ event_read_cb( int fd, short event UNUSED, void * vio )
             what |= EVBUFFER_ERROR;
         }
 
-        tr_net_strerror( errstr, sizeof( errstr ), e ); 
-        dbgmsg( io, "event_read_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
+        dbgmsg( io, "event_read_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, strerror( e ) );
 
         if( io->gotError != NULL )
             io->gotError( io, what, io->userData );
@@ -267,22 +258,21 @@ tr_evbuffer_write( tr_peerIo * io, int fd, size_t howmuch )
 {
     int e;
     int n;
-    char errstr[256];
     struct evbuffer * buffer = io->outbuf;
 
     howmuch = MIN( EVBUFFER_LENGTH( buffer ), howmuch );
 
-    EVUTIL_SET_SOCKET_ERROR( 0 );
+    errno = 0;
 #ifdef WIN32
     n = (int) send(fd, buffer->buffer, howmuch,  0 );
 #else
     n = (int) write(fd, buffer->buffer, howmuch );
 #endif
-    e = EVUTIL_SOCKET_ERROR( );
-    dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?tr_net_strerror(errstr,sizeof(errstr),e):"") );
+    e = errno;
+    dbgmsg( io, "wrote %d to peer (%s)", n, (n==-1?strerror(e):"") );
 
     if( n > 0 )
-        evbuffer_drain( buffer, (size_t)n );
+        evbuffer_drain( buffer, n );
 
     /* keep the iobuf's excess capacity from growing too large */
     if( EVBUFFER_LENGTH( io->outbuf ) == 0 ) {
@@ -320,15 +310,23 @@ event_write_cb( int fd, short event UNUSED, void * vio )
         return;
     }
 
-    EVUTIL_SET_SOCKET_ERROR( 0 );
+    errno = 0;
     res = tr_evbuffer_write( io, fd, howmuch );
-    e = EVUTIL_SOCKET_ERROR( );
+    e = errno;
 
     if (res == -1) {
+#ifndef WIN32
+/*todo. evbuffer uses WriteFile when WIN32 is set. WIN32 system calls do not
+ *  *set errno. thus this error checking is not portable*/
         if (e == EAGAIN || e == EINTR || e == EINPROGRESS)
             goto reschedule;
         /* error case */
         what |= EVBUFFER_ERROR;
+
+#else
+        goto reschedule;
+#endif
+
     } else if (res == 0) {
         /* eof case */
         what |= EVBUFFER_EOF;
@@ -636,7 +634,7 @@ tr_peerIoClear( tr_peerIo * io )
 int
 tr_peerIoReconnect( tr_peerIo * io )
 {
-    short int pendingEvents;
+    int pendingEvents;
     tr_session * session;
 
     assert( tr_isPeerIo( io ) );
@@ -716,18 +714,17 @@ tr_peerIoSetPeersId( tr_peerIo *     io,
 ***
 **/
 
-static unsigned int
+static size_t
 getDesiredOutputBufferSize( const tr_peerIo * io, uint64_t now )
 {
     /* this is all kind of arbitrary, but what seems to work well is
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    const unsigned int currentSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps( &io->bandwidth, now, TR_UP );
-    const unsigned int period = 15u; /* arbitrary */
-    /* the 3 is arbitrary; the .5 is to leave room for messages */
-    static const unsigned int ceiling =  (unsigned int)( MAX_BLOCK_SIZE * 3.5 );
-    return MAX( ceiling, currentSpeed_Bps*period );
+    const double currentSpeed = tr_bandwidthGetPieceSpeed( &io->bandwidth, now, TR_UP );
+    const double period = 15; /* arbitrary */
+    const double numBlocks = 3.5; /* the 3 is arbitrary; the .5 is to leave room for messages */
+    return MAX( MAX_BLOCK_SIZE*numBlocks, currentSpeed*1024*period );
 }
 
 size_t
@@ -748,7 +745,8 @@ tr_peerIoGetWriteBufferSpace( const tr_peerIo * io, uint64_t now )
 **/
 
 void
-tr_peerIoSetEncryption( tr_peerIo * io, uint32_t encryptionMode )
+tr_peerIoSetEncryption( tr_peerIo * io,
+                        int         encryptionMode )
 {
     assert( tr_isPeerIo( io ) );
     assert( encryptionMode == PEER_ENCRYPTION_NONE
@@ -881,10 +879,9 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_DOWN, howmuch )))
     {
         int e;
-
-        EVUTIL_SET_SOCKET_ERROR( 0 );
-        res = evbuffer_read( io->inbuf, io->socket, (int)howmuch );
-        e = EVUTIL_SOCKET_ERROR( );
+        errno = 0;
+        res = evbuffer_read( io->inbuf, io->socket, howmuch );
+        e = errno;
 
         dbgmsg( io, "read %d from peer (%s)", res, (res==-1?strerror(e):"") );
 
@@ -893,12 +890,10 @@ tr_peerIoTryRead( tr_peerIo * io, size_t howmuch )
 
         if( ( res <= 0 ) && ( io->gotError ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
         {
-            char errstr[512];
             short what = EVBUFFER_READ | EVBUFFER_ERROR;
             if( res == 0 )
                 what |= EVBUFFER_EOF;
-            tr_net_strerror( errstr, sizeof( errstr ), e ); 
-            dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr );
+            dbgmsg( io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, strerror( e ) );
             io->gotError( io, what, io->userData );
         }
     }
@@ -914,20 +909,17 @@ tr_peerIoTryWrite( tr_peerIo * io, size_t howmuch )
     if(( howmuch = tr_bandwidthClamp( &io->bandwidth, TR_UP, howmuch )))
     {
         int e;
-        EVUTIL_SET_SOCKET_ERROR( 0 );
+        errno = 0;
         n = tr_evbuffer_write( io, io->socket, howmuch );
-        e = EVUTIL_SOCKET_ERROR( );
+        e = errno;
 
         if( n > 0 )
             didWriteWrapper( io, n );
 
         if( ( n < 0 ) && ( io->gotError ) && ( e != EPIPE ) && ( e != EAGAIN ) && ( e != EINTR ) && ( e != EINPROGRESS ) )
         {
-            char errstr[512];
             const short what = EVBUFFER_WRITE | EVBUFFER_ERROR;
-
-            tr_net_strerror( errstr, sizeof( errstr ), e ); 
-            dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, errstr );
+            dbgmsg( io, "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)", n, what, e, strerror( e ) );
 
             if( io->gotError != NULL )
                 io->gotError( io, what, io->userData );

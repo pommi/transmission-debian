@@ -18,9 +18,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
- $Id: tr-dht.c 11284 2010-10-01 20:22:51Z charles $
-
 */
 
 /* ansi */
@@ -28,19 +25,13 @@ THE SOFTWARE.
 #include <stdio.h>
 
 /* posix */
+#include <netinet/in.h> /* sockaddr_in */
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/socket.h> /* socket(), bind() */
+#include <netdb.h>
 #include <unistd.h> /* close() */
-#ifdef WIN32
-  #include <inttypes.h>
-  #define _WIN32_WINNT  0x0501	/* freeaddrinfo(),getaddrinfo(),getnameinfo() */
-  #include <ws2tcpip.h>
-#else
-  #include <sys/types.h>
-  #include <sys/socket.h> /* socket(), bind() */
-  #include <netdb.h>
-  #include <netinet/in.h> /* sockaddr_in */
-#endif
 
 /* third party */
 #include <event.h>
@@ -90,11 +81,12 @@ bootstrap_done( tr_session *session, int af )
 }
 
 static void
-nap( int roughly_sec )
+nap( int roughly )
 {
-    const int roughly_msec = roughly_sec * 1000;
-    const int msec = roughly_msec/2 + tr_cryptoWeakRandInt(roughly_msec);
-    tr_wait_msec( msec );
+    struct timeval tv;
+    tv.tv_sec = roughly / 2 + tr_cryptoWeakRandInt( roughly );
+    tv.tv_usec = tr_cryptoWeakRandInt( 1000000 );
+    select( 0, NULL, NULL, NULL, &tv );
 }
 
 static int
@@ -201,7 +193,7 @@ dht_bootstrap(void *closure)
             tr_buildPath(cl->session->configDir, "dht.bootstrap", NULL);
 
         if(bootstrap_file)
-            f = fopen(bootstrap_file, "rb");
+            f = fopen(bootstrap_file, "r");
         if(f != NULL) {
             tr_ninf("DHT", "Attempting manual bootstrap");
             for(;;) {
@@ -546,7 +538,7 @@ tr_dhtStatus( tr_session * session, int af, int * nodes_return )
 
     tr_runInEventThread( session, getstatus, &closure );
     while( closure.status < 0 )
-        tr_wait_msec( 50 /*msec*/ );
+        tr_wait_msec( 10 /*msec*/ );
 
     if( nodes_return )
         *nodes_return = closure.count;

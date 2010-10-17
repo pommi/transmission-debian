@@ -20,14 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
-#endif
-
 #ifndef _TR_LPD_H
 #define _TR_LPD_H
 
-/* $Id: tr-lpd.h 11257 2010-09-23 13:29:41Z charles $ */
+/* $Id$ */
 
 int tr_lpdInit( tr_session*, tr_address* );
 void tr_lpdUninit( tr_session* );

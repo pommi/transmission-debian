@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: PrefsController.h 11046 2010-07-24 03:19:41Z livings124 $
+ * $Id: PrefsController.h 10666 2010-05-19 23:08:14Z livings124 $
  *
  * Copyright (c) 2005-2010 Transmission authors and contributors
  *
@@ -37,7 +37,7 @@
     NSString * fInitialString;
     
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
-    IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
+    IBOutlet NSTextField * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
@@ -115,11 +115,8 @@
 - (void) setRenamePartialFiles: (id) sender;
 
 - (void) applyRatioSetting: (id) sender;
-- (void) setRatioStop: (id) sender;
 - (void) updateRatioStopField;
-
-- (void) applyIdleStopSetting: (id) sender;
-- (void) setIdleStop: (id) sender;
+- (void) setRatioStop: (id) sender;
 
 - (void) applySpeedSettings: (id) sender;
 - (void) applyAltSpeedSettings;

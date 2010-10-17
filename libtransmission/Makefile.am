@@ -21,7 +21,6 @@ libtransmission_a_SOURCES = \
     bencode.c \
     bitfield.c \
     blocklist.c \
-    cache.c \
     clients.c \
     completion.c \
     ConvertUTF.c \
@@ -44,6 +43,7 @@ libtransmission_a_SOURCES = \
     platform.c \
     port-forwarding.c \
     ptrarray.c \
+    publish.c \
     ratecontrol.c \
     resume.c \
     rpcimpl.c \
@@ -71,7 +71,6 @@ noinst_HEADERS = \
     bitfield.h \
     bitset.h \
     blocklist.h \
-    cache.h \
     clients.h \
     ConvertUTF.h \
     crypto.h \
@@ -95,6 +94,7 @@ noinst_HEADERS = \
     platform.h \
     port-forwarding.h \
     ptrarray.h \
+    publish.h \
     ratecontrol.h \
     resume.h \
     rpcimpl.h \

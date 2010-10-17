@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: tr-window.c 11263 2010-09-24 15:22:53Z charles $
+ * $Id: tr-window.c 10857 2010-06-25 20:15:07Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -26,6 +26,13 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+
+#if !GTK_CHECK_VERSION( 2,16,0 )
+ /* FIXME: when 2.16 has been out long enough, it would be really nice to
+  * get rid of this libsexy usage because of its makefile strangeness */
+ #define USE_SEXY
+ #include "sexy-icon-entry.h"
+#endif
 
 #include <libtransmission/transmission.h>
 
@@ -198,8 +205,8 @@ prefsChanged( TrCore * core UNUSED,
         tr_window_update( (TrWindow*)wind );
     }
     else if( !strcmp( key, TR_PREFS_KEY_ALT_SPEED_ENABLED ) ||
-             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP_KBps ) ||
-             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ) )
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_UP ) ||
+             !strcmp( key, TR_PREFS_KEY_ALT_SPEED_DOWN ) )
     {
         syncAltSpeedButton( p );
     }
@@ -259,8 +266,8 @@ syncAltSpeedButton( PrivateData * p )
     const char * stock = b ? "alt-speed-on" : "alt-speed-off";
     GtkWidget * w = p->alt_speed_button;
 
-    tr_formatter_speed_KBps( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP_KBps ), sizeof( u ) );
-    tr_formatter_speed_KBps( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN_KBps ), sizeof( d ) );
+    tr_strlspeed( u, pref_int_get( TR_PREFS_KEY_ALT_SPEED_UP ), sizeof( u ) );
+    tr_strlspeed( d, pref_int_get( TR_PREFS_KEY_ALT_SPEED_DOWN ), sizeof( d ) );
     fmt = b ? _( "Click to disable Temporary Speed Limits\n(%1$s down, %2$s up)" )
             : _( "Click to enable Temporary Speed Limits\n(%1$s down, %2$s up)" );
     str = g_strdup_printf( fmt, d, u );
@@ -381,11 +388,11 @@ onSpeedSet( GtkCheckMenuItem * check, gpointer vp )
     const char * key;
     PrivateData * p = vp;
     GObject * o = G_OBJECT( check );
-    const int KBps = GPOINTER_TO_INT( g_object_get_data( o, SPEED_KEY ) );
+    const int speed = GPOINTER_TO_INT( g_object_get_data( o, SPEED_KEY ) );
     tr_direction dir = GPOINTER_TO_INT( g_object_get_data( o, DIRECTION_KEY ) );
 
-    key = dir==TR_UP ? TR_PREFS_KEY_USPEED_KBps : TR_PREFS_KEY_DSPEED_KBps;
-    tr_core_set_pref_int( p->core, key, KBps );
+    key = dir==TR_UP ? TR_PREFS_KEY_USPEED : TR_PREFS_KEY_DSPEED;
+    tr_core_set_pref_int( p->core, key, speed );
 
     key = dir==TR_UP ? TR_PREFS_KEY_USPEED_ENABLED : TR_PREFS_KEY_DSPEED_ENABLED;
     tr_core_set_pref_bool( p->core, key, TRUE );
@@ -396,7 +403,7 @@ createSpeedMenu( PrivateData * p, tr_direction dir )
 {
     int i, n;
     GtkWidget *w, *m;
-    const int speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+    const int speeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
     m = gtk_menu_new( );
 
@@ -417,13 +424,13 @@ createSpeedMenu( PrivateData * p, tr_direction dir )
     w = gtk_separator_menu_item_new( );
     gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
 
-    for( i=0, n=G_N_ELEMENTS(speeds_KBps); i<n; ++i )
+    for( i=0, n=G_N_ELEMENTS(speeds); i<n; ++i )
     {
         char buf[128];
-        tr_formatter_speed_KBps( buf, speeds_KBps[i], sizeof( buf ) );
+        tr_strlspeed( buf, speeds[i], sizeof( buf ) );
         w = gtk_menu_item_new_with_label( buf );
         g_object_set_data( G_OBJECT( w ), DIRECTION_KEY, GINT_TO_POINTER( dir ) );
-        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( speeds_KBps[i] ) );
+        g_object_set_data( G_OBJECT( w ), SPEED_KEY, GINT_TO_POINTER( speeds[i] ) );
         g_signal_connect( w, "activate", G_CALLBACK(onSpeedSet), p );
         gtk_menu_shell_append( GTK_MENU_SHELL( m ), w );
     }
@@ -534,7 +541,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
     PrivateData * p = vp;
 
     w = p->speedlimit_on_item[TR_DOWN];
-    tr_formatter_speed_KBps( buf1, pref_int_get( TR_PREFS_KEY_DSPEED_KBps ), sizeof( buf1 ) );
+    tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_DSPEED ), sizeof( buf1 ) );
     gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_DSPEED_ENABLED );
@@ -542,7 +549,7 @@ onOptionsClicked( GtkButton * button UNUSED, gpointer vp )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( w ), TRUE );
 
     w = p->speedlimit_on_item[TR_UP];
-    tr_formatter_speed_KBps( buf1, pref_int_get( TR_PREFS_KEY_USPEED_KBps ), sizeof( buf1 ) );
+    tr_strlspeed( buf1, pref_int_get( TR_PREFS_KEY_USPEED ), sizeof( buf1 ) );
     gtk_label_set_text( GTK_LABEL( gtk_bin_get_child( GTK_BIN( w ) ) ), buf1 );
 
     b = pref_flag_get( TR_PREFS_KEY_USPEED_ENABLED );
@@ -640,7 +647,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     gtk_container_set_border_width( GTK_CONTAINER( h ), GUI_PAD_SMALL );
 
         w = gtk_button_new( );
-        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "utilities", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
+        gtk_container_add( GTK_CONTAINER( w ), gtk_image_new_from_stock( "options", GTK_ICON_SIZE_SMALL_TOOLBAR ) );
         gtr_widget_set_tooltip_text( w, _( "Options" ) );
         gtk_box_pack_start( GTK_BOX( h ), w, 0, 0, 0 );
         gtk_button_set_relief( GTK_BUTTON( w ), GTK_RELIEF_NONE );
@@ -698,18 +705,33 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
                                          GTK_SHADOW_IN );
     gtk_container_add( GTK_CONTAINER( w ), p->view );
 
-    /* lay out the widgets */
-    gtk_box_pack_start( GTK_BOX( vbox ), mainmenu, FALSE, FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX( vbox ), filter, FALSE, FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX( vbox ), list, TRUE, TRUE, 0 );
-    gtk_box_pack_start( GTK_BOX( vbox ), status, FALSE, FALSE, 0 );
+    /* layout the widgets */
+    {
+        const char * str = pref_string_get( PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER );
+        char ** tokens = g_strsplit( str, ",", -1 );
+        for( i=0; tokens && tokens[i]; ++i )
+        {
+            const char * key = tokens[i];
+
+            if( !strcmp( key, "menu" ) )
+                gtk_box_pack_start( GTK_BOX( vbox ), mainmenu, FALSE, FALSE, 0 );
+            else if( !strcmp( key, "toolbar" ) )
+                gtk_box_pack_start( GTK_BOX( vbox ), toolbar, FALSE, FALSE, 0 );
+            else if( !strcmp( key, "filter" ) )
+                gtk_box_pack_start( GTK_BOX( vbox ), filter, FALSE, FALSE, 0 );
+            else if( !strcmp( key, "list" ) )
+                gtk_box_pack_start( GTK_BOX( vbox ), list, TRUE, TRUE, 0 );
+            else if( !strcmp( key, "statusbar" ) )
+                gtk_box_pack_start( GTK_BOX( vbox ), status, FALSE, FALSE, 0 );
+        }
+        g_strfreev( tokens );
+    }
 
     {
-        /* this is to determine the maximum width/height for the label */
         int w=0, h=0;
-        PangoLayout * pango_layout;
-        pango_layout = gtk_widget_create_pango_layout( p->ul_lb, "999.99 KiB/s" );
+        /* this is to determine the maximum width/height for the label */
+        PangoLayout * pango_layout =
+            gtk_widget_create_pango_layout( p->ul_lb, _( "999.9 KiB/s" ) );
         pango_layout_get_pixel_size( pango_layout, &w, &h );
         gtk_widget_set_size_request( p->ul_lb, w, h );
         gtk_widget_set_size_request( p->dl_lb, w, h );
@@ -728,6 +750,7 @@ tr_window_new( GtkUIManager * ui_mgr, TrCore * core )
     prefsChanged( core, PREF_KEY_STATUSBAR, self );
     prefsChanged( core, PREF_KEY_STATUSBAR_STATS, self );
     prefsChanged( core, PREF_KEY_TOOLBAR, self );
+    prefsChanged( core, PREF_KEY_FILTER_MODE, self );
     prefsChanged( core, TR_PREFS_KEY_ALT_SPEED_ENABLED, self );
     p->pref_handler_id = g_signal_connect( core, "prefs-changed",
                                            G_CALLBACK( prefsChanged ), self );
@@ -743,20 +766,22 @@ updateTorrentCount( PrivateData * p )
     if( p && p->core )
     {
         char      buf[512];
-        const int torrentCount = gtk_tree_model_iter_n_children( tr_core_model( p->core ), NULL );
-        const int visibleCount = gtk_tree_model_iter_n_children( p->filter_model, NULL );
+        const int torrentCount = gtk_tree_model_iter_n_children(
+            tr_core_model( p->core ), NULL );
+        const int visibleCount = gtk_tree_model_iter_n_children(
+            p->filter_model, NULL );
 
         if( !torrentCount )
             *buf = '\0';
         else if( torrentCount != visibleCount )
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%1$'d of %2$'d Torrent",
-                                      "%1$'d of %2$'d Torrents",
-                                      torrentCount ),
+                        ngettext( "%1$'d of %2$'d Torrent",
+                                  "%1$'d of %2$'d Torrents",
+                                  torrentCount ),
                         visibleCount, torrentCount );
         else
             g_snprintf( buf, sizeof( buf ),
-                        gtr_ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
+                        ngettext( "%'d Torrent", "%'d Torrents", torrentCount ),
                         torrentCount );
         gtk_label_set_text( GTK_LABEL( p->gutter_lb ), buf );
     }
@@ -832,10 +857,10 @@ updateSpeeds( PrivateData * p )
         }
         while( gtk_tree_model_iter_next( model, &iter ) );
 
-        tr_formatter_speed_KBps( buf, down, sizeof( buf ) );
+        tr_strlspeed( buf, down, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->dl_lb ), buf );
 
-        tr_formatter_speed_KBps( buf, up, sizeof( buf ) );
+        tr_strlspeed( buf, up, sizeof( buf ) );
         gtk_label_set_text( GTK_LABEL( p->ul_lb ), buf );
     }
 }
@@ -860,18 +885,3 @@ tr_window_get_selection( TrWindow * w )
     return get_private_data( w )->selection;
 }
 
-void
-tr_window_set_busy( TrWindow * w, gboolean isBusy )
-{
-    if( w && gtr_widget_get_realized( GTK_WIDGET( w ) ) )
-    {    
-        GdkDisplay * display = gtk_widget_get_display( GTK_WIDGET( w ) );
-        GdkCursor * cursor = isBusy ? gdk_cursor_new_for_display( display, GDK_WATCH ) : NULL;
-
-        gdk_window_set_cursor( GTK_WIDGET(w)->window, cursor );
-        gdk_display_flush( display );
-
-        if( cursor )
-            gdk_cursor_unref( cursor ); 
-    }
-}

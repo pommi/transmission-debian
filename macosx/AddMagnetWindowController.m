@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: AddMagnetWindowController.m 11090 2010-08-01 20:18:44Z charles $
+ * $Id$
  *
  * Copyright (c) 2010 Transmission authors and contributors
  *

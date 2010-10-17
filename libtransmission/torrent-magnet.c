@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent-magnet.c 11280 2010-10-01 13:33:39Z charles $
+ * $Id:$
  */
 
 #include <assert.h>
@@ -116,7 +116,7 @@ findInfoDictOffset( const tr_torrent * tor )
                 int infoLen;
                 char * infoContents = tr_bencToStr( infoDict, TR_FMT_BENC, &infoLen );
                 const uint8_t * i = (const uint8_t*) tr_memmem( (char*)fileContents, fileLen, infoContents, infoLen );
-                offset = i != NULL ? i - fileContents : 0;
+                offset = i == NULL ? i - fileContents : 0;
                 tr_free( infoContents );
             }
 
@@ -348,10 +348,10 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
     return have_request;
 }
 
-double
+float
 tr_torrentGetMetadataPercent( const tr_torrent * tor )
 {
-    double ret;
+    float ret;
 
     if( tr_torrentHasMetadata( tor ) )
         ret = 1.0;
@@ -360,7 +360,7 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
         if( m == NULL )
             ret = 0.0;
         else
-            ret = (m->pieceCount - m->piecesNeededCount) / (double)m->pieceCount;
+            ret = (m->pieceCount - m->piecesNeededCount) / (float)m->pieceCount;
     }
 
     return ret;

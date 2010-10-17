@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: PeerProgressIndicatorCell.m 10832 2010-06-24 00:00:43Z livings124 $
+ * $Id: PeerProgressIndicatorCell.m 10711 2010-05-31 14:06:54Z livings124 $
  * 
  * Copyright (c) 2007-2010 Transmission authors and contributors
  *
@@ -24,7 +24,6 @@
 
 #import "PeerProgressIndicatorCell.h"
 #import "NSApplicationAdditions.h"
-#import "NSStringAdditions.h"
 
 #import "transmission.h" // required by utils.h
 #import "utils.h"
@@ -64,7 +63,8 @@
             [paragraphStyle release];
         }
         
-        [[NSString percentString: [self floatValue] longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
+        [[NSString localizedStringWithFormat: @"%.1f%%", tr_truncd([self floatValue] * 100.0, 1)] drawInRect: cellFrame
+            withAttributes: fAttributes];
     }
     else
     {

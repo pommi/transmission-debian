@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: handshake.c 10912 2010-06-30 16:40:19Z charles $
+ * $Id: handshake.c 10506 2010-04-21 04:44:35Z charles $
  */
 
 #include <assert.h>
@@ -99,8 +99,6 @@ enum
 #define HANDSHAKE_SET_EXTPREF( reserved, val ) ( ( reserved )[5] |= 0x03 &\
                                                                     ( val ) )
 
-typedef uint8_t handshake_state_t;
-
 struct tr_handshake
 {
     tr_bool               haveReadAnythingFromPeer;
@@ -110,7 +108,7 @@ struct tr_handshake
     tr_crypto *           crypto;
     tr_session *          session;
     uint8_t               mySecret[KEY_LEN];
-    handshake_state_t     state;
+    uint8_t               state;
     tr_encryption_mode    encryptionMode;
     uint16_t              pad_c_len;
     uint16_t              pad_d_len;
@@ -157,7 +155,7 @@ enum
     } while( 0 )
 
 static const char*
-getStateName( const handshake_state_t state )
+getStateName( short state )
 {
     const char * str = "f00!";
 
@@ -200,14 +198,16 @@ getStateName( const handshake_state_t state )
 }
 
 static void
-setState( tr_handshake * handshake, handshake_state_t state )
+setState( tr_handshake * handshake,
+          short          state )
 {
     dbgmsg( handshake, "setting to state [%s]", getStateName( state ) );
     handshake->state = state;
 }
 
 static void
-setReadState( tr_handshake * handshake, handshake_state_t state )
+setReadState( tr_handshake * handshake,
+              int            state )
 {
     setState( handshake, state );
 }
@@ -346,7 +346,7 @@ sendYa( tr_handshake * handshake )
 
     /* send it */
     setReadState( handshake, AWAITING_YB );
-    tr_peerIoWrite( handshake->io, outbuf, walk - outbuf, FALSE );
+    tr_peerIoWrite( handshake->io, outbuf, walk-outbuf, FALSE );
 }
 
 static uint32_t
@@ -588,7 +588,8 @@ readPadD( tr_handshake *    handshake,
     tr_peerIoReadBytes( handshake->io, inbuf, tmp, needlen );
     tr_free( tmp );
 
-    tr_peerIoSetEncryption( handshake->io, handshake->crypto_select );
+    tr_peerIoSetEncryption( handshake->io,
+                            handshake->crypto_select );
 
     setState( handshake, AWAITING_HANDSHAKE );
     return READ_NOW;
@@ -724,7 +725,7 @@ static int
 readPeerId( tr_handshake    * handshake,
             struct evbuffer * inbuf )
 {
-    tr_bool peerIsGood;
+    int  peerIsGood;
     char client[128];
     tr_torrent * tor;
     const uint8_t * tor_peer_id;
@@ -745,7 +746,7 @@ readPeerId( tr_handshake    * handshake,
     tor = tr_torrentFindFromHash( handshake->session, tr_peerIoGetTorrentHash( handshake->io ) );
     tor_peer_id = tor && tor->peer_id ? tor->peer_id : tr_getPeerId( );
     peerIsGood = memcmp( peer_id, tor_peer_id, PEER_ID_LEN ) != 0;
-    dbgmsg( handshake, "isPeerGood == %d", (int)peerIsGood );
+    dbgmsg( handshake, "isPeerGood == %d", peerIsGood );
     return tr_handshakeDone( handshake, peerIsGood );
 }
 
@@ -964,7 +965,7 @@ readIA( tr_handshake *    handshake,
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     {
-        const uint16_t len = 0;
+        const int len = 0;
         tr_peerIoWriteUint16( handshake->io, outbuf, len );
     }
 
@@ -1095,18 +1096,19 @@ canRead( struct tr_peerIo * io, void * arg, size_t * piece )
     return ret;
 }
 
-static tr_bool
-fireDoneFunc( tr_handshake * handshake, tr_bool isConnected )
+static int
+fireDoneFunc( tr_handshake * handshake,
+              tr_bool        isConnected )
 {
     const uint8_t * peer_id = isConnected && handshake->havePeerID
                             ? tr_peerIoGetPeersId( handshake->io )
                             : NULL;
-    const tr_bool success = ( *handshake->doneCB )( handshake,
-                                                    handshake->io,
-                                                    handshake->haveReadAnythingFromPeer,
-                                                    isConnected,
-                                                    peer_id,
-                                                    handshake->doneUserData );
+    const int success = ( *handshake->doneCB )( handshake,
+                                                handshake->io,
+                                                handshake->haveReadAnythingFromPeer,
+                                                isConnected,
+                                                peer_id,
+                                                handshake->doneUserData );
 
     return success;
 }

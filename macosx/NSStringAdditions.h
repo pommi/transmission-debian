@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: NSStringAdditions.h 11284 2010-10-01 20:22:51Z charles $
+ * $Id: StringAdditions.h 2869 2007-08-19 03:03:28Z livings124 $
  *
  * Copyright (c) 2005-2010 Transmission authors and contributors
  *
@@ -34,8 +34,6 @@
 + (NSString *) stringForSpeed: (CGFloat) speed;
 + (NSString *) stringForSpeedAbbrev: (CGFloat) speed;
 + (NSString *) stringForRatio: (CGFloat) ratio;
-
-+ (NSString *) percentString: (CGFloat) progress longDecimals: (BOOL) longDecimals;
 
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds;
 + (NSString *) timeString: (uint64_t) seconds showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max;

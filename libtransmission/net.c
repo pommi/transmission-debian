@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * $Id: net.c 10917 2010-07-01 04:00:41Z charles $
+ * $Id: net.c 10753 2010-06-14 23:14:58Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -32,8 +32,8 @@
 #include <sys/types.h>
 
 #ifdef WIN32
- #define _WIN32_WINNT   0x0501
- #include <ws2tcpip.h>
+ #include <winsock2.h> /* inet_addr */
+ #include <WS2tcpip.h>
 #else
  #include <sys/socket.h>
  #include <netinet/in.h>
@@ -64,8 +64,8 @@ const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
 
 #ifdef WIN32
-const char *
-inet_ntop( int af, const void * src, char * dst, socklen_t cnt )
+static const char *
+inet_ntop( int af, const void *src, char *dst, socklen_t cnt )
 {
     if (af == AF_INET)
     {
@@ -90,47 +90,33 @@ inet_ntop( int af, const void * src, char * dst, socklen_t cnt )
     return NULL;
 }
 
-int
-inet_pton( int af, const char * src, void * dst )
+static int
+inet_pton(int af, const char *src, void *dst)
 {
-    struct addrinfo hints, *res, *ressave;
-    struct sockaddr_in * s4;
-    struct sockaddr_in6 * s6;
+    struct addrinfo hints;
+    struct addrinfo *res;
+    struct addrinfo *ressave;
 
-    memset( &hints, 0, sizeof( struct addrinfo ));
+    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = af;
-    hints.ai_flags = AI_NUMERICHOST;
 
-    if( getaddrinfo( src, NULL, &hints, &res ) ) {
-        if( WSAGetLastError() == WSAHOST_NOT_FOUND )
-            return 0;
-        else {
-            errno = EAFNOSUPPORT;
-            return -1;
-        }
-    }
+    if (getaddrinfo(src, NULL, &hints, &res) != 0)
+        return -1;
 
     ressave = res;
-    while( res ) {
-        switch (res->ai_family) {
-            case AF_INET:
-                s4 = (struct sockaddr_in *) res->ai_addr;
-                memcpy( dst, &s4->sin_addr, sizeof( struct in_addr ) );
-                break;
-            case AF_INET6:
-                s6 = (struct sockaddr_in6 *) res->ai_addr;
-                memcpy( dst, &s6->sin6_addr, sizeof( struct in6_addr ) );
-                break;
-            default: /* AF_UNSPEC, AF_NETBIOS */
-                break;
-        }
+
+    while (res)
+    {
+        memcpy(dst, res->ai_addr, res->ai_addrlen);
         res = res->ai_next;
     }
 
     freeaddrinfo(ressave);
-    return 1;
+    return 0;
 }
+
 #endif
+
 
 void
 tr_netInit( void )
@@ -145,18 +131,6 @@ tr_netInit( void )
 #endif
         initialized = TRUE;
     }
-}
-
-char *
-tr_net_strerror( char * buf, size_t buflen, int err )
-{
-    *buf = '\0';
-#ifdef WIN32
-    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL );
-#else
-    tr_strlcpy( buf, tr_strerror( err ), buflen );
-#endif
-    return buf;
 }
 
 const char *

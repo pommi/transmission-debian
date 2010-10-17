@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent-magnet.h 11280 2010-10-01 13:33:39Z charles $
+ * $Id:$
  */
 
 #ifndef __TRANSMISSION__
@@ -33,6 +33,6 @@ tr_bool tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * se
 
 void tr_torrentSetMetadataSizeHint( tr_torrent * tor, int metadata_size );
 
-double tr_torrentGetMetadataPercent( const tr_torrent * tor );
+float tr_torrentGetMetadataPercent( const tr_torrent * tor );
 
 #endif

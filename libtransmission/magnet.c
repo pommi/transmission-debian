@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: magnet.c 11280 2010-10-01 13:33:39Z charles $
+ * $Id:$
  */
 
 #include <assert.h>

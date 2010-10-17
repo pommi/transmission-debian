@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: BlocklistDownloader.m 10793 2010-06-18 03:11:22Z livings124 $
+ * $Id: BlocklistDownloader.m 10624 2010-05-02 18:03:49Z livings124 $
  *
  * Copyright (c) 2008-2010 Transmission authors and contributors
  *
@@ -118,6 +118,10 @@ BlocklistDownloader * fDownloader = nil;
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
 {
+    #warning remove
+    NSLog(@"%@", [error localizedDescription]);
+    NSLog(@"%@", [error localizedFailureReason]);
+    NSLog(@"%@", [error localizedRecoverySuggestion]);
     [fViewController setFailed: [error localizedDescription]];
     
     [[BlocklistScheduler scheduler] updateSchedule];

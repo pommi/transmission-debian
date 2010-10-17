@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: completion.c 10912 2010-06-30 16:40:19Z charles $
+ * $Id: completion.c 10387 2010-03-15 23:29:56Z charles $
  */
 
 #include <assert.h>
@@ -186,7 +186,7 @@ tr_cpSetHaveAll( tr_completion * cp )
 tr_bool
 tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
 {
-    tr_bool success = FALSE;
+    int success = FALSE;
 
     assert( cp );
     assert( blockBitfield );
@@ -198,7 +198,7 @@ tr_cpBlockBitfieldSet( tr_completion * cp, tr_bitfield * blockBitfield )
         tr_block_index_t b = 0;
         tr_piece_index_t p = 0;
         uint32_t pieceBlock = 0;
-        uint16_t completeBlocksInPiece = 0;
+        uint32_t completeBlocksInPiece = 0;
         tr_block_index_t completeBlocksInTorrent = 0;
         uint32_t blocksInCurrentPiece = tr_torPieceCountBlocks( cp->tor, p );
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: Torrent.h 11175 2010-08-14 17:32:52Z livings124 $
+ * $Id: Torrent.h 10610 2010-05-01 16:19:40Z livings124 $
  *
  * Copyright (c) 2006-2010 Transmission authors and contributors
  *
@@ -95,12 +95,8 @@
 - (void) setRatioSetting: (tr_ratiolimit) setting;
 - (CGFloat) ratioLimit;
 - (void) setRatioLimit: (CGFloat) limit;
+- (BOOL) seedRatioSet;
 - (CGFloat) progressStopRatio;
-
-- (tr_idlelimit) idleSetting;
-- (void) setIdleSetting: (tr_idlelimit) setting;
-- (NSUInteger) idleLimitMinutes;
-- (void) setIdleLimitMinutes: (NSUInteger) limit;
 
 - (BOOL) usesSpeedLimit: (BOOL) upload;
 - (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload;
@@ -154,6 +150,8 @@
 - (CGFloat) progressDone;
 - (CGFloat) progressLeft;
 - (CGFloat) checkingProgress;
+
+- (NSInteger) eta;
 
 - (CGFloat) availableDesired;
 

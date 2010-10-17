@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) Mnemosyne LLC
+ * This file Copyright (C) 2009-2010 Mnemosyne LLC
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license.
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  *
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * $Id: make-dialog.h 11098 2010-08-02 20:55:11Z charles $
+ * $Id: make-dialog.h 9868 2010-01-04 21:00:47Z charles $
  */
 
 #ifndef MAKE_DIALOG_H
@@ -44,15 +44,10 @@ class MakeDialog: public QDialog
         void onProgress( );
 
         void onFolderClicked( );
-        void onFolderSelected( const QString& );
         void onFolderSelected( const QStringList& );
-
         void onFileClicked( );
-        void onFileSelected( const QString& );
         void onFileSelected( const QStringList& );
-
         void onDestinationClicked( );
-        void onDestinationSelected( const QString& );
         void onDestinationSelected( const QStringList& );
 
     private:
@@ -84,10 +79,6 @@ class MakeDialog: public QDialog
         QDialogButtonBox * myNewButtonBox;
         QDialog * myNewDialog;
         struct tr_metainfo_builder * myBuilder;
-
-    protected:
-        virtual void dragEnterEvent( QDragEnterEvent * );
-        virtual void dropEvent( QDropEvent * );
 
     public:
         MakeDialog( Session&, QWidget * parent = 0 );
