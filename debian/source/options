@@ -1,1 +1,2 @@
+compression = "bzip2"
 extend-diff-ignore = "^\.pc$"
