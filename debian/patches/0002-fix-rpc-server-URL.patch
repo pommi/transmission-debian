@@ -1,0 +1,23 @@
+From: Leo Antunes <leo@costela.net>
+Date: Mon, 18 Oct 2010 00:12:10 +0200
+Subject: [PATCH] fix rpc server URL
+
+---
+ libtransmission/rpc-server.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/libtransmission/rpc-server.c b/libtransmission/rpc-server.c
+index 99f1d93..323165b 100644
+--- a/libtransmission/rpc-server.c
++++ b/libtransmission/rpc-server.c
+@@ -608,8 +608,7 @@ handle_request( struct evhttp_request * req, void * arg )
+                || !strcmp( req->uri, "/transmission/clutch" )
+                || !strcmp( req->uri, "/" ) )
+         {
+-            const char * location = "transmission/web/";
+-            evhttp_add_header( req->output_headers, "Location", location );
++            evhttp_add_header( req->output_headers, "Location", "/transmission/web/" );
+             send_simple_response( req, HTTP_MOVEPERM, NULL );
+         }
+         else if( !strncmp( req->uri, "/transmission/web/", 18 ) )
+-- 
