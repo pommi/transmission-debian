@@ -1,3 +1,9 @@
+transmission (2.10-2) experimental; urgency=low
+  
+  * correct binary names in mime files
+
+ -- Leo Costela <costela@debian.org>  Mon, 18 Oct 2010 20:41:44 +0200
+
 transmission (2.10-1) experimental; urgency=low
   
   * new upstream release (closes: #592835)
