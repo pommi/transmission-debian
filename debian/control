@@ -25,9 +25,9 @@ Description: lightweight BitTorrent client
 Package: transmission-common
 Architecture: all
 Depends: ${misc:Depends}
-# because of the usr/share/pixmaps move to -common
-Replaces: transmission-gtk (<= 1.73-1)
-Breaks: transmission-gtk (<= 1.73-1)
+# because of the usr/share/icons move to -common
+Replaces: transmission-gtk (<= 2.10-1)
+Breaks: transmission-gtk (<= 2.10-1)
 Description: lightweight BitTorrent client (common files)
  Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
  and daemon form). All its incarnations feature a very simple, intuitive

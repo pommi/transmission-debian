@@ -3,6 +3,8 @@ transmission (2.10-2) experimental; urgency=low
   * correct binary names in mime files
   * remove old example script which depended on specific 
     transmission-remote output; added example for download hook script
+  * update replaces/breaks for the /usr/share/icons move to 
+    transmission-common (closes: #600637)
 
  -- Leo Costela <costela@debian.org>  Mon, 18 Oct 2010 20:41:44 +0200
 
