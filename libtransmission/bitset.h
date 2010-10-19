@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: bitset.h 10020 2010-01-26 07:50:17Z charles $
+ * $Id: bitset.h 11299 2010-10-11 15:41:27Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -41,22 +41,7 @@ tr_bitsetDestructor( tr_bitset * b )
     tr_bitfieldDestruct( &b->bitfield );
 }
 
-static inline void
-tr_bitsetReserve( tr_bitset * b, size_t size )
-{
-    if( b->bitfield.bitCount < size )
-    {
-        tr_bitfield * tmp = tr_bitfieldDup( &b->bitfield );
-
-        tr_bitfieldDestruct( &b->bitfield );
-        tr_bitfieldConstruct( &b->bitfield, size );
-
-        if( ( tmp->bits != NULL ) && ( tmp->byteCount > 0 ) )
-            memcpy( b->bitfield.bits, tmp->bits, tmp->byteCount );
-
-        tr_bitfieldFree( tmp );
-    }
-}
+void tr_bitsetReserve( tr_bitset * b, size_t size );
 
 static inline tr_bool
 tr_bitsetHasFast( const tr_bitset * b, const size_t nth )

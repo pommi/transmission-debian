@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-mgr.h 11264 2010-09-25 00:34:15Z Longinus00 $
+ * $Id: peer-mgr.h 11295 2010-10-08 13:33:50Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -109,12 +109,6 @@ typedef struct tr_peer
     char                   * client;
 
     time_t                   chokeChangedAt;
-
-    time_t                   lastBlocksAtTime;
-    int                      blocksAt[60];
-
-    time_t                   lastCancelTime;
-    int                      cancelAt[60];
 
     tr_recentHistory       * blocksSentToClient;
     tr_recentHistory       * blocksSentToPeer;

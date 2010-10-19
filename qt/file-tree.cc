@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: file-tree.cc 11092 2010-08-01 20:36:13Z charles $
+ * $Id: file-tree.cc 11306 2010-10-13 00:43:54Z charles $
  */
 
 #include <cassert>
@@ -641,7 +641,7 @@ FileTreeView :: FileTreeView( QWidget * parent ):
     sortByColumn( COL_NAME, Qt::AscendingOrder );
     installEventFilter( this );
 
-    for( int i=0; i<=NUM_COLUMNS; ++i )
+    for( int i=0; i<NUM_COLUMNS; ++i )
         header()->setResizeMode( i, QHeaderView::Fixed );
 
     connect( this, SIGNAL(clicked(const QModelIndex&)),

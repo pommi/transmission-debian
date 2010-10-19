@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * $Id: net.c 10917 2010-07-01 04:00:41Z charles $
+ * $Id: net.c 11311 2010-10-14 17:03:04Z charles $
  *
  * Copyright (c) 2005-2008 Transmission authors and contributors
  *
@@ -237,7 +237,7 @@ tr_netSetTOS( int s, int tos )
 }
 
 int
-tr_netSetCongestionControl( int s, const char *algorithm )
+tr_netSetCongestionControl( int s UNUSED, const char *algorithm UNUSED )
 {
 #ifdef TCP_CONGESTION
     return setsockopt( s, IPPROTO_TCP, TCP_CONGESTION,

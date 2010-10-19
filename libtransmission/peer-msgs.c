@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-msgs.c 10998 2010-07-11 20:49:19Z charles $
+ * $Id: peer-msgs.c 11313 2010-10-14 19:43:18Z charles $
  */
 
 #include <assert.h>
@@ -306,7 +306,7 @@ pokeBatchPeriod( tr_peermsgs * msgs,
     }
 }
 
-static inline void
+static void
 dbgOutMessageLen( tr_peermsgs * msgs )
 {
     dbgmsg( msgs, "outMessage size is now %zu", EVBUFFER_LENGTH( msgs->outMessages ) );
@@ -1213,8 +1213,11 @@ prefetchPieces( tr_peermsgs *msgs )
     for( i=msgs->prefetchCount; i<msgs->peer->pendingReqsToClient && i<12; ++i )
     {
         const struct peer_request * req = msgs->peerAskedFor + i;
-        tr_cachePrefetchBlock( getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length );
-        ++msgs->prefetchCount;
+        if( requestIsValid( msgs, req ) )
+        {
+            tr_cachePrefetchBlock( getSession(msgs)->cache, msgs->torrent, req->index, req->offset, req->length );
+            ++msgs->prefetchCount;
+        }
     }
 }
 

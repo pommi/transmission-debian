@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: remote.c 11262 2010-09-24 14:23:58Z charles $
+ * $Id: remote.c 11318 2010-10-16 16:08:40Z charles $
  */
 
 #include <assert.h>
@@ -1632,6 +1632,9 @@ processResponse( const char * host, int port, const void * response, size_t len 
             case TAG_PORTTEST:
                 printPortTest( &top ); break;
 
+            case TAG_TRACKERS:
+                printTrackers( &top ); break;
+
             case TAG_TORRENT_ADD: {
                 int64_t i;
                 tr_benc * b = &top;
@@ -1641,10 +1644,6 @@ processResponse( const char * host, int port, const void * response, size_t len 
                     tr_snprintf( id, sizeof(id), "%"PRId64, i );
                 /* fall-through to default: to give success or failure msg */
             }
-
-            case TAG_TRACKERS:
-                printTrackers( &top ); break;
-
             default:
                 if( !tr_bencDictFindStr( &top, "result", &str ) )
                     status |= EXIT_FAILURE;

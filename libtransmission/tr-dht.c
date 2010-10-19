@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
- $Id: tr-dht.c 11284 2010-10-01 20:22:51Z charles $
+ $Id: tr-dht.c 11308 2010-10-13 17:09:05Z Longinus00 $
 
 */
 
@@ -389,8 +389,8 @@ tr_dhtInit(tr_session *ss, const tr_address * tr_addr)
 
     v[0] = 'T';
     v[1] = 'R';
-    v[2] = (SVN_REVISION_NUM >> 8) & 0xFF;
-    v[3] = SVN_REVISION_NUM & 0xFF;
+    v[2] = MAJOR_VERSION;
+    v[3] = MINOR_VERSION;
     rc = dht_init( dht_socket, dht6_socket, myid, (const unsigned char*)v );
     if(rc < 0)
         goto fail;

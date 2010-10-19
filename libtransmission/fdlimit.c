@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: fdlimit.c 10998 2010-07-11 20:49:19Z charles $
+ * $Id: fdlimit.c 11301 2010-10-11 21:44:46Z charles $
  */
 
 #ifndef WIN32
@@ -231,7 +231,7 @@ tr_pwrite( int fd, const void *buf, size_t count, off_t offset )
 }
 
 int
-tr_prefetch( int fd, off_t offset, size_t count )
+tr_prefetch( int fd UNUSED, off_t offset UNUSED, size_t count UNUSED )
 {
 #ifdef HAVE_POSIX_FADVISE
     return posix_fadvise( fd, offset, count, POSIX_FADV_WILLNEED );

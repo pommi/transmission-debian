@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-mgr.c 11283 2010-10-01 18:16:01Z charles $
+ * $Id: peer-mgr.c 11307 2010-10-13 03:56:25Z charles $
  */
 
 #include <assert.h>
@@ -47,6 +47,10 @@ enum
 
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = ( 10 * 1000 ),
+
+    /* an optimistically unchoked peer is immune from rechoking
+       for this many calls to rechokeUploads(). */
+    OPTIMISTIC_UNCHOKE_MULTIPLIER = 4,
 
     /* how frequently to reallocate bandwidth */
     BANDWIDTH_PERIOD_MSEC = 500,
@@ -179,8 +183,10 @@ typedef struct tr_torrent_peers
     tr_ptrArray                webseeds; /* tr_webseed */
 
     tr_torrent               * tor;
-    tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
     struct tr_peerMgr        * manager;
+
+    tr_peer                  * optimistic; /* the optimistic peer, or NULL if none */
+    int                        optimisticUnchokeTimeScaler;
 
     tr_bool                    isRunning;
     tr_bool                    needsCompletenessCheck;
@@ -836,20 +842,15 @@ comparePieceByIndex( const void * va, const void * vb )
 static void
 pieceListSort( Torrent * t, int mode )
 {
-    int(*compar)(const void *, const void *);
-
     assert( mode==PIECES_SORTED_BY_INDEX
          || mode==PIECES_SORTED_BY_WEIGHT );
 
-    switch( mode ) {
-        case PIECES_SORTED_BY_WEIGHT: compar = comparePieceByWeight; break;
-        case PIECES_SORTED_BY_INDEX: compar = comparePieceByIndex; break;
-        default: assert( 0 && "unhandled" );  break;
-    }
-
     weightTorrent = t->tor;
-    qsort( t->pieces, t->pieceCount,
-           sizeof( struct weighted_piece ), compar );
+
+    if( mode == PIECES_SORTED_BY_WEIGHT )
+        qsort( t->pieces, t->pieceCount, sizeof( struct weighted_piece ), comparePieceByWeight );
+    else
+        qsort( t->pieces, t->pieceCount, sizeof( struct weighted_piece ), comparePieceByIndex );
 }
 
 static tr_bool
@@ -2714,6 +2715,13 @@ rechokeUploads( Torrent * t, const uint64_t now )
 
     assert( torrentIsLocked( t ) );
 
+    /* an optimistic unchoke peer's "optimistic"
+     * state lasts for N calls to rechokeUploads(). */
+    if( t->optimisticUnchokeTimeScaler > 0 )
+        t->optimisticUnchokeTimeScaler--;
+    else
+        t->optimistic = NULL;
+
     /* sort the peers by preference and rate */
     for( i = 0, size = 0; i < peerCount; ++i )
     {
@@ -2732,7 +2740,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
         {
             tr_peerMsgsSetChoke( peer->msgs, TRUE );
         }
-        else
+        else if( peer != t->optimistic )
         {
             struct ChokeData * n = &choke[size++];
             n->peer         = peer;
@@ -2769,7 +2777,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
     }
 
     /* optimistic unchoke */
-    if( !isMaxedOut && (i<size) )
+    if( !t->optimistic && !isMaxedOut && (i<size) )
     {
         int n;
         struct ChokeData * c;
@@ -2792,6 +2800,7 @@ rechokeUploads( Torrent * t, const uint64_t now )
             c = tr_ptrArrayNth( &randPool, tr_cryptoWeakRandInt( n ));
             c->isChoked = FALSE;
             t->optimistic = c->peer;
+            t->optimisticUnchokeTimeScaler = OPTIMISTIC_UNCHOKE_MULTIPLIER;
         }
 
         tr_ptrArrayDestruct( &randPool, NULL );

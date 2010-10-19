@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: session.c 11250 2010-09-22 15:17:16Z charles $
+ * $Id: session.c 11299 2010-10-11 15:41:27Z charles $
  */
 
 #include <assert.h>
@@ -1161,7 +1161,7 @@ tr_sessionGetActiveSpeedLimit_KBps( const tr_session  * session,
                                     tr_direction        dir,
                                     double            * setme_KBps )
 {
-    int Bps;
+    int Bps = 0;
     const tr_bool is_active = tr_sessionGetActiveSpeedLimit_Bps( session, dir, &Bps );
     *setme_KBps = toSpeedKBps( Bps );
     return is_active;

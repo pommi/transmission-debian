@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: verify.c 11023 2010-07-19 14:44:24Z charles $
+ * $Id: verify.c 11304 2010-10-12 15:52:20Z charles $
  */
 
 #include <unistd.h> /* S_ISREG */
@@ -54,7 +54,6 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
     tr_bool hadPiece = 0;
     time_t lastSleptAt = 0;
     uint32_t piecePos = 0;
-    uint32_t pieceBytesRead = 0;
     tr_file_index_t fileIndex = 0;
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
@@ -103,12 +102,10 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
             const ssize_t numRead = tr_pread( fd, buffer, bytesThisPass, filePos );
             if( numRead == (ssize_t)bytesThisPass )
                 SHA1_Update( &sha, buffer, numRead );
-            if( numRead > 0 ) {
-                pieceBytesRead += numRead;
 #if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
+            if( numRead > 0 )
                 posix_fadvise( fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED );
 #endif
-            }
         }
 
         /* move our offsets */
@@ -150,7 +147,6 @@ verifyTorrent( tr_torrent * tor, tr_bool * stopFlag )
             SHA1_Init( &sha );
             ++pieceIndex;
             piecePos = 0;
-            pieceBytesRead = 0;
         }
 
         /* if we're finishing a file... */
