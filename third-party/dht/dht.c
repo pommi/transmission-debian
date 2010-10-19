@@ -39,10 +39,17 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/time.h>
+
+#ifndef WIN32
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#else
+#include <w32api.h>
+#define WINVER WindowsXP
+#include <ws2tcpip.h>
+#endif
 
 #include "dht.h"
 
@@ -54,6 +61,48 @@ THE SOFTWARE.
 
 #ifndef MSG_CONFIRM
 #define MSG_CONFIRM 0
+#endif
+
+#ifdef WIN32
+
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
+#define EAGAIN WSAEWOULDBLOCK
+static int
+set_nonblocking(int fd, int nonblocking)
+{
+    int rc;
+
+    unsigned long mode = !!nonblocking;
+    rc = ioctlsocket(fd, FIONBIO, &mode);
+    if(rc != 0)
+        errno = WSAGetLastError();
+    return (rc == 0 ? 0 : -1);
+}
+
+static int
+random(void)
+{
+    return rand();
+}
+extern const char *inet_ntop(int, const void *, char *, socklen_t);
+
+#else
+
+static int
+set_nonblocking(int fd, int nonblocking)
+{
+    int rc;
+    rc = fcntl(fd, F_GETFL, 0);
+    if(rc < 0)
+        return -1;
+
+    rc = fcntl(fd, F_SETFL, nonblocking?(rc | O_NONBLOCK):(rc & ~O_NONBLOCK));
+    if(rc < 0)
+        return -1;
+
+    return 0;
+}
+
 #endif
 
 /* We set sin_family to 0 to mark unused slots. */
@@ -331,7 +380,7 @@ is_martian(struct sockaddr *sa)
 /* Forget about the ``XOR-metric''.  An id is just a path from the
    root of the tree, so bits are numbered from the start. */
 
-static inline int
+static int
 id_cmp(const unsigned char *restrict id1, const unsigned char *restrict id2)
 {
     /* Memcmp is guaranteed to perform an unsigned comparison. */
@@ -1175,9 +1224,23 @@ static int
 storage_store(const unsigned char *id, struct sockaddr *sa)
 {
     int i, len;
-    struct storage *st = storage;
+    struct storage *st;
     unsigned char *ip;
     unsigned short port;
+
+    if(sa->sa_family == AF_INET) {
+        struct sockaddr_in *sin = (struct sockaddr_in*)sa;
+        ip = (unsigned char*)&sin->sin_addr;
+        len = 4;
+        port = ntohs(sin->sin_port);
+    } else if(sa->sa_family == AF_INET6) {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
+        ip = (unsigned char*)&sin6->sin6_addr;
+        len = 16;
+        port = ntohs(sin6->sin6_port);
+    } else {
+        return -1;
+    }
 
     st = find_storage(id);
 
@@ -1190,18 +1253,6 @@ storage_store(const unsigned char *id, struct sockaddr *sa)
         st->next = storage;
         storage = st;
         numstorage++;
-    }
-
-    if(sa->sa_family == AF_INET) {
-        struct sockaddr_in *sin = (struct sockaddr_in*)sa;
-        ip = (unsigned char*)&sin->sin_addr;
-        len = 4;
-        port = ntohs(sin->sin_port);
-    } else if(sa->sa_family == AF_INET6) {
-        struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)sa;
-        ip = (unsigned char*)&sin6->sin6_addr;
-        len = 16;
-        port = ntohs(sin6->sin6_port);
     }
 
     for(i = 0; i < st->numpeers; i++) {
@@ -1548,11 +1599,7 @@ dht_init(int s, int s6, const unsigned char *id, const unsigned char *v)
             return -1;
         buckets->af = AF_INET;
 
-        rc = fcntl(s, F_GETFL, 0);
-        if(rc < 0)
-            goto fail;
-
-        rc = fcntl(s, F_SETFL, (rc | O_NONBLOCK));
+        rc = set_nonblocking(s, 1);
         if(rc < 0)
             goto fail;
     }
@@ -1563,11 +1610,7 @@ dht_init(int s, int s6, const unsigned char *id, const unsigned char *v)
             return -1;
         buckets6->af = AF_INET6;
 
-        rc = fcntl(s6, F_GETFL, 0);
-        if(rc < 0)
-            goto fail;
-
-        rc = fcntl(s6, F_SETFL, (rc | O_NONBLOCK));
+        rc = set_nonblocking(s6, 1);
         if(rc < 0)
             goto fail;
     }

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id: torrent-magnet.c 11301 2010-10-11 21:44:46Z charles $
  */
 
 #include <assert.h>
@@ -116,7 +116,7 @@ findInfoDictOffset( const tr_torrent * tor )
                 int infoLen;
                 char * infoContents = tr_bencToStr( infoDict, TR_FMT_BENC, &infoLen );
                 const uint8_t * i = (const uint8_t*) tr_memmem( (char*)fileContents, fileLen, infoContents, infoLen );
-                offset = i == NULL ? i - fileContents : 0;
+                offset = i != NULL ? i - fileContents : 0;
                 tr_free( infoContents );
             }
 
@@ -268,7 +268,7 @@ tr_torrentSetMetadataPiece( tr_torrent  * tor, int piece, const void  * data, in
 
                     if( success && !tr_getBlockSize( info.pieceSize ) )
                     {
-                        tr_torrentSetLocalError( tor, _( "Magnet torrent's metadata is not usable" ) );
+                        tr_torrentSetLocalError( tor, "%s", _( "Magnet torrent's metadata is not usable" ) );
                         success = FALSE;
                     }
 
@@ -348,10 +348,10 @@ tr_torrentGetNextMetadataRequest( tr_torrent * tor, time_t now, int * setme_piec
     return have_request;
 }
 
-float
+double
 tr_torrentGetMetadataPercent( const tr_torrent * tor )
 {
-    float ret;
+    double ret;
 
     if( tr_torrentHasMetadata( tor ) )
         ret = 1.0;
@@ -360,7 +360,7 @@ tr_torrentGetMetadataPercent( const tr_torrent * tor )
         if( m == NULL )
             ret = 0.0;
         else
-            ret = (m->pieceCount - m->piecesNeededCount) / (float)m->pieceCount;
+            ret = (m->pieceCount - m->piecesNeededCount) / (double)m->pieceCount;
     }
 
     return ret;

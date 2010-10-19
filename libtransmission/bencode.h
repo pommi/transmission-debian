@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: bencode.h 10084 2010-02-02 22:45:22Z charles $
+ * $Id: bencode.h 10783 2010-06-16 14:27:24Z charles $
  */
 
 #ifndef TR_BENCODE_H
@@ -155,6 +155,8 @@ tr_benc * tr_bencListAddDict( tr_benc *, size_t reserveCount );
 size_t    tr_bencListSize( const tr_benc * list );
 
 tr_benc * tr_bencListChild( tr_benc * list, size_t n );
+
+int       tr_bencListRemove( tr_benc *, size_t n );
 
 /***
 ****

@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = transmissioncli$(EXEEXT)
+bin_PROGRAMS = transmission-cli$(EXEEXT)
 subdir = cli
 DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -52,9 +52,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_transmissioncli_OBJECTS = cli.$(OBJEXT)
-transmissioncli_OBJECTS = $(am_transmissioncli_OBJECTS)
-transmissioncli_DEPENDENCIES =  \
+am_transmission_cli_OBJECTS = cli.$(OBJEXT)
+transmission_cli_OBJECTS = $(am_transmission_cli_OBJECTS)
+transmission_cli_DEPENDENCIES =  \
 	$(top_builddir)/libtransmission/libtransmission.a \
 	$(top_builddir)/third-party/libnatpmp/libnatpmp.a \
 	$(top_builddir)/third-party/miniupnp/libminiupnp.a
@@ -87,8 +87,8 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(transmissioncli_SOURCES)
-DIST_SOURCES = $(transmissioncli_SOURCES)
+SOURCES = $(transmission_cli_SOURCES)
+DIST_SOURCES = $(transmission_cli_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -312,9 +312,9 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
     @ZLIB_LDFLAGS@
 
-dist_man_MANS = transmissioncli.1
-transmissioncli_SOURCES = cli.c
-transmissioncli_LDADD = \
+dist_man_MANS = transmission-cli.1
+transmission_cli_SOURCES = cli.c
+transmission_cli_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
     $(top_builddir)/third-party/miniupnp/libminiupnp.a \
@@ -403,9 +403,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-transmissioncli$(EXEEXT): $(transmissioncli_OBJECTS) $(transmissioncli_DEPENDENCIES) 
-	@rm -f transmissioncli$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(transmissioncli_OBJECTS) $(transmissioncli_LDADD) $(LIBS)
+transmission-cli$(EXEEXT): $(transmission_cli_OBJECTS) $(transmission_cli_DEPENDENCIES) 
+	@rm -f transmission-cli$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(transmission_cli_OBJECTS) $(transmission_cli_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

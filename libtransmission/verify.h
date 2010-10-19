@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: verify.h 10905 2010-06-29 01:21:38Z charles $
+ * $Id: verify.h 10904 2010-06-28 13:42:45Z charles $
  */
 
 #ifndef __TRANSMISSION__

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: stats.c 10066 2010-02-01 04:54:10Z charles $
+ * $Id: stats.c 11132 2010-08-06 14:38:54Z charles $
  */
 
 #include <glib/gi18n.h>
@@ -73,8 +73,8 @@ updateStats( gpointer gdata )
              tr_strltime( buf, one.secondsActive, sizeof( buf ) ) );
     setLabelFromRatio( ui->one_ratio_lb, one.ratio );
 
-    fmt = ngettext( "Started %'d time", "Started %'d times",
-                    (int)all.sessionCount );
+    fmt = gtr_ngettext( "Started %'d time", "Started %'d times",
+                        (int)all.sessionCount );
     g_snprintf( buf, sizeof( buf ), fmt, (int)all.sessionCount );
     setLabel( ui->all_sessions_lb, buf );
     setLabel( ui->all_up_lb,

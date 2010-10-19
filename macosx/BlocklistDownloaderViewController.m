@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: BlocklistDownloaderViewController.m 10624 2010-05-02 18:03:49Z livings124 $
+ * $Id: BlocklistDownloaderViewController.m 11032 2010-07-21 05:13:25Z livings124 $
  *
  * Copyright (c) 2008-2010 Transmission authors and contributors
  *
@@ -139,10 +139,11 @@
 {
     //load window and show as sheet
     [NSBundle loadNibNamed: @"BlocklistStatusWindow" owner: self];
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
     
     BlocklistDownloader * downloader = [BlocklistDownloader downloader];
-    [downloader setViewController: self];
+    [downloader setViewController: self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text
+    
+    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
 }
 
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info

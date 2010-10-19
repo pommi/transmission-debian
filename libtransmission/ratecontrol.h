@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: ratecontrol.h 9847 2010-01-01 22:26:35Z charles $
+ * $Id: ratecontrol.h 10931 2010-07-03 00:25:22Z charles $
  *
  * Copyright (c) 2006-2008 Transmission authors and contributors
  *
@@ -70,8 +70,8 @@ static inline void tr_rcDestruct  ( tr_ratecontrol * rc ) { memset( rc, 0xDEAD, 
 void             tr_rcTransferred ( tr_ratecontrol         * ratecontrol,
                                     size_t                   byteCount );
 
-float            tr_rcRate        ( const tr_ratecontrol   * ratecontrol,
-                                    uint64_t                 now );
+int              tr_rcRate_Bps ( const tr_ratecontrol   * ratecontrol,
+                                 uint64_t                 now );
 
 
 #endif

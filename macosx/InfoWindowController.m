@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: InfoWindowController.m 10376 2010-03-14 15:03:14Z livings124 $
+ * $Id: InfoWindowController.m 11316 2010-10-15 23:39:14Z livings124 $
  *
  * Copyright (c) 2006-2010 Transmission authors and contributors
  *
@@ -338,6 +338,14 @@ typedef enum
     
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
+}
+
+- (void) swipeWithEvent:(NSEvent *) event
+{
+    if ([event deltaX] < 0.0)
+        [self setNextTab];
+    else if ([event deltaX] > 0.0)
+        [self setPreviousTab];
 }
 
 - (void) updateInfoStats

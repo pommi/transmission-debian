@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-msgs.h 10332 2010-03-08 04:29:58Z charles $
+ * $Id: peer-msgs.h 10800 2010-06-19 14:33:10Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -19,7 +19,6 @@
 
 #include <inttypes.h>
 #include "peer-common.h"
-#include "publish.h"
 
 struct tr_torrent;
 struct tr_peer;
@@ -32,12 +31,10 @@ struct tr_bitfield;
 
 typedef struct tr_peermsgs tr_peermsgs;
 
-tr_peermsgs* tr_peerMsgsNew( struct tr_torrent * torrent,
-                             struct tr_peer *    peer,
-                             tr_delivery_func    func,
-                             void *              user,
-                             tr_publisher_tag *  setme );
-
+tr_peermsgs* tr_peerMsgsNew( struct tr_torrent    * torrent,
+                             struct tr_peer       * peer,
+                             tr_peer_callback     * callback,
+                             void                 * callback_data );
 
 void         tr_peerMsgsSetChoke( tr_peermsgs *, int doChoke );
 
@@ -54,9 +51,6 @@ void         tr_peerMsgsCancel( tr_peermsgs * msgs,
                                 tr_block_index_t block );
 
 void         tr_peerMsgsFree( tr_peermsgs* );
-
-void         tr_peerMsgsUnsubscribe( tr_peermsgs      * peer,
-                                     tr_publisher_tag   tag );
 
 size_t       tr_generateAllowedSet( tr_piece_index_t  * setmePieces,
                                     size_t              desiredSetSize,

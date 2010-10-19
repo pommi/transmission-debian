@@ -1,3 +1,72 @@
+=== Transmission 2.11 (2010/10/16) ===
+[http://trac.transmissionbt.com/query?milestone=2.11&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Fix a 2.10 crash
+  * Fix minor build issues on various platforms, particularly embedded systems
+  * Fix issue when saving bencoded files on small hardware running uClibc
+  * Fix minor rounding issue when displaying percentages
+  * Fix the optimistic unchoke interval
+==== Mac ====
+  * Swipe to change inspector tab
+==== GTK+ ====
+  * Fix drag-and-dropping a magnet link
+  * Fix hiding dialogs when hiding Transmission in the notification area
+==== Qt ====
+  * Fix crash in the file tree
+==== Daemon ====
+  * Fix missing status message when using "transmission-remote --add"
+==== Web Client ====
+  * Add Transmission website links to the action menu
+
+=== Transmission 2.10 (2010/10/07) ===
+[http://trac.transmissionbt.com/query?milestone=2.10&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Support for automatically stopping idle seeding torrents
+  * Small memory cache to reduce disk IO
+  * gzip compression support added to the RPC server
+  * Add support for a cookies.txt file
+  * Minor CPU optimizations
+==== Mac ====
+  * Display file sizes and speeds in base 10 on Snow Leopard
+==== GTK+ ====
+  * Files and folders can be opened by clicking on them in the files list
+  * Update the interface when session changes are made via RPC
+  * Fix the Details dialog to fit on a netbook screen
+==== Qt ====
+  * Tracker announce list editing
+  * New filterbar
+  * Improved display for showing a torrent's tracker announces
+  * Better DBUS integration
+  * Support adding torrents via drag-and-drop
+  * Add Desktop Notification for added/complete torrents
+  * Other minor improvements
+==== Web Client ====
+  * Peer list added to the inspector
+  * Compact view mode
+  * Support filtering by active and finished
+  * Support sorting by size
+==== Daemon ====
+  * Allow the .pidfile location to be set in settings.json
+==== Utils ====
+  * New command-line utility "transmission-edit" for editing torrent files
+  * New command-line utility "transmission-show" for viewing torrent files
+  * New command-line utility "transmission-create" for creating torrent files
+
+=== Transmission 2.04 (2010/08/06) ===
+[http://trac.transmissionbt.com/query?milestone=2.04&group=component&groupdesc=1&order=severity All tickets closed by this release]
+==== All Platforms ====
+  * Improved shutdown time in some situations
+  * Fix display bug in tr_truncd()
+==== Mac ====
+  * Fix bug that caused Local Peer Discovery to always be disabled on startup
+==== GTK+ ====
+  * Fix inaccurate "active torrent" counts in the filterbar 
+  * Fix display bug with magnet link names
+==== Qt ====
+  * Fix crash when accessing a password-protected remote session
+==== Web Client ====
+  * Fix bad redirect
+
 === Transmission 2.03 (2010/07/21) ===
 [http://trac.transmissionbt.com/query?milestone=2.03&group=component&groupdesc=1&order=severity All tickets closed by this release]
 ==== Mac ====

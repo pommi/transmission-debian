@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: utils.c 10964 2010-07-07 16:48:24Z charles $
+ * $Id: utils.c 11299 2010-10-11 15:41:27Z charles $
  */
 
 #ifdef HAVE_MEMMEM
@@ -22,19 +22,19 @@
 #endif
 
 #include <assert.h>
-#include <ctype.h> /* isalpha, tolower */
+#include <ctype.h> /* isalpha(), tolower() */
 #include <errno.h>
-#include <math.h> /* pow */
+#include <math.h> /* pow(), fabs(), floor() */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> /* strerror, memset, memmem */
+#include <string.h> /* strerror(), memset(), memmem() */
 #include <time.h> /* nanosleep() */
 
 #ifdef HAVE_ICONV_OPEN
  #include <iconv.h>
 #endif
-#include <libgen.h> /* basename */
+#include <libgen.h> /* basename() */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -43,11 +43,14 @@
 #include "event.h"
 
 #ifdef WIN32
- #include <direct.h> /* _getcwd */
- #include <windows.h> /* Sleep */
+ #include <w32api.h>
+ #define WINVER WindowsXP /* freeaddrinfo(), getaddrinfo(), getnameinfo() */
+ #include <direct.h> /* _getcwd() */
+ #include <windows.h> /* Sleep() */
 #endif
 
 #include "transmission.h"
+#include "bencode.h"
 #include "fdlimit.h"
 #include "ConvertUTF.h"
 #include "list.h"
@@ -59,8 +62,7 @@
 
 time_t transmission_now = 0;
 
-int                   messageLevel = TR_MSG_INF;
-static tr_lock *      messageLock = NULL;
+tr_msg_level messageLevel = TR_MSG_ERR;
 static tr_bool        messageQueuing = FALSE;
 static tr_msg_list *  messageQueue = NULL;
 static tr_msg_list ** messageQueueTail = &messageQueue;
@@ -76,15 +78,15 @@ static int            messageQueueCount = 0;
 ****
 ***/
 
-void
-tr_msgInit( void )
+static tr_lock*
+getMessageLock( void )
 {
-    const char * env = getenv( "TR_DEBUG" );
-    messageLevel = ( env ? atoi( env ) : 0 ) + 1;
-    messageLevel = MAX( 1, messageLevel );
+    static tr_lock * l = NULL;
 
-    if( messageLock == NULL )
-        messageLock = tr_lockNew( );
+    if( !l )
+        l = tr_lockNew( );
+
+    return l;
 }
 
 FILE*
@@ -117,54 +119,34 @@ tr_getLog( void )
 }
 
 void
-tr_setMessageLevel( int level )
+tr_setMessageLevel( tr_msg_level level )
 {
-    tr_lockLock( messageLock );
-
-    messageLevel = MAX( 0, level );
-
-    tr_lockUnlock( messageLock );
+    messageLevel = level;
 }
 
-int
+tr_msg_level
 tr_getMessageLevel( void )
 {
-    int ret;
-    tr_lockLock( messageLock );
-
-    ret = messageLevel;
-
-    tr_lockUnlock( messageLock );
-    return ret;
+    return messageLevel;
 }
 
 void
 tr_setMessageQueuing( tr_bool enabled )
 {
-    tr_lockLock( messageLock );
-
     messageQueuing = enabled;
-
-    tr_lockUnlock( messageLock );
 }
 
 tr_bool
 tr_getMessageQueuing( void )
 {
-    int ret;
-    tr_lockLock( messageLock );
-
-    ret = messageQueuing;
-
-    tr_lockUnlock( messageLock );
-    return ret;
+    return messageQueuing != 0;
 }
 
 tr_msg_list *
 tr_getQueuedMessages( void )
 {
     tr_msg_list * ret;
-    tr_lockLock( messageLock );
+    tr_lockLock( getMessageLock( ) );
 
     ret = messageQueue;
     messageQueue = NULL;
@@ -172,7 +154,7 @@ tr_getQueuedMessages( void )
 
     messageQueueCount = 0;
 
-    tr_lockUnlock( messageLock );
+    tr_lockUnlock( getMessageLock( ) );
     return ret;
 }
 
@@ -278,15 +260,14 @@ tr_deepLog( const char  * file,
 
 void
 tr_msg( const char * file, int line,
-        int level, const char * name,
+        tr_msg_level level,
+        const char * name,
         const char * fmt, ... )
 {
     const int err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     va_list ap;
-
-    if( messageLock != NULL )
-        tr_lockLock( messageLock );
+    tr_lockLock( getMessageLock( ) );
 
     /* build the text message */
     *buf = '\0';
@@ -344,10 +325,37 @@ tr_msg( const char * file, int line,
         }
     }
 
-    if( messageLock != NULL )
-        tr_lockUnlock( messageLock );
-
+    tr_lockUnlock( getMessageLock( ) );
     errno = err;
+}
+
+/***
+****
+***/
+
+void*
+tr_malloc( size_t size )
+{
+    return size ? malloc( size ) : NULL;
+}
+
+void*
+tr_malloc0( size_t size )
+{
+    return size ? calloc( 1, size ) : NULL;
+}
+
+void
+tr_free( void * p )
+{
+    if( p != NULL )
+        free( p );
+}
+
+void*
+tr_memdup( const void * src, size_t byteCount )
+{
+    return memcpy( tr_malloc( byteCount ), src, byteCount );
 }
 
 /***
@@ -411,8 +419,6 @@ tr_set_compare( const void * va,
 ****
 ***/
 
-#ifdef DISABLE_GETTEXT
-
 const char*
 tr_strip_positional_args( const char* str )
 {
@@ -431,22 +437,24 @@ tr_strip_positional_args( const char* str )
     for( out = buf; *str; ++str )
     {
         *out++ = *str;
+
         if( ( *str == '%' ) && isdigit( str[1] ) )
         {
             const char * tmp = str + 1;
             while( isdigit( *tmp ) )
                 ++tmp;
-
             if( *tmp == '$' )
-                str = tmp;
+                str = tmp[1]=='\'' ? tmp+1 : tmp;
         }
+
+        if( ( *str == '%' ) && ( str[1] == '\'' ) )
+            str = str + 1;
+ 
     }
     *out = '\0';
 
     return strcmp( buf, in ) ? buf : in;
 }
-
-#endif
 
 /**
 ***
@@ -486,7 +494,7 @@ tr_loadFile( const char * path,
     struct stat  sb;
     int fd;
     ssize_t n;
-    const char * err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
+    const char * const err_fmt = _( "Couldn't read \"%1$s\": %2$s" );
 
     /* try to stat the file */
     errno = 0;
@@ -523,7 +531,7 @@ tr_loadFile( const char * path,
         errno = err;
         return NULL;
     }
-    n = read( fd, buf, sb.st_size );
+    n = read( fd, buf, (size_t)sb.st_size );
     if( n == -1 )
     {
         const int err = errno;
@@ -682,6 +690,12 @@ tr_buildPath( const char *first_element, ... )
 ****/
 
 char*
+tr_strdup( const void * in )
+{
+    return tr_strndup( in, in ? (int)strlen((const char *)in) : 0 );
+}
+
+char*
 tr_strndup( const void * in, int len )
 {
     char * out = NULL;
@@ -802,7 +816,7 @@ tr_str_has_suffix( const char *str, const char *suffix )
 ****/
 
 uint64_t
-tr_date( void )
+tr_time_msec( void )
 {
     struct timeval tv;
 
@@ -887,14 +901,13 @@ tr_strlcpy( char *       dst,
 ***/
 
 double
-tr_getRatio( double numerator,
-             double denominator )
+tr_getRatio( uint64_t numerator, uint64_t denominator )
 {
     double ratio;
 
-    if( denominator )
-        ratio = numerator / denominator;
-    else if( numerator )
+    if( denominator > 0 )
+        ratio = numerator / (double)denominator;
+    else if( numerator > 0 )
         ratio = TR_RATIO_INF;
     else
         ratio = TR_RATIO_NA;
@@ -937,9 +950,10 @@ tr_hex_to_sha1( uint8_t * out, const char * in )
 ***/
 
 static tr_bool
-isValidURLChars( const char * url )
+isValidURLChars( const char * url, int url_len )
 {
     const char * c;
+    const char * end;
     static const char * rfc2396_valid_chars =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
@@ -952,7 +966,7 @@ isValidURLChars( const char * url )
     if( url == NULL )
         return FALSE;
 
-    for( c = url; c && *c; ++c )
+    for( c=url, end=c+url_len; c && *c && c!=end; ++c )
         if( !strchr( rfc2396_valid_chars, *c ) )
             return FALSE;
 
@@ -965,9 +979,10 @@ tr_urlIsValidTracker( const char * url )
 {
     tr_bool valid;
     char * scheme = NULL;
+    const int len = url ? strlen(url) : 0;
 
-    valid = isValidURLChars( url )
-         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+    valid = isValidURLChars( url, len )
+         && !tr_urlParse( url, len, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") );
 
@@ -977,13 +992,15 @@ tr_urlIsValidTracker( const char * url )
 
 /** @brief return TRUE if the url is a http or https or ftp or sftp url that Transmission understands */
 tr_bool
-tr_urlIsValid( const char * url )
+tr_urlIsValid( const char * url, int url_len )
 {
     tr_bool valid;
     char * scheme = NULL;
+    if( ( url_len < 0 ) && ( url != NULL ) )
+        url_len = strlen( url );
 
-    valid = isValidURLChars( url )
-         && !tr_urlParse( url, -1, &scheme, NULL, NULL, NULL )
+    valid = isValidURLChars( url, url_len )
+         && !tr_urlParse( url, url_len, &scheme, NULL, NULL, NULL )
          && ( scheme != NULL )
          && ( !strcmp(scheme,"http") || !strcmp(scheme,"https") || !strcmp(scheme,"ftp") || !strcmp(scheme,"sftp") );
 
@@ -1087,7 +1104,7 @@ tr_base64_encode( const void * input, int length, int * setme_len )
         BUF_MEM * bptr;
 
         if( length < 1 )
-            length = strlen( input );
+            length = (int)strlen( input );
 
         bmem = BIO_new( BIO_s_mem( ) );
         b64 = BIO_new( BIO_f_base64( ) );
@@ -1145,6 +1162,19 @@ tr_base64_decode( const void * input,
 /***
 ****
 ***/
+
+void
+tr_removeElementFromArray( void         * array,
+                           unsigned int   index_to_remove,
+                           size_t         sizeof_element,
+                           size_t         nmemb )
+{
+    char * a = (char*) array;
+
+    memmove( a + sizeof_element * index_to_remove,
+             a + sizeof_element * ( index_to_remove  + 1 ),
+             sizeof_element * ( --nmemb - index_to_remove ) );
+}
 
 int
 tr_lowerBound( const void * key,
@@ -1310,7 +1340,7 @@ parseNumberSection( const char * str, int len, struct number_range * setme )
     return success;
 }
 
-static int
+int
 compareInt( const void * va, const void * vb )
 {
     const int a = *(const int *)va;
@@ -1403,9 +1433,27 @@ tr_parseNumberRange( const char * str_in, int len, int * setmeCount )
 double
 tr_truncd( double x, int decimal_places )
 {
-    const int i = (int) pow( 10, decimal_places );  
-    double x2 = (int)(x*i);
-    return x2 / i;
+    const int i = (int) pow( 10, decimal_places );
+    return floor( x * i ) / i;
+}
+
+char*
+tr_strtruncd( char * buf, double x, int precision, size_t buflen )
+{
+    tr_snprintf( buf, buflen, "%.*f", precision, tr_truncd( x, precision ) );
+    return buf;
+}
+
+char*
+tr_strpercent( char * buf, double x, size_t buflen )
+{
+    if( x < 10.0 )
+        tr_strtruncd( buf, x, 2, buflen );
+    else if( x < 100.0 )
+        tr_strtruncd( buf, x, 1, buflen );
+    else
+        tr_strtruncd( buf, x, 0, buflen );
+    return buf;
 }
 
 char*
@@ -1415,12 +1463,8 @@ tr_strratio( char * buf, size_t buflen, double ratio, const char * infinity )
         tr_strlcpy( buf, _( "None" ), buflen );
     else if( (int)ratio == TR_RATIO_INF )
         tr_strlcpy( buf, infinity, buflen );
-    else if( ratio < 10.0 )
-        tr_snprintf( buf, buflen, "%.2f", tr_truncd( ratio, 2 ) );
-    else if( ratio < 100.0 )
-        tr_snprintf( buf, buflen, "%.1f", tr_truncd( ratio, 1 ) );
     else
-        tr_snprintf( buf, buflen, "%'.0f", ratio );
+        tr_strpercent( buf, ratio, buflen );
     return buf;
 }
 
@@ -1436,7 +1480,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     char * buf;
     struct stat st;
     off_t bytesLeft;
-    const off_t buflen = 1024 * 128; /* 128 KiB buffer */
+    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
 
     /* make sure the old file exists */
     if( stat( oldpath, &st ) ) {
@@ -1475,7 +1519,7 @@ tr_moveFile( const char * oldpath, const char * newpath, tr_bool * renamed )
     while( bytesLeft > 0 )
     {
         ssize_t bytesWritten;
-        const off_t bytesThisPass = MIN( bytesLeft, buflen );
+        const off_t bytesThisPass = MIN( bytesLeft, (off_t)buflen );
         const int numRead = read( in, buf, bytesThisPass );
         if( numRead < 0 )
             break;
@@ -1509,7 +1553,7 @@ tr_valloc( size_t bufLen )
 
     if( !pageSize ) {
 #ifdef HAVE_GETPAGESIZE
-        pageSize = getpagesize();
+        pageSize = (size_t) getpagesize();
 #else /* guess */
         pageSize = 4096;
 #endif
@@ -1530,6 +1574,179 @@ tr_valloc( size_t bufLen )
     if( !buf )
         buf = malloc( allocLen );
 
-    tr_dbg( "tr_valloc(%zu) allocating %zu bytes", bufLen, allocLen );
     return buf;
 }
+
+char *
+tr_realpath( const char * path, char * resolved_path )
+{
+#ifdef WIN32
+    /* From a message to the Mingw-msys list, Jun 2, 2005 by Mark Junker. */
+    if( GetFullPathNameA( path, TR_PATH_MAX, resolved_path, NULL ) == 0 )
+        return NULL;
+    return resolved_path;
+#else
+    return realpath( path, resolved_path );
+#endif
+}
+
+/***
+****
+****
+****
+***/
+
+struct formatter_unit
+{
+    char * name;
+    uint64_t value;
+};
+  
+struct formatter_units
+{
+    struct formatter_unit units[4];
+};
+
+enum { TR_FMT_KB, TR_FMT_MB, TR_FMT_GB, TR_FMT_TB };
+
+static void
+formatter_init( struct formatter_units * units,
+                unsigned int kilo,
+                const char * kb, const char * mb,
+                const char * gb, const char * tb )
+{
+    uint64_t value = kilo;
+    units->units[TR_FMT_KB].name = tr_strdup( kb );
+    units->units[TR_FMT_KB].value = value;
+
+    value *= kilo;
+    units->units[TR_FMT_MB].name = tr_strdup( mb );
+    units->units[TR_FMT_MB].value = value;
+
+    value *= kilo;
+    units->units[TR_FMT_GB].name = tr_strdup( gb );
+    units->units[TR_FMT_GB].value = value;
+
+    value *= kilo;
+    units->units[TR_FMT_TB].name = tr_strdup( tb );
+    units->units[TR_FMT_TB].value = value;
+}
+
+static char*
+formatter_get_size_str( const struct formatter_units * u,
+                        char * buf, uint64_t bytes, size_t buflen )
+{
+    int precision;
+    double value;
+    const char * units;
+    const struct formatter_unit * unit;
+
+         if( bytes < u->units[1].value ) unit = &u->units[0];
+    else if( bytes < u->units[2].value ) unit = &u->units[1];
+    else if( bytes < u->units[3].value ) unit = &u->units[2];
+    else                                 unit = &u->units[3];
+
+    value = (double)bytes / unit->value;
+    units = unit->name;
+    if( unit->value == 1 )
+        precision = 0;
+    else if( value < 100 )
+        precision = 2;
+    else
+        precision = 1;
+    tr_snprintf( buf, buflen, "%.*f %s", precision, value, units );
+    return buf;
+}
+
+static struct formatter_units size_units;
+
+void
+tr_formatter_size_init( unsigned int kilo,
+                        const char * kb, const char * mb,
+                        const char * gb, const char * tb )
+{
+    formatter_init( &size_units, kilo, kb, mb, gb, tb );
+}
+
+char*
+tr_formatter_size_B( char * buf, uint64_t bytes, size_t buflen )
+{
+    return formatter_get_size_str( &size_units, buf, bytes, buflen );
+}
+
+static struct formatter_units speed_units;
+
+unsigned int tr_speed_K = 0u;
+
+void
+tr_formatter_speed_init( unsigned int kilo,
+                         const char * kb, const char * mb,
+                         const char * gb, const char * tb )
+{
+    tr_speed_K = kilo;
+    formatter_init( &speed_units, kilo, kb, mb, gb, tb );
+}
+
+char*
+tr_formatter_speed_KBps( char * buf, double KBps, size_t buflen )
+{
+    const double K = speed_units.units[TR_FMT_KB].value;
+    double speed = KBps;
+
+    if( speed <= 999.95 ) /* 0.0 KB to 999.9 KB */
+        tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_KB].name );
+    else {
+        speed /= K;
+        if( speed <= 99.995 ) /* 0.98 MB to 99.99 MB */
+            tr_snprintf( buf, buflen, "%.2f %s", speed, speed_units.units[TR_FMT_MB].name );
+        else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
+            tr_snprintf( buf, buflen, "%.1f %s", speed, speed_units.units[TR_FMT_MB].name );
+        else {
+            speed /= K;
+            tr_snprintf( buf, buflen, "%.1f %s", speed, speed_units.units[TR_FMT_GB].name );
+        }
+    }
+
+    return buf;
+}
+
+static struct formatter_units mem_units;
+
+unsigned int tr_mem_K = 0u;
+ 
+void
+tr_formatter_mem_init( unsigned int kilo,
+                       const char * kb, const char * mb,
+                       const char * gb, const char * tb )
+{
+    tr_mem_K = kilo;
+    formatter_init( &mem_units, kilo, kb, mb, gb, tb );
+}
+
+char*
+tr_formatter_mem_B( char * buf, uint64_t bytes_per_second, size_t buflen )
+{
+    return formatter_get_size_str( &mem_units, buf, bytes_per_second, buflen );
+}
+
+void
+tr_formatter_get_units( tr_benc * d )
+{
+    int i;
+    tr_benc * l;
+
+    tr_bencDictReserve( d, 6 );
+
+    tr_bencDictAddInt( d, "memory-bytes", mem_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "memory-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, mem_units.units[i].name );
+
+    tr_bencDictAddInt( d, "size-bytes",   size_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "size-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, size_units.units[i].name );
+
+    tr_bencDictAddInt( d, "speed-bytes",  speed_units.units[TR_FMT_KB].value );
+    l = tr_bencDictAddList( d, "speed-units", 4 );
+    for( i=0; i<4; i++ ) tr_bencListAddStr( l, speed_units.units[i].name );
+}
+

@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2009-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
- * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license.
- * This exemption does not extend to derived works not owned by
- * the Transmission project.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
  *
- * $Id: filters.h 9868 2010-01-04 21:00:47Z charles $
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * $Id: filters.h 11196 2010-09-06 00:19:37Z charles $
  */
 
 #ifndef QTR_FILTERS_H
@@ -25,7 +25,8 @@ class FilterMode
         FilterMode( int mode=SHOW_ALL ): myMode(mode) { }
         FilterMode( const QString& name ): myMode(modeFromName(name)) { }
         static const QString names[];
-        enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED, NUM_MODES };
+        enum { SHOW_ALL, SHOW_ACTIVE, SHOW_DOWNLOADING, SHOW_SEEDING, SHOW_PAUSED,
+               SHOW_FINISHED, SHOW_QUEUED, SHOW_VERIFYING, SHOW_ERROR, NUM_MODES };
         static int modeFromName( const QString& name );
         static const QString& nameFromMode( int mode ) { return names[mode]; }
         int mode() const { return myMode; }
@@ -42,7 +43,7 @@ class SortMode
         static const QString names[];
         enum { SORT_BY_ACTIVITY, SORT_BY_AGE, SORT_BY_ETA, SORT_BY_NAME,
                SORT_BY_PROGRESS, SORT_BY_RATIO, SORT_BY_SIZE,
-               SORT_BY_STATE, SORT_BY_TRACKER, SORT_BY_ID, NUM_MODES };
+               SORT_BY_STATE, SORT_BY_ID, NUM_MODES };
         static int modeFromName( const QString& name );
         static const QString& nameFromMode( int mode );
         int mode() const { return myMode; }

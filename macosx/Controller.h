@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: Controller.h 10465 2010-04-12 00:55:31Z livings124 $
+ * $Id: Controller.h 11178 2010-08-14 19:44:43Z livings124 $
  *
  * Copyright (c) 2005-2010 Transmission authors and contributors
  *
@@ -199,7 +199,7 @@ typedef enum
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;
-- (void) torrentStoppedForRatio: (NSNotification *) notification;
+- (void) torrentFinishedSeeding: (NSNotification *) notification;
 
 - (void) updateTorrentHistory;
 

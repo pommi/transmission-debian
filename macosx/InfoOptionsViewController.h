@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: InfoOptionsViewController.h 10389 2010-03-16 00:45:52Z charles $
+ * $Id: InfoOptionsViewController.h 11046 2010-07-24 03:19:41Z livings124 $
  *
  * Copyright (c) 2010 Transmission authors and contributors
  *
@@ -31,11 +31,10 @@
     
     BOOL fSet;
     
-    IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp;
+    IBOutlet NSPopUpButton * fPriorityPopUp, * fRatioPopUp, * fIdlePopUp;
     IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck, * fGlobalLimitCheck;
-    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
-                        * fUploadLimitLabel, * fDownloadLimitLabel, * fPeersConnectLabel,
-                        * fPeersConnectField;
+    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField, * fIdleLimitField,
+                        * fUploadLimitLabel, * fDownloadLimitLabel, * fIdleLimitLabel, * fPeersConnectLabel, * fPeersConnectField;
     
     NSString * fInitialString;
 }
@@ -50,6 +49,9 @@
 
 - (void) setRatioSetting: (id) sender;
 - (void) setRatioLimit: (id) sender;
+
+- (void) setIdleSetting: (id) sender;
+- (void) setIdleLimit: (id) sender;
 
 - (void) setPriority: (id) sender;
 

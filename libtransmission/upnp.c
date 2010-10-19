@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: upnp.c 10910 2010-06-30 06:07:06Z charles $
+ * $Id: upnp.c 10900 2010-06-27 15:29:23Z charles $
  */
 
 #include <assert.h>

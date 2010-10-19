@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: inout.c 10962 2010-07-07 16:31:08Z charles $
+ * $Id: inout.c 11313 2010-10-14 19:43:18Z charles $
  */
 
 #ifdef HAVE_LSEEK64
@@ -26,9 +26,11 @@
 #include <openssl/sha.h>
 
 #include "transmission.h"
+#include "cache.h"
 #include "crypto.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "platform.h"
 #include "stats.h"
 #include "torrent.h"
@@ -71,6 +73,9 @@ readOrWriteBytes( tr_session       * session,
     int             fd = -1;
     int             err = 0;
     const tr_bool doWrite = ioMode >= TR_IO_WRITE;
+
+//if( doWrite )
+//    fprintf( stderr, "in file %s at offset %zu, writing %zu bytes; file length is %zu\n", file->name, (size_t)fileOffset, buflen, (size_t)file->length );
 
     assert( fileIndex < info->fileCount );
     assert( !file->length || ( fileOffset < file->length ) );
@@ -162,8 +167,7 @@ readOrWriteBytes( tr_session       * session,
 }
 
 static int
-compareOffsetToFile( const void * a,
-                     const void * b )
+compareOffsetToFile( const void * a, const void * b )
 {
     const uint64_t  offset = *(const uint64_t*)a;
     const tr_file * file = b;
@@ -183,9 +187,14 @@ tr_ioFindFileLocation( const tr_torrent * tor,
     const uint64_t  offset = tr_pieceOffset( tor, pieceIndex, pieceOffset, 0 );
     const tr_file * file;
 
+    assert( tr_isTorrent( tor ) );
+    assert( offset < tor->info.totalSize );
+
     file = bsearch( &offset,
                     tor->info.files, tor->info.fileCount, sizeof( tr_file ),
                     compareOffsetToFile );
+
+    assert( file != NULL );
 
     *fileIndex = file - tor->info.files;
     *fileOffset = offset - file->offset;
@@ -211,8 +220,8 @@ readOrWritePiece( tr_torrent       * tor,
 
     if( pieceIndex >= tor->info.pieceCount )
         return EINVAL;
-    if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
-        return EINVAL;
+    //if( pieceOffset + buflen > tr_torPieceCountBytes( tor, pieceIndex ) )
+    //    return EINVAL;
 
     tr_ioFindFileLocation( tor, pieceIndex, pieceOffset,
                            &fileIndex, &fileOffset );
@@ -225,6 +234,7 @@ readOrWritePiece( tr_torrent       * tor,
         err = readOrWriteBytes( tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
         buflen -= bytesThisPass;
+//fprintf( stderr, "++fileIndex to %d\n", (int)fileIndex );
         ++fileIndex;
         fileOffset = 0;
 
@@ -283,7 +293,7 @@ recalculateHash( tr_torrent       * tor,
     size_t   bytesLeft;
     uint32_t offset = 0;
     tr_bool  success = TRUE;
-    const size_t buflen = 1024 * 256; /* 256 KiB buffer */
+    const size_t buflen = tor->blockSize;
     void * buffer = tr_valloc( buflen );
     SHA_CTX  sha;
 
@@ -301,7 +311,7 @@ recalculateHash( tr_torrent       * tor,
     while( bytesLeft )
     {
         const int len = MIN( bytesLeft, buflen );
-        success = !tr_ioRead( tor, pieceIndex, offset, len, buffer );
+        success = !tr_cacheReadBlock( tor->session->cache, tor, pieceIndex, offset, len, buffer );
         if( !success )
             break;
         SHA1_Update( &sha, buffer, len );

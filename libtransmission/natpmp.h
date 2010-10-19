@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: natpmp.h 9868 2010-01-04 21:00:47Z charles $
+ * $Id: natpmp.h 10945 2010-07-05 21:04:17Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -26,11 +26,9 @@ typedef struct tr_natpmp tr_natpmp;
 
 tr_natpmp * tr_natpmpInit( void );
 
-void        tr_natpmpClose( tr_natpmp * );
+void tr_natpmpClose( tr_natpmp * );
 
-int         tr_natpmpPulse(         tr_natpmp *,
-                                int port,
-                                int isEnabled );
+int tr_natpmpPulse( tr_natpmp *, tr_port port, tr_bool isEnabled, tr_port * public_port );
 
 /* @} */
 #endif

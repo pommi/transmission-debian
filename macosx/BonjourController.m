@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: BonjourController.m 9844 2010-01-01 21:12:04Z livings124 $
+ * $Id: BonjourController.m 11154 2010-08-07 16:44:17Z livings124 $
  *
  * Copyright (c) 2008-2010 Transmission authors and contributors
  *
@@ -61,12 +61,12 @@ BonjourController * fDefaultController = nil;
 
 - (void) netService: (NSNetService *) sender didNotPublish: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to publish the web interface service on port %d, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to publish the web interface service on port %ld, with error: %@", [sender port], errorDict);
 }
 
 - (void) netService: (NSNetService *) sender didNotResolve: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to resolve the web interface service on port %d, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to resolve the web interface service on port %ld, with error: %@", [sender port], errorDict);
 }
 
 @end

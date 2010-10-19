@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-common.h 10694 2010-05-26 15:23:21Z charles $
+ * $Id: peer-common.h 10800 2010-06-19 14:33:10Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -83,6 +83,12 @@ typedef struct
     tr_port          port;         /* for GOT_PORT */
 }
 tr_peer_event;
+
+struct tr_peer;
+
+typedef void tr_peer_callback( struct tr_peer      * peer,
+                              const tr_peer_event  * event,
+                              void                 * client_data );
 
 #ifdef WIN32
  #define EMSGSIZE WSAEMSGSIZE

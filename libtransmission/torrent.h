@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent.h 10878 2010-06-26 18:52:05Z livings124 $
+ * $Id: torrent.h 11204 2010-09-12 18:58:49Z livings124 $
  */
 
 #ifndef __TRANSMISSION__
@@ -107,7 +107,7 @@ time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
 tr_torrent*      tr_torrentNext( tr_session  * session,
                                  tr_torrent  * current );
 
-void             tr_torrentCheckSeedRatio( tr_torrent * tor );
+void             tr_torrentCheckSeedLimit( tr_torrent * tor );
 
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void             tr_torrentSave( tr_torrent * tor );
@@ -185,8 +185,8 @@ struct tr_torrent
     uint32_t                   lastBlockSize;
     uint32_t                   lastPieceSize;
 
-    uint32_t                   blockCountInPiece;
-    uint32_t                   blockCountInLastPiece;
+    uint16_t                   blockCountInPiece;
+    uint16_t                   blockCountInLastPiece;
 
     struct tr_completion       completion;
 
@@ -194,7 +194,6 @@ struct tr_torrent
     tr_completeness            completeness;
 
     struct tr_torrent_tiers  * tiers;
-    struct tr_publisher_tag  * tiersSubscription;
 
     time_t                     dhtAnnounceAt;
     time_t                     dhtAnnounce6At;
@@ -211,9 +210,9 @@ struct tr_torrent
     uint64_t                   corruptPrev;
 
     uint64_t                   etaDLSpeedCalculatedAt;
-    double                     etaDLSpeed;
+    double                     etaDLSpeed_KBps;
     uint64_t                   etaULSpeedCalculatedAt;
-    double                     etaULSpeed;
+    double                     etaULSpeed_KBps;
 
     time_t                     addedDate;
     time_t                     activityDate;
@@ -229,6 +228,9 @@ struct tr_torrent
 
     tr_torrent_ratio_limit_hit_func  * ratio_limit_hit_func;
     void                             * ratio_limit_hit_func_user_data;
+
+    tr_torrent_idle_limit_hit_func  * idle_limit_hit_func;
+    void                            * idle_limit_hit_func_user_data;
 
     tr_bool                    isRunning;
     tr_bool                    isStopping;
@@ -256,6 +258,10 @@ struct tr_torrent
     double                     desiredRatio;
     tr_ratiolimit              ratioLimitMode;
 
+    uint16_t                   idleLimitMinutes;
+    tr_idlelimit               idleLimitMode;
+    tr_bool                    finishedSeedingByIdle;
+
     uint64_t                   preVerifyTotal;
 };
 
@@ -274,11 +280,13 @@ tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
 }
 
 /* how many blocks are in this piece? */
-static inline uint32_t
+static inline uint16_t
 tr_torPieceCountBlocks( const tr_torrent * tor, const tr_piece_index_t piece )
 {
-    return piece == tor->info.pieceCount - 1 ? tor->blockCountInLastPiece
-                                             : tor->blockCountInPiece;
+    if( piece + 1 == tor->info.pieceCount )
+        return tor->blockCountInLastPiece;
+    else
+        return tor->blockCountInPiece;
 }
 
 /* how many bytes are in this piece? */
@@ -419,5 +427,9 @@ char* tr_torrentBuildPartial( const tr_torrent *, tr_file_index_t fileNo );
 /* for when the info dict has been fundamentally changed wrt files,
  * piece size, etc. such as in BEP 9 where peers exchange metadata */
 void tr_torrentGotNewInfoDict( tr_torrent * tor );
+
+void tr_torrentSetSpeedLimit_Bps  ( tr_torrent *, tr_direction, int Bps );
+int tr_torrentGetSpeedLimit_Bps  ( const tr_torrent *, tr_direction );
+
 
 #endif

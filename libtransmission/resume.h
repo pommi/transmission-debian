@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: resume.h 10414 2010-03-22 00:55:43Z charles $
+ * $Id: resume.h 11044 2010-07-24 02:57:39Z charles $
  */
 
 #ifndef __TRANSMISSION__
@@ -35,7 +35,8 @@ enum
     TR_FR_ADDED_DATE          = ( 1 << 13 ),
     TR_FR_DONE_DATE           = ( 1 << 14 ),
     TR_FR_ACTIVITY_DATE       = ( 1 << 15 ),
-    TR_FR_RATIOLIMIT          = ( 1 << 16 )
+    TR_FR_RATIOLIMIT          = ( 1 << 16 ),
+    TR_FR_IDLELIMIT           = ( 1 << 17 )
 };
 
 /**

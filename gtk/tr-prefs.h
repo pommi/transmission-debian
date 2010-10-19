@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: tr-prefs.h 10391 2010-03-17 19:23:03Z charles $
+ * $Id: tr-prefs.h 11128 2010-08-06 06:22:05Z charles $
  */
 
 #ifndef TR_PREFS_H
@@ -36,14 +36,12 @@ GtkWidget * tr_prefs_dialog_new( GObject *   core,
 #define PREF_KEY_ASKQUIT                           "prompt-before-exit"
 #define PREF_KEY_SORT_MODE                         "sort-mode"
 #define PREF_KEY_SORT_REVERSED                     "sort-reversed"
-#define PREF_KEY_FILTER_MODE                       "filter-mode"
 #define PREF_KEY_COMPACT_VIEW                      "compact-view"
 #define PREF_KEY_FILTERBAR                         "show-filterbar"
 #define PREF_KEY_STATUSBAR                         "show-statusbar"
 #define PREF_KEY_STATUSBAR_STATS                   "statusbar-stats"
 #define PREF_KEY_TOOLBAR                           "show-toolbar"
 #define PREF_KEY_BLOCKLIST_UPDATES_ENABLED         "blocklist-updates-enabled"
-#define PREF_KEY_MAIN_WINDOW_LAYOUT_ORDER          "main-window-layout-order"
 #define PREF_KEY_MAIN_WINDOW_HEIGHT                "main-window-height"
 #define PREF_KEY_MAIN_WINDOW_WIDTH                 "main-window-width"
 #define PREF_KEY_MAIN_WINDOW_X                     "main-window-x"

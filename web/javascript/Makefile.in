@@ -309,6 +309,7 @@ transmissionlocaledir = @transmissionlocaledir@
 dist_data_DATA = \
   common.js \
   dialog.js \
+  formatter.js \
   menu.js \
   torrent.js \
   transmission.js \

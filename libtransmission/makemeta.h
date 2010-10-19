@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: makemeta.h 10971 2010-07-07 22:50:22Z charles $
+ * $Id: makemeta.h 10970 2010-07-07 22:50:18Z charles $
  */
 
 #ifndef TR_MAKEMETA_H
