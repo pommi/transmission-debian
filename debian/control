@@ -5,7 +5,7 @@ Maintainer: Leo Costela <costela@debian.org>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 8), autotools-dev, libgtk2.0-dev, libevent-dev 
  (>= 1.4), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev | 
- libcurl-dev, chrpath, intltool (>= 0.40), qt4-qmake, libqt4-dev, 
+ libcurl-dev, intltool (>= 0.40), qt4-qmake, libqt4-dev, 
 # libcanberra-gtk-dev, libgconf2-dev
 Standards-Version: 3.9.1
 Vcs-Browser: http://git.debian.org/collab-maint/transmission/
@@ -14,20 +14,21 @@ Homepage: http://www.transmissionbt.com/
 
 Package: transmission
 Architecture: all
-Depends: transmission-cli (>= ${binary:Version}), transmission-gtk (>= ${binary:Version}), transmission-common (= ${source:Version}), ${misc:Depends}
+Depends: transmission-gtk (>= ${binary:Version}) | transmission-qt (>= ${binary:Version}) | transmission-cli (>= ${binary:Version}), transmission-common (>= ${binary:Version}), ${misc:Depends}
 Description: lightweight BitTorrent client
  Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
  and daemon form). All its incarnations feature a very simple, intuitive 
  interface on top on an efficient, cross-platform back-end.
  .
- This package installs both (deprecated) CLI and GUI versions of transmission.
+ This is just a metapackage depending on one of the front-end 
+ alternatives
 
 Package: transmission-common
 Architecture: all
 Depends: ${misc:Depends}
 # because of the usr/share/icons move to -common
-Replaces: transmission-gtk (<= 2.10-1)
-Breaks: transmission-gtk (<= 2.10-1)
+Replaces: transmission-gtk (<< 2.10-1)
+Breaks: transmission-gtk (<< 2.10-1)
 Description: lightweight BitTorrent client (common files)
  Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
  and daemon form). All its incarnations feature a very simple, intuitive
