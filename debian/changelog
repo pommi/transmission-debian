@@ -1,3 +1,10 @@
+transmission (2.21-1) experimental; urgency=low
+
+  * new upstream release (must go to experimental because of 
+    libevent >= 2.0.10 dep)
+
+ -- Leo Costela <costela@debian.org>  Mon, 21 Feb 2011 17:03:33 +0100
+
 transmission (2.11-1) experimental; urgency=low
   
   * new upstream release
