@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: TorrentTableView.m 10407 2010-03-20 18:54:24Z livings124 $
+ * $Id: TorrentTableView.m 11617 2011-01-01 20:42:14Z livings124 $
  *
- * Copyright (c) 2005-2010 Transmission authors and contributors
+ * Copyright (c) 2005-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,6 +26,7 @@
 #import "Controller.h"
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
+#import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
@@ -215,11 +216,12 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        NSInteger count = [[item torrents] count];
+        NSUInteger count = [[item torrents] count];
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
-            return [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Torrent table -> group row -> tooltip"), count];
+            return [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Torrent table -> group row -> tooltip"),
+                    [NSString formattedUInteger: count]];
     }
     else
         return nil;
@@ -640,7 +642,7 @@
         NSMenuItem * item;
         if ([menu numberOfItems] == 4)
         {
-            const CGFloat ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+            const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
             
             for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
@@ -849,7 +851,7 @@
     
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
-        [progressMarks addObject: [NSNumber numberWithFloat: i]];
+        [progressMarks addObject: [NSNumber numberWithDouble: i]];
     
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];

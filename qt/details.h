@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: details.h 11234 2010-09-19 17:33:25Z charles $
+ * $Id: details.h 11452 2010-12-04 00:19:52Z charles $
  */
 
 #ifndef DETAILS_DIALOG_H
@@ -142,20 +142,16 @@ class Details: public QDialog
         void onFileWantedChanged( const QSet<int>& fileIndices, bool );
         void onHonorsSessionLimitsToggled( bool );
         void onDownloadLimitedToggled( bool );
-        void onDownloadLimitChanged( int );
+        void onSpinBoxEditingFinished( );
         void onUploadLimitedToggled( bool );
-        void onUploadLimitChanged( int );
         void onRatioModeChanged( int );
-        void onRatioLimitChanged( double );
         void onIdleModeChanged( int );
-        void onIdleLimitChanged( int );
         void onShowTrackerScrapesToggled( bool );
         void onShowBackupTrackersToggled( bool );
         void onTrackerSelectionChanged( );
         void onAddTrackerClicked( );
         void onEditTrackerClicked( );
         void onRemoveTrackerClicked( );
-        void onMaxPeersChanged( int );
         void refresh( );
 };
 

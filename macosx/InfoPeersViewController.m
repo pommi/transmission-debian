@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: InfoPeersViewController.m 10832 2010-06-24 00:00:43Z livings124 $
+ * $Id: InfoPeersViewController.m 11617 2011-01-01 20:42:14Z livings124 $
  *
- * Copyright (c) 2010 Transmission authors and contributors
+ * Copyright (c) 2010-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -185,7 +185,7 @@
         
         if (connected > 0)
         {
-            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 6];
+            NSMutableArray * fromComponents = [NSMutableArray arrayWithCapacity: 7];
             if (tracker > 0)
                 [fromComponents addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), tracker]];
@@ -273,7 +273,7 @@
         if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
             return [webSeed objectForKey: @"Address"];
@@ -292,12 +292,12 @@
         else if ([ident isEqualToString: @"UL To"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
             return [peer objectForKey: @"IP"];

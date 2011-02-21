@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2009-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: magnet.c 11280 2010-10-01 13:33:39Z charles $
+ * $Id: magnet.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <assert.h>
@@ -24,7 +24,7 @@
 ***/
 
 /* this base32 code converted from code by Robert Kaye and Gordon Mohr
- * and is public domain.  see http://bitzi.com/publicdomain for more info */
+ * and is public domain. see http://bitzi.com/publicdomain for more info */
 
 static const int base32Lookup[] =
 {
@@ -133,7 +133,7 @@ tr_magnetParse( const char * uri )
             else
                 vallen = strlen( val );
 
-            if( ( keylen==2 ) && !memcmp( key, "xt", 2 ) && !memcmp( val, "urn:btih:", 9 ) )
+            if( ( keylen==2 ) && !memcmp( key, "xt", 2 ) && val && !memcmp( val, "urn:btih:", 9 ) )
             {
                 const char * hash = val + 9;
                 const int hashlen = vallen - 9;

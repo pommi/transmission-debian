@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2008-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: bandwidth.c 10998 2010-07-11 20:49:19Z charles $
+ * $Id: bandwidth.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <assert.h>
@@ -205,9 +205,9 @@ phaseOne( tr_ptrArray * peerArray, tr_direction dir )
     int peerCount = tr_ptrArraySize( peerArray );
     struct tr_peerIo ** peers = (struct tr_peerIo**) tr_ptrArrayBase( peerArray );
 
-    /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
-     * peers from starving the others.  Loop through the peers, giving each a
-     * small chunk of bandwidth.  Keep looping until we run out of bandwidth
+    /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
+     * peers from starving the others. Loop through the peers, giving each a
+     * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     n = peerCount;
     dbgmsg( "%d peers to go round-robin for %s", n, (dir==TR_UP?"upload":"download") );
@@ -267,15 +267,15 @@ tr_bandwidthAllocate( tr_bandwidth  * b,
         }
     }
 
-    /* First phase of IO.  Tries to distribute bandwidth fairly to keep faster
-     * peers from starving the others.  Loop through the peers, giving each a
-     * small chunk of bandwidth.  Keep looping until we run out of bandwidth
+    /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
+     * peers from starving the others. Loop through the peers, giving each a
+     * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     phaseOne( &high, dir );
     phaseOne( &normal, dir );
     phaseOne( &low, dir );
 
-    /* Second phase of IO.  To help us scale in high bandwidth situations,
+    /* Second phase of IO. To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidthAllocate() call, when we start over again. */
@@ -343,12 +343,12 @@ tr_bandwidthGetPieceSpeed_Bps( const tr_bandwidth * b, const uint64_t now, const
     return getSpeed_Bps( &b->band[dir].piece, HISTORY_MSEC, now );
 }
 
-static void
-bandwidthUsedImpl( tr_bandwidth  * b,
-                   tr_direction    dir,
-                   size_t          byteCount,
-                   tr_bool         isPieceData,
-                   uint64_t        now )
+void
+tr_bandwidthUsed( tr_bandwidth  * b,
+                  tr_direction    dir,
+                  size_t          byteCount,
+                  tr_bool         isPieceData,
+                  uint64_t        now )
 {
     struct tr_band * band;
 
@@ -372,14 +372,5 @@ fprintf( stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\
         bytesUsed( now, &band->piece, byteCount );
 
     if( b->parent != NULL )
-        bandwidthUsedImpl( b->parent, dir, byteCount, isPieceData, now );
-}
-
-void
-tr_bandwidthUsed( tr_bandwidth  * b,
-                  tr_direction    dir,
-                  size_t          byteCount,
-                  tr_bool         isPieceData )
-{
-    bandwidthUsedImpl( b, dir, byteCount, isPieceData, tr_time_msec( ) );
+        tr_bandwidthUsed( b->parent, dir, byteCount, isPieceData, now );
 }

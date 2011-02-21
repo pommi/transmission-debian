@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: filterbar.h 11092 2010-08-01 20:36:13Z charles $
+ * $Id: filterbar.h 11406 2010-11-14 05:03:38Z charles $
  */
 
 #ifndef QTR_FILTERBAR_H
@@ -71,6 +71,7 @@ class FilterBar: public QWidget
         QComboBox * createActivityCombo( );
         void recountSoon( );
         void refreshTrackers( );
+        QString getCountString( int n ) const;
 
     private:
         Prefs& myPrefs;

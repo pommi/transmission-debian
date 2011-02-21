@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: PrefsController.h 11046 2010-07-24 03:19:41Z livings124 $
+ * $Id: PrefsController.h 11617 2011-01-01 20:42:14Z livings124 $
  *
- * Copyright (c) 2005-2010 Transmission authors and contributors
+ * Copyright (c) 2005-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,15 +36,19 @@
     
     NSString * fInitialString;
     
-    IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp;
+    IBOutlet NSTextField * fCheckForUpdatesLabel;
+    IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
+    
+    IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp, * fDoneScriptPopUp;
     IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
 
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     IBOutlet NSPopUpButton * fAutoSpeedDayTypePopUp;
     
-    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField, * fBlocklistMessageField, * fBlocklistDateField;
-    IBOutlet NSButton * fBlocklistEnableCheck;
+    IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField,
+                        * fBlocklistURLField, * fBlocklistMessageField, * fBlocklistDateField;
+    IBOutlet NSButton * fBlocklistButton;
     
     PortChecker * fPortChecker;
     IBOutlet NSTextField * fPortField, * fPortStatusField;
@@ -53,9 +57,6 @@
     IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
-    
-    IBOutlet NSTextField * fProxyAddressField, * fProxyPortField, * fProxyPasswordField;
-    IBOutlet NSPopUpButton * fProxyTypePopUp;
     
     IBOutlet NSTextField * fRPCPortField, * fRPCPasswordField;
     IBOutlet NSTableView * fRPCWhitelistTable;
@@ -92,6 +93,8 @@
 - (void) updateBlocklist: (id) sender;
 - (void) setBlocklistAutoUpdate: (id) sender;
 - (void) updateBlocklistFields;
+- (void) updateBlocklistURLField;
+- (void) updateBlocklistButton;
 
 - (void) setAutoStartDownloads: (id) sender;
 
@@ -113,6 +116,9 @@
 - (void) setUseIncompleteFolder: (id) sender;
 
 - (void) setRenamePartialFiles: (id) sender;
+
+- (void) setDoneScriptEnabled: (id) sender;
+- (void) doneScriptSheetShow: (id) sender;
 
 - (void) applyRatioSetting: (id) sender;
 - (void) setRatioStop: (id) sender;
@@ -139,16 +145,6 @@
 
 - (void) setAutoSize: (id) sender;
 
-- (void) setProxyEnabled: (id) sender;
-- (void) setProxyAddress: (id) sender;
-- (void) setProxyPort: (id) sender;
-- (void) setProxyType: (id) sender;
-- (void) updateProxyType;
-- (void) setProxyAuthorize: (id) sender;
-- (void) setProxyUsername: (id) sender;
-- (void) setProxyPassword: (id) sender;
-- (void) updateProxyPassword;
-
 - (void) setRPCEnabled: (id) sender;
 - (void) linkWebUI: (id) sender;
 - (void) setRPCAuthorize: (id) sender;
@@ -161,6 +157,7 @@
 - (void) updateRPCWhitelist;
 - (void) addRemoveRPCIP: (id) sender;
 
+- (void) helpForScript: (id) sender;
 - (void) helpForPeers: (id) sender;
 - (void) helpForNetwork: (id) sender;
 - (void) helpForRemote: (id) sender;

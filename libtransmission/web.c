@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2008-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: web.c 11200 2010-09-09 18:28:20Z charles $
+ * $Id: web.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #ifdef WIN32
@@ -17,7 +17,8 @@
 #endif
 
 #include <curl/curl.h>
-#include <event.h>
+
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "list.h"
@@ -72,6 +73,7 @@ struct tr_web_task
 {
     long code;
     struct evbuffer * response;
+    struct evbuffer * freebuf;
     char * url;
     char * range;
     tr_session * session;
@@ -82,7 +84,8 @@ struct tr_web_task
 static void
 task_free( struct tr_web_task * task )
 {
-    evbuffer_free( task->response );
+    if( task->freebuf )
+        evbuffer_free( task->freebuf );
     tr_free( task->range );
     tr_free( task->url );
     tr_free( task );
@@ -124,14 +127,6 @@ sockoptfunction( void * vtask, curl_socket_t fd, curlsocktype purpose UNUSED )
 }
 #endif
 
-static int
-getCurlProxyType( tr_proxy_type t )
-{
-    if( t == TR_PROXY_SOCKS4 ) return CURLPROXY_SOCKS4;
-    if( t == TR_PROXY_SOCKS5 ) return CURLPROXY_SOCKS5;
-    return CURLPROXY_HTTP;
-}
-
 static long
 getTimeoutFromURL( const struct tr_web_task * task )
 {
@@ -150,27 +145,13 @@ static CURL *
 createEasy( tr_session * s, struct tr_web_task * task )
 {
     const tr_address * addr;
+    tr_bool is_default_value;
     CURL * e = curl_easy_init( );
     const long verbose = getenv( "TR_CURL_VERBOSE" ) != NULL;
-    char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );          
-
-    if( !task->range && s->isProxyEnabled ) {
-        const long proxyType = getCurlProxyType( s->proxyType );
-        curl_easy_setopt( e, CURLOPT_PROXY, s->proxy );
-        curl_easy_setopt( e, CURLOPT_PROXYAUTH, CURLAUTH_ANY );
-        curl_easy_setopt( e, CURLOPT_PROXYPORT, s->proxyPort );
-        curl_easy_setopt( e, CURLOPT_PROXYTYPE, proxyType );
-    }
-
-    if( !task->range && s->isProxyAuthEnabled ) {
-        char * str = tr_strdup_printf( "%s:%s", s->proxyUsername,
-                                                s->proxyPassword );
-        curl_easy_setopt( e, CURLOPT_PROXYUSERPWD, str );
-        tr_free( str );
-    }
+    char * cookie_filename = tr_buildPath( s->configDir, "cookies.txt", NULL );
 
     curl_easy_setopt( e, CURLOPT_AUTOREFERER, 1L );
-    curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename ); 
+    curl_easy_setopt( e, CURLOPT_COOKIEFILE, cookie_filename );
     curl_easy_setopt( e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity" );
     curl_easy_setopt( e, CURLOPT_FOLLOWLOCATION, 1L );
     curl_easy_setopt( e, CURLOPT_MAXREDIRS, -1L );
@@ -189,13 +170,18 @@ createEasy( tr_session * s, struct tr_web_task * task )
     curl_easy_setopt( e, CURLOPT_WRITEDATA, task );
     curl_easy_setopt( e, CURLOPT_WRITEFUNCTION, writeFunc );
 
-    if(( addr = tr_sessionGetPublicAddress( s, TR_AF_INET )))
+    if((( addr = tr_sessionGetPublicAddress( s, TR_AF_INET, &is_default_value ))) && !is_default_value )
+        curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( addr ) );
+    else if ((( addr = tr_sessionGetPublicAddress( s, TR_AF_INET6, &is_default_value ))) && !is_default_value )
         curl_easy_setopt( e, CURLOPT_INTERFACE, tr_ntop_non_ts( addr ) );
 
     if( task->range )
         curl_easy_setopt( e, CURLOPT_RANGE, task->range );
 
-    tr_free( cookie_filename ); 
+    if( s->curl_easy_config_func != NULL )
+        s->curl_easy_config_func( s, e, task->url );
+
+    tr_free( cookie_filename );
     return e;
 }
 
@@ -212,8 +198,8 @@ task_finish_func( void * vtask )
     if( task->done_func != NULL )
         task->done_func( task->session,
                          task->code,
-                         EVBUFFER_DATA( task->response ),
-                         EVBUFFER_LENGTH( task->response ),
+                         evbuffer_pullup( task->response, -1 ),
+                         evbuffer_get_length( task->response ),
                          task->done_func_user_data );
 
     task_free( task );
@@ -230,6 +216,19 @@ tr_webRun( tr_session         * session,
            tr_web_done_func     done_func,
            void               * done_func_user_data )
 {
+    tr_webRunWithBuffer( session, url, range,
+                         done_func, done_func_user_data,
+                         NULL );
+}
+
+void
+tr_webRunWithBuffer( tr_session         * session,
+                     const char         * url,
+                     const char         * range,
+                     tr_web_done_func     done_func,
+                     void               * done_func_user_data,
+                     struct evbuffer    * buffer )
+{
     struct tr_web * web = session->web;
 
     if( web != NULL )
@@ -241,7 +240,8 @@ tr_webRun( tr_session         * session,
         task->range = tr_strdup( range );
         task->done_func = done_func;
         task->done_func_user_data = done_func_user_data;
-        task->response = evbuffer_new( );
+        task->response = buffer ? buffer : evbuffer_new( );
+        task->freebuf = buffer ? NULL : task->response;
 
         tr_lockLock( web->taskLock );
         tr_list_append( &web->tasks, task );
@@ -255,7 +255,7 @@ tr_webRun( tr_session         * session,
  * http://msdn.microsoft.com/en-us/library/ms740141%28VS.85%29.aspx
  * On win32, any two of the parameters, readfds, writefds, or exceptfds,
  * can be given as null. At least one must be non-null, and any non-null
- * descriptor set must contain at least one handle to a socket. 
+ * descriptor set must contain at least one handle to a socket.
  */
 static void
 tr_select( int nfds,
@@ -275,7 +275,7 @@ tr_select( int nfds,
         char errstr[512];
         const int e = EVUTIL_SOCKET_ERROR( );
         tr_net_strerror( errstr, sizeof( errstr ), e );
-        dbgmsg( "Error: select (%d) %s", e, errstr ); 
+        dbgmsg( "Error: select (%d) %s", e, errstr );
     }
 #else
     select( nfds, r_fd_set, w_fd_set, c_fd_set, t );
@@ -319,7 +319,7 @@ tr_webThreadFunc( void * vsession )
         tr_lockLock( web->taskLock );
         while(( task = tr_list_pop_front( &web->tasks )))
         {
-            dbgmsg( "adding task to curl: [%s]\n", task->url );
+            dbgmsg( "adding task to curl: [%s]", task->url );
             curl_multi_add_handle( multi, createEasy( session, task ));
             /*fprintf( stderr, "adding a task.. taskCount is now %d\n", taskCount );*/
             ++taskCount;
@@ -370,7 +370,7 @@ tr_webThreadFunc( void * vsession )
                 curl_easy_getinfo( e, CURLINFO_RESPONSE_CODE, &task->code );
                 curl_multi_remove_handle( multi, e );
                 curl_easy_cleanup( e );
-/*fprintf( stderr, "removing a completed task.. taskCount is now %d (response code: %d, response len: %d)\n", taskCount, (int)task->code, (int)EVBUFFER_LENGTH(task->response) );*/
+/*fprintf( stderr, "removing a completed task.. taskCount is now %d (response code: %d, response len: %d)\n", taskCount, (int)task->code, (int)evbuffer_get_length(task->response) );*/
                 tr_runInEventThread( task->session, task_finish_func, task );
                 --taskCount;
             }
@@ -467,7 +467,7 @@ tr_http_escape( struct evbuffer  * out,
     if( ( len < 0 ) && ( str != NULL ) )
         len = strlen( str );
 
-    for( end=str+len; str!=end; ++str ) {
+    for( end=str+len; str && str!=end; ++str ) {
         if(    ( *str == ',' )
             || ( *str == '-' )
             || ( *str == '.' )

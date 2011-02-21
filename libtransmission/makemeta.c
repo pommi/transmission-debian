@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2007-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: makemeta.c 11272 2010-09-30 05:22:33Z Longinus00 $
+ * $Id: makemeta.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <assert.h>
@@ -294,39 +294,25 @@ getFileInfo( const char *                     topFile,
              tr_benc *                        uninitialized_length,
              tr_benc *                        uninitialized_path )
 {
-    const char * pch, *prev;
-    size_t       topLen;
-    int          n;
+    size_t offset;
 
     /* get the file size */
     tr_bencInitInt( uninitialized_length, file->size );
 
     /* how much of file->filename to walk past */
-    topLen = strlen( topFile );
-    if( topLen>0 && topFile[topLen-1]!=TR_PATH_DELIMITER )
-        ++topLen; /* +1 for the path delimiter */
+    offset = strlen( topFile );
+    if( offset>0 && topFile[offset-1]!=TR_PATH_DELIMITER )
+        ++offset; /* +1 for the path delimiter */
 
     /* build the path list */
-    n = 1;
-    for( pch = file->filename + topLen; *pch; ++pch )
-        if( *pch == TR_PATH_DELIMITER )
-            ++n;
-    tr_bencInitList( uninitialized_path, n );
-    for( prev = pch = file->filename + topLen; ; ++pch )
-    {
-        char buf[TR_PATH_MAX];
-
-        if( *pch && *pch != TR_PATH_DELIMITER )
-            continue;
-
-        memcpy( buf, prev, pch - prev );
-        buf[pch - prev] = '\0';
-
-        tr_bencListAddStr( uninitialized_path, buf );
-
-        prev = pch + 1;
-        if( !*pch )
-            break;
+    tr_bencInitList( uninitialized_path, 0 );
+    if( strlen(file->filename) > offset ) {
+        char * filename = tr_strdup( file->filename + offset );
+        char * walk = filename;
+        const char * token;
+        while(( token = tr_strsep( &walk, TR_PATH_DELIMITER_STR )))
+            tr_bencListAddStr( uninitialized_path, token );
+        tr_free( filename );
     }
 }
 

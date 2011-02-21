@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: create.c 11266 2010-09-27 15:07:57Z charles $
+ * $Id: create.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <stdio.h>

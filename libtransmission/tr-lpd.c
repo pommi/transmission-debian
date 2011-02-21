@@ -13,7 +13,7 @@ all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include <signal.h> /* sig_atomic_t */
 #include <sys/time.h>
 #include <unistd.h> /* close() */
-#include <fcntl.h> /* fcntl(), O_NONBLOCK */
 #include <ctype.h> /* toupper() */
 #ifdef WIN32
   #include <w32api.h>
@@ -36,8 +35,6 @@ THE SOFTWARE.
   #include <inttypes.h>
   #include <ws2tcpip.h>
   typedef uint16_t in_port_t;			/* all missing */
-  extern int fcntl (int fd, int cmd, ...);
-  #define O_NONBLOCK	04000
 #else
   #include <sys/types.h>
   #include <sys/socket.h> /* socket(), bind() */
@@ -45,7 +42,8 @@ THE SOFTWARE.
 #endif
 
 /* third party */
-#include <event.h>
+#include <event2/event.h>
+#include <event2/util.h>
 
 /* libT */
 #include "transmission.h"
@@ -63,16 +61,16 @@ THE SOFTWARE.
 * @file tr-lpd.c
 *
 * This module implements the Local Peer Discovery (LPD) protocol as supported by the
-* uTorrent client application.  A typical LPD datagram is 119 bytes long.
+* uTorrent client application. A typical LPD datagram is 119 bytes long.
 *
-* $Id: tr-lpd.c 11299 2010-10-11 15:41:27Z charles $
+* $Id: tr-lpd.c 11599 2010-12-27 19:18:17Z charles $
 */
 
 static void event_callback( int, short, void* );
 
 static int lpd_socket; /**<separate multicast receive socket */
 static int lpd_socket2; /**<and multicast send socket */
-static struct event lpd_event;
+static struct event * lpd_event = NULL;
 static tr_port lpd_port;
 
 static tr_torrent* lpd_torStaticType UNUSED; /* just a helper for static type analysis */
@@ -251,33 +249,6 @@ static int lpd_extractParam( const char* const str, const char* const name, int 
 /**
 * @} */
 
-
-/**
-* @brief Configures additional capabilities for a socket */
-static int
-lpd_configureSocket( int sock, int add )
-{
-#ifdef WIN32
-    unsigned long flags = 1;
-
-    if (add != O_NONBLOCK)
-        return -1;		/* not supported */
-    if (ioctlsocket(sock, FIONBIO, &flags) == SOCKET_ERROR)
-        return -1;
-#else
-    /* read-modify-write socket flags */
-    int flags = fcntl( sock, F_GETFL );
-
-    if( flags < 0 )
-        return -1;
-
-    if( fcntl( sock, F_SETFL, add | flags ) == -1 )
-        return -1;
-#endif
-
-    return add;
-}
-
 /**
 * @brief Initializes Local Peer Discovery for this node
 *
@@ -310,8 +281,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
         if( lpd_socket < 0 )
             goto fail;
 
-        /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket ) < 0 )
             goto fail;
 
         if( setsockopt( lpd_socket, SOL_SOCKET, SO_REUSEADDR,
@@ -350,8 +320,7 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
         if( lpd_socket2 < 0 )
             goto fail;
 
-        /* enable non-blocking operation */
-        if( lpd_configureSocket( lpd_socket2, O_NONBLOCK ) < 0 )
+        if( evutil_make_socket_nonblocking( lpd_socket2 ) < 0 )
             goto fail;
 
         /* configure outbound multicast TTL */
@@ -369,8 +338,8 @@ int tr_lpdInit( tr_session* ss, tr_address* tr_addr UNUSED )
     /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
      * any announcement received during the initial interval will be discarded. */
 
-    event_set( &lpd_event, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
-    event_add( &lpd_event, NULL );
+    lpd_event = event_new( ss->event_base, lpd_socket, EV_READ | EV_PERSIST, event_callback, NULL );
+    event_add( lpd_event, NULL );
 
     tr_ndbg( "LPD", "Local Peer Discovery initialised" );
 
@@ -398,7 +367,8 @@ void tr_lpdUninit( tr_session* ss )
 
     tr_ndbg( "LPD", "Uninitialising Local Peer Discovery" );
 
-    event_del( &lpd_event );
+    event_free( lpd_event );
+    lpd_event = NULL;
 
     /* just shut down, we won't remember any former nodes */
     EVUTIL_CLOSESOCKET( lpd_socket );
@@ -444,7 +414,7 @@ static inline void lpd_consistencyCheck( void )
 * @return Returns TRUE on success
 *
 * Send a query for torrent t out to the LPD multicast group (or the LAN, for that
-* matter).  A listening client on the same network might react by adding us to his
+* matter). A listening client on the same network might react by adding us to his
 * peer pool for torrent t.
 */
 tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
@@ -501,7 +471,7 @@ tr_bool tr_lpdSendAnnounce( const tr_torrent* t )
 * the peer in/out parameter.
 *
 * @note The port information gets added to the peer structure if tr_lpdConsiderAnnounce
-* is able to extract the necessary information from the announce message.  That is, if
+* is able to extract the necessary information from the announce message. That is, if
 * return != 0, the caller may retrieve the value from the passed structure.
 */
 static int tr_lpdConsiderAnnounce( tr_pex* peer, const char* const msg )

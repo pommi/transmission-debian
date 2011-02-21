@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: torrent.h 11194 2010-09-03 04:30:43Z charles $
+ * $Id: torrent.h 11446 2010-12-01 05:41:58Z charles $
  */
 
 #ifndef QTR_TORRENT_H
@@ -268,6 +268,7 @@ class Torrent: public QObject
         uint64_t uploadedEver( ) const { return getSize( UPLOADED_EVER ); }
         uint64_t failedEver( ) const { return getSize( FAILED_EVER ); }
         int compareTracker( const Torrent& ) const;
+        int compareSeedRatio( const Torrent& ) const;
         int compareRatio( const Torrent& ) const;
         int compareETA( const Torrent& ) const;
         bool hasETA( ) const { return getETA( ) >= 0; }
