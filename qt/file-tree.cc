@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: file-tree.cc 11306 2010-10-13 00:43:54Z charles $
+ * $Id: file-tree.cc 11522 2010-12-12 16:43:19Z charles $
  */
 
 #include <cassert>
@@ -693,6 +693,25 @@ FileTreeView :: eventFilter( QObject * o, QEvent * event )
         left -= 20; // not sure why this is necessary.  it works in different themes + font sizes though...
         setColumnWidth( COL_NAME, std::max(left,0) );
         return false;
+    }
+
+    // handle using the keyboard to toggle the
+    // wanted/unwanted state or the file priority
+    else if( event->type() == QEvent::KeyPress )
+    {
+        switch( dynamic_cast<QKeyEvent*>(event)->key() )
+        {
+            case Qt::Key_Space:
+                foreach( QModelIndex i, selectionModel()->selectedRows(COL_WANTED) )
+                    clicked( i );
+                return false;
+
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+                foreach( QModelIndex i, selectionModel()->selectedRows(COL_PRIORITY) )
+                    clicked( i );
+                return false;
+        }
     }
 
     return false;

@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h> /* fprintf */
 #include <string.h> /* strcmp */
 
@@ -269,7 +270,7 @@ test_lowerbound( void )
         const int pos = tr_lowerBound( &i, A, N, sizeof(int), compareInts, &exact );
 
 #if 0
-        fprintf( stderr, "searching for %d.  ", i );
+        fprintf( stderr, "searching for %d. ", i );
         fprintf( stderr, "result: index = %d, ", pos );
         if( pos != N )
             fprintf( stderr, "A[%d] == %d\n", pos, A[pos] );
@@ -292,9 +293,6 @@ test_memmem( void )
     check( tr_memmem( haystack, sizeof haystack, haystack, sizeof haystack) == haystack )
     check( tr_memmem( haystack, sizeof haystack, needle, sizeof needle) == haystack + 2 )
     check( tr_memmem( needle, sizeof needle, haystack, sizeof haystack) == NULL )
-    check( tr_memmem( haystack, sizeof haystack, "", 0) == haystack )
-    check( tr_memmem( haystack, sizeof haystack, NULL, 0) == haystack )
-    check( tr_memmem( haystack, 0, "", 0) == haystack )
 
     return 0;
 }
@@ -379,6 +377,7 @@ static int
 test_truncd( void )
 {
     char buf[32];
+    const double nan = sqrt( -1 );
 
     tr_snprintf( buf, sizeof( buf ), "%.2f%%", 99.999 );
     check( !strcmp( buf, "100.00%" ) );
@@ -391,6 +390,18 @@ test_truncd( void )
 
     tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.15, 2 ) );
     check( !strcmp( buf, "2.15" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 2.05, 2 ) );
+    check( !strcmp( buf, "2.05" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( 3.3333, 2 ) );
+    check( !strcmp( buf, "3.33" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.0f", tr_truncd( 3.3333, 0 ) );
+    check( !strcmp( buf, "3" ) );
+
+    tr_snprintf( buf, sizeof( buf ), "%.2f", tr_truncd( nan, 2 ) );
+    check( strstr( buf, "nan" ) != NULL );
 
     return 0;
 }
@@ -406,8 +417,8 @@ main( void )
     /* base64 */
     out = tr_base64_encode( "YOYO!", -1, &len );
     check( out );
-    check( !strcmp( out, "WU9ZTyE=\n" ) );
-    check( len == 9 );
+    check( !strcmp( out, "WU9ZTyE=" ) );
+    check( len == 8 );
     in = tr_base64_decode( out, -1, &len );
     check( in );
     check( !strcmp( in, "YOYO!" ) );

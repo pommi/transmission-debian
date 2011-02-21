@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2007-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: natpmp.c 10945 2010-07-05 21:04:17Z charles $
+ * $Id: natpmp.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <errno.h>
@@ -71,7 +71,7 @@ logVal( const char * func,
     else
         tr_ndbg(
              getKey( ),
-            "%s failed.  natpmp returned %d (%s); errno is %d (%s)",
+            "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
             func, ret, strnatpmperr( ret ), errno, tr_strerror( errno ) );
 }
 
@@ -212,7 +212,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, tr_port private_port, tr_bool is_enabled
         {
             nat->state = TR_NATPMP_IDLE;
             nat->is_mapped = TRUE;
-            nat->renew_time = tr_time( ) + LIFETIME_SECS;
+            nat->renew_time = tr_time( ) + ( resp.pnu.newportmapping.lifetime / 2 );
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
             tr_ninf( getKey( ), _( "Port %d forwarded successfully" ), nat->private_port );

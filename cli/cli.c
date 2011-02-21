@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: cli.c 11163 2010-08-09 00:18:26Z charles $
+ * $Id: cli.c 11709 2011-01-19 13:48:47Z jordan $
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -232,13 +232,6 @@ main( int argc, char ** argv )
 
     printf( "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING );
 
-    /* the command line overrides defaults */
-    if( parseCommandLine( &settings, argc, (const char**)argv ) )
-        return EXIT_FAILURE;
-
-    if( showVersion )
-        return 0;
-
     /* user needs to pass in at least one argument */
     if( argc < 2 ) {
         tr_getopt_usage( MY_READABLE_NAME, getUsage( ), options );
@@ -249,6 +242,13 @@ main( int argc, char ** argv )
     tr_bencInitDict( &settings, 0 );
     configDir = getConfigDir( argc, (const char**)argv );
     tr_sessionLoadSettings( &settings, configDir, MY_CONFIG_NAME );
+
+    /* the command line overrides defaults */
+    if( parseCommandLine( &settings, argc, (const char**)argv ) )
+        return EXIT_FAILURE;
+
+    if( showVersion )
+        return 0;
 
     /* Check the options for validity */
     if( !torrentPath ) {

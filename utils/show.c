@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -7,16 +7,16 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: show.c 11263 2010-09-24 15:22:53Z charles $
+ * $Id: show.c 11709 2011-01-19 13:48:47Z jordan $
  */
 
 #include <stdio.h>
 #include <time.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
-#include <curl/curl.h> 
+#include <curl/curl.h>
 
-#include <event.h> /* struct evbuffer */
+#include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -85,11 +85,20 @@ parseCommandLine( int argc, const char ** argv )
     return 0;
 }
 
+static int
+compare_files_by_name( const void * va, const void * vb )
+{
+    const tr_file * a = *(const tr_file**)va;
+    const tr_file * b = *(const tr_file**)vb;
+    return strcmp( a->name, b->name );
+}
+
 static void
 showInfo( const tr_info * inf )
 {
     int i;
     char buf[128];
+    tr_file ** files;
     int prevTier = -1;
 
     /**
@@ -118,7 +127,7 @@ showInfo( const tr_info * inf )
     **/
 
     printf( "\nTRACKERS\n" );
-    for( i=0; i<(int)inf->trackerCount; ++i ) 
+    for( i=0; i<inf->trackerCount; ++i )
     {
         if( prevTier != inf->trackers[i].tier )
         {
@@ -130,12 +139,29 @@ showInfo( const tr_info * inf )
     }
 
     /**
+    ***
+    **/
+
+    if( inf->webseedCount > 0 )
+    {
+        printf( "\nWEBSEEDS\n\n" );
+
+        for( i=0; i<inf->webseedCount; ++i )
+            printf( "  %s\n", inf->webseeds[i] );
+    }
+
+    /**
     ***  Files
     **/
 
     printf( "\nFILES\n\n" );
+    files = tr_new( tr_file*, inf->fileCount );
     for( i=0; i<(int)inf->fileCount; ++i )
-        printf( "  %s (%s)\n", inf->files[i].name, tr_formatter_size_B( buf, inf->files[i].length, sizeof( buf ) ) );
+        files[i] = &inf->files[i];
+    qsort( files, inf->fileCount, sizeof(tr_file*), compare_files_by_name );
+    for( i=0; i<(int)inf->fileCount; ++i )
+        printf( "  %s (%s)\n", files[i]->name, tr_formatter_size_B( buf, files[i]->length, sizeof( buf ) ) );
+    tr_free( files );
 }
 
 static size_t
@@ -207,8 +233,8 @@ doScrape( const tr_info * inf )
                 tr_benc top;
                 tr_benc * files;
                 tr_bool matched = FALSE;
-                const char * begin = (const char*) EVBUFFER_DATA( buf );
-                const char * end = begin + EVBUFFER_LENGTH( buf );
+                const char * begin = (const char*) evbuffer_pullup( buf, -1 );
+                const char * end = begin + evbuffer_get_length( buf );
 
                 if( !tr_bencParse( begin, end, &top, NULL ) )
                 {

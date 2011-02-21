@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: prefs.h 11092 2010-08-01 20:36:13Z charles $
+ * $Id: prefs.h 11379 2010-11-02 01:24:08Z charles $
  */
 
 #ifndef QTR_PREFS_H
@@ -80,6 +80,7 @@ class Prefs: public QObject
             ALT_SPEED_LIMIT_TIME_ENABLED,
             ALT_SPEED_LIMIT_TIME_DAY,
             BLOCKLIST_ENABLED,
+            BLOCKLIST_URL,
             DSPEED,
             DSPEED_ENABLED,
             DOWNLOAD_DIR,
@@ -106,14 +107,7 @@ class Prefs: public QObject
             DHT_ENABLED,
             LPD_ENABLED,
             PORT_FORWARDING,
-            PROXY_AUTH_ENABLED,
             PREALLOCATION,
-            PROXY_ENABLED,
-            PROXY_PASSWORD,
-            PROXY_PORT,
-            PROXY,
-            PROXY_TYPE,
-            PROXY_USERNAME,
             RATIO,
             RATIO_ENABLED,
             RENAME_PARTIAL_FILES,

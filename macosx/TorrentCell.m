@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: TorrentCell.m 10439 2010-04-02 18:14:46Z livings124 $
+ * $Id: TorrentCell.m 11617 2011-01-01 20:42:14Z livings124 $
  *
- * Copyright (c) 2006-2010 Transmission authors and contributors
+ * Copyright (c) 2006-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -610,8 +610,8 @@
     //fill an all-white bar for magnet links
     if ([torrent isMagnet])
     {
-        [[NSColor whiteColor] set];
-        NSRectFill(barRect);
+        [[NSColor colorWithCalibratedWhite: 1.0 alpha: [fDefaults boolForKey: @"SmallView"] ? 0.25 : 1.0] set];
+        NSRectFillUsingOperation(barRect, NSCompositeSourceOver);
         return;
     }
     

@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: FileListNode.m 10206 2010-02-15 14:56:14Z livings124 $
+ * $Id: FileListNode.m 11617 2011-01-01 20:42:14Z livings124 $
  *
- * Copyright (c) 2008-2010 Transmission authors and contributors
+ * Copyright (c) 2008-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -121,7 +121,7 @@
     return fIcon;
 }
 
-- (NSArray *) children
+- (NSMutableArray *) children
 {
     NSAssert(fIsFolder, @"method can only be invoked on folders");
     

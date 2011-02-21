@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: app.h 11094 2010-08-02 03:07:42Z charles $
+ * $Id: app.h 11437 2010-11-25 03:00:25Z charles $
  */
 
 #ifndef QTR_APP_H
@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QSet>
 #include <QTimer>
+#include <QTranslator>
 
 #include "favicon.h"
 
@@ -51,6 +52,8 @@ class MyApp: public QApplication
         QTimer myStatsTimer;
         QTimer mySessionTimer;
         time_t myLastFullUpdateTime;
+        QTranslator qtTranslator;
+        QTranslator appTranslator;
 
     private slots:
         void consentGiven( );

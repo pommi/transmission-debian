@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: FileOutlineView.m 10206 2010-02-15 14:56:14Z livings124 $
+ * $Id: FileOutlineView.m 11617 2011-01-01 20:42:14Z livings124 $
  * 
- * Copyright (c) 2007-2010 Transmission authors and contributors
+ * Copyright (c) 2007-2011 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -91,8 +91,7 @@
     const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
     
     //don't allow quick look on add window
-    #warning get rid of conversion of protocol and replace with @protocol(QLPreviewPanelDataSource)
-    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] conformsToProtocol: NSProtocolFromString(@"QLPreviewPanelDataSource")])
+    if ([NSApp isOnSnowLeopardOrBetter] && firstChar == ' ' && [[[self window] windowController] isKindOfClass: [InfoWindowController class]])
     {
         if ([[QLPreviewPanelSL sharedPreviewPanel] isVisible])
             [[QLPreviewPanelSL sharedPreviewPanel] orderOut: nil];

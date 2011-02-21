@@ -1,13 +1,13 @@
 /*
- * This file Copyright (C) 2008-2010 Mnemosyne LLC
+ * This file Copyright (C) Mnemosyne LLC
  *
- * This file is licensed by the GPL version 2.  Works owned by the
+ * This file is licensed by the GPL version 2. Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
  * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: rpcimpl.c 11236 2010-09-19 20:36:31Z Longinus00 $
+ * $Id: rpcimpl.c 11834 2011-02-06 17:30:46Z jordan $
  */
 
 #include <assert.h>
@@ -17,11 +17,16 @@
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
 
-#include <event.h> /* evbuffer */
+#ifdef HAVE_ZLIB
+ #include <zlib.h>
+#endif
+
+#include <event2/buffer.h>
 
 #include "transmission.h"
 #include "bencode.h"
 #include "completion.h"
+#include "fdlimit.h"
 #include "json.h"
 #include "rpcimpl.h"
 #include "session.h"
@@ -31,7 +36,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION     10
+#define RPC_VERSION     11
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
@@ -97,8 +102,7 @@ tr_idle_function_done( struct tr_rpc_idle_data * data, const char * result )
     tr_bencDictAddStr( data->response, "result", result );
 
     tr_bencToBuf( data->response, TR_FMT_JSON_LEAN, buf );
-    (*data->callback)( data->session, (const char*)EVBUFFER_DATA(buf),
-                       EVBUFFER_LENGTH(buf), data->callback_user_data );
+    (*data->callback)( data->session, buf, data->callback_user_data );
 
     evbuffer_free( buf );
     tr_bencFree( data->response );
@@ -240,19 +244,22 @@ torrentRemove( tr_session               * session,
 {
     int i;
     int torrentCount;
+    tr_rpc_callback_type type;
+    tr_bool deleteFlag = FALSE;
     tr_torrent ** torrents = getTorrents( session, args_in, &torrentCount );
 
     assert( idle_data == NULL );
 
+    tr_bencDictFindBool( args_in, "delete-local-data", &deleteFlag );
+    type = deleteFlag ? TR_RPC_TORRENT_TRASHING
+                      : TR_RPC_TORRENT_REMOVING;
+
     for( i=0; i<torrentCount; ++i )
     {
         tr_torrent * tor = torrents[i];
-        const tr_rpc_callback_status status = notify( session, TR_RPC_TORRENT_REMOVING, tor );
-        tr_bool deleteFlag;
-        if( tr_bencDictFindBool( args_in, "delete-local-data", &deleteFlag ) && deleteFlag )
-            tr_torrentDeleteLocalData( tor, NULL );
+        const tr_rpc_callback_status status = notify( session, type, tor );
         if( !( status & TR_RPC_NOREMOVE ) )
-            tr_torrentRemove( tor );
+            tr_torrentRemove( tor, deleteFlag, NULL );
     }
 
     tr_free( torrents );
@@ -450,7 +457,7 @@ addPeers( const tr_torrent * tor,
     tr_torrentPeersFree( peers, peerCount );
 }
 
-/* faster-than-strcmp() optimization.  this is kind of clumsy,
+/* faster-than-strcmp() optimization. This is kind of clumsy,
    but addField() was in the profiler's top 10 list, and this
    makes it 4x faster... */
 #define tr_streq(a,alen,b) ((alen+1==sizeof(b)) && !memcmp(a,b,alen))
@@ -589,6 +596,10 @@ addField( const tr_torrent * tor, tr_benc * d, const char * key )
         tr_bencDictAddInt( d, key, st->startDate );
     else if( tr_streq( key, keylen, "status" ) )
         tr_bencDictAddInt( d, key, st->activity );
+    else if( tr_streq( key, keylen, "secondsDownloading" ) )
+        tr_bencDictAddInt( d, key, st->secondsDownloading );
+    else if( tr_streq( key, keylen, "secondsSeeding" ) )
+        tr_bencDictAddInt( d, key, st->secondsSeeding );
     else if( tr_streq( key, keylen, "trackers" ) )
         addTrackers( inf, tr_bencDictAddList( d, key, inf->trackerCount ) );
     else if( tr_streq( key, keylen, "trackerStats" ) ) {
@@ -781,8 +792,8 @@ copyTrackers( tr_tracker_info * tgt, const tr_tracker_info * src, int n )
 {
     int i;
     int maxTier = -1;
-   
-    for( i=0; i<n; ++i ) 
+
+    for( i=0; i<n; ++i )
     {
         tgt[i].tier = src[i].tier;
         tgt[i].announce = tr_strdup( src[i].announce );
@@ -1112,42 +1123,74 @@ gotNewBlocklist( tr_session       * session,
     }
     else /* successfully fetched the blocklist... */
     {
+        int fd;
         const char * configDir = tr_sessionGetConfigDir( session );
         char * filename = tr_buildPath( configDir, "blocklist.tmp", NULL );
-        FILE * fp = fopen( filename, "wb+" );
 
-        if( fp == NULL )
-        {
-            tr_snprintf( result, sizeof( result ),
-                         _( "Couldn't save file \"%1$s\": %2$s" ),
-                         filename, tr_strerror( errno ) );
+        errno = 0;
+
+        if( !errno ) {
+            fd = tr_open_file_for_writing( filename );
+            if( fd < 0 )
+                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
         }
-        else
+
+        if( !errno ) {
+            const char * buf = response;
+            size_t buflen = response_byte_count;
+            while( buflen > 0 ) {
+                int n = write( fd, buf, buflen );
+                if( n < 0 ) {
+                    tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename, tr_strerror( errno ) );
+                    break;
+                }
+                buf += n;
+                buflen -= n;
+            }
+            tr_close_file( fd );
+        }
+
+#ifdef HAVE_ZLIB
+        if( !errno )
         {
-            const size_t n = fwrite( response, 1, response_byte_count, fp );
-            fclose( fp );
-
-            if( n != response_byte_count )
-            {
-                tr_snprintf( result, sizeof( result ),
-                             _( "Couldn't save file \"%1$s\": %2$s" ),
-                             filename, tr_strerror( errno ) );
+            char * filename2 = tr_buildPath( configDir, "blocklist.txt.tmp", NULL );
+            fd = tr_open_file_for_writing( filename2 );
+            if( fd < 0 )
+                tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
+            else {
+                gzFile gzf = gzopen( filename, "r" );
+                if( gzf ) {
+                    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
+                    uint8_t * buf = tr_valloc( buflen );
+                    for( ;; ) {
+                        int n = gzread( gzf, buf, buflen );
+                        if( n < 0 ) /* error */
+                            tr_snprintf( result, sizeof( result ), _( "Error reading \"%1$s\": %2$s" ), filename, gzerror( gzf, NULL ) );
+                        if( n < 1 ) /* error or EOF */
+                            break;
+                        if( write( fd, buf, n ) < 0 )
+                            tr_snprintf( result, sizeof( result ), _( "Couldn't save file \"%1$s\": %2$s" ), filename2, tr_strerror( errno ) );
+                    }
+                    tr_free( buf );
+                    gzclose( gzf );
+                }
+                tr_close_file( fd );
             }
-            else
-            {
-                /* feed it to the session */
-                const int ruleCount = tr_blocklistSetContent( session, filename );
 
-                /* give the client a response */
-                tr_bencDictAddInt( data->args_out, "blocklist-size", ruleCount );
-                tr_snprintf( result, sizeof( result ), "success" );
-            }
-
-            /* cleanup */
             unlink( filename );
+            tr_free( filename );
+            filename = filename2;
+        }
+#endif
+
+        if( !errno ) {
+            /* feed it to the session and give the client a response */
+            const int rule_count = tr_blocklistSetContent( session, filename );
+            tr_bencDictAddInt( data->args_out, "blocklist-size", rule_count );
+            tr_snprintf( result, sizeof( result ), "success" );
         }
 
-        /* cleanup */
+        unlink( filename );
         tr_free( filename );
     }
 
@@ -1160,8 +1203,7 @@ blocklistUpdate( tr_session               * session,
                  tr_benc                  * args_out UNUSED,
                  struct tr_rpc_idle_data  * idle_data )
 {
-    const char * url = "http://update.transmissionbt.com/level1";
-    tr_webRun( session, url, NULL, gotNewBlocklist, idle_data );
+    tr_webRun( session, session->blocklist_url, NULL, gotNewBlocklist, idle_data );
     return NULL;
 }
 
@@ -1408,6 +1450,8 @@ sessionSet( tr_session               * session,
         tr_sessionUseAltSpeedTime( session, boolVal );
     if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_BLOCKLIST_ENABLED, &boolVal ) )
         tr_blocklistSetEnabled( session, boolVal );
+    if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_BLOCKLIST_URL, &str ) )
+        tr_blocklistSetURL( session, str );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_DOWNLOAD_DIR, &str ) )
         tr_sessionSetDownloadDir( session, str );
     if( tr_bencDictFindStr( args_in, TR_PREFS_KEY_INCOMPLETE_DIR, &str ) )
@@ -1535,10 +1579,12 @@ sessionGet( tr_session               * s,
     tr_bencDictAddInt ( d, TR_PREFS_KEY_ALT_SPEED_TIME_DAY,tr_sessionGetAltSpeedDay(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_ALT_SPEED_TIME_ENABLED, tr_sessionUsesAltSpeedTime(s) );
     tr_bencDictAddBool( d, TR_PREFS_KEY_BLOCKLIST_ENABLED, tr_blocklistIsEnabled( s ) );
+    tr_bencDictAddStr ( d, TR_PREFS_KEY_BLOCKLIST_URL, tr_blocklistGetURL( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_MAX_CACHE_SIZE_MB, tr_sessionGetCacheLimit_MB( s ) );
     tr_bencDictAddInt ( d, "blocklist-size", tr_blocklistGetRuleCount( s ) );
     tr_bencDictAddStr ( d, "config-dir", tr_sessionGetConfigDir( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_DOWNLOAD_DIR, tr_sessionGetDownloadDir( s ) );
+    tr_bencDictAddInt ( d, "download-dir-free-space",  tr_sessionGetDownloadDirFreeSpace( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_GLOBAL, tr_sessionGetPeerLimit( s ) );
     tr_bencDictAddInt ( d, TR_PREFS_KEY_PEER_LIMIT_TORRENT, tr_sessionGetPeerLimitPerTorrent( s ) );
     tr_bencDictAddStr ( d, TR_PREFS_KEY_INCOMPLETE_DIR, tr_sessionGetIncompleteDir( s ) );
@@ -1572,7 +1618,21 @@ sessionGet( tr_session               * s,
         default: str = "preferred"; break;
     }
     tr_bencDictAddStr( d, TR_PREFS_KEY_ENCRYPTION, str );
+    
+    return NULL;
+}
 
+/***
+****
+***/
+
+static const char*
+sessionClose( tr_session               * session,
+              tr_benc                  * args_in UNUSED,
+              tr_benc                  * args_out UNUSED,
+              struct tr_rpc_idle_data  * idle_data UNUSED )
+{
+    notify( session, TR_RPC_SESSION_CLOSE, NULL );
     return NULL;
 }
 
@@ -1592,6 +1652,7 @@ methods[] =
 {
     { "port-test",             FALSE, portTest            },
     { "blocklist-update",      FALSE, blocklistUpdate     },
+    { "session-close",         TRUE,  sessionClose        },
     { "session-get",           TRUE,  sessionGet          },
     { "session-set",           TRUE,  sessionSet          },
     { "session-stats",         TRUE,  sessionStats        },
@@ -1607,10 +1668,9 @@ methods[] =
 };
 
 static void
-noop_response_callback( tr_session * session UNUSED,
-                        const char * response UNUSED,
-                        size_t       response_len UNUSED,
-                        void       * user_data UNUSED )
+noop_response_callback( tr_session       * session UNUSED,
+                        struct evbuffer  * response UNUSED,
+                        void             * user_data UNUSED )
 {
 }
 
@@ -1653,8 +1713,7 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
         tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
-        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
-                     EVBUFFER_LENGTH( buf ), callback_user_data );
+        (*callback)( session, buf, callback_user_data );
 
         evbuffer_free( buf );
         tr_bencFree( &response );
@@ -1675,8 +1734,7 @@ request_exec( tr_session             * session,
         if( tr_bencDictFindInt( request, "tag", &tag ) )
             tr_bencDictAddInt( &response, "tag", tag );
         tr_bencToBuf( &response, TR_FMT_JSON_LEAN, buf );
-        (*callback)( session, (const char*)EVBUFFER_DATA(buf),
-                     EVBUFFER_LENGTH(buf), callback_user_data );
+        (*callback)( session, buf, callback_user_data );
 
         evbuffer_free( buf );
         tr_bencFree( &response );
