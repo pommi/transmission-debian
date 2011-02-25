@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Leo Costela <costela@debian.org>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 8), autotools-dev, libgtk2.0-dev, libevent-dev 
- (>= 1.4), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev | 
+ (>= 2.0), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev | 
  libcurl-dev, intltool (>= 0.40), qt4-qmake, libqt4-dev, 
 # libcanberra-gtk-dev, libgconf2-dev
 Standards-Version: 3.9.1
