@@ -1,7 +1,9 @@
 transmission (2.21-1) experimental; urgency=low
 
   * new upstream release (must go to experimental because of 
-    libevent >= 2.0.10 dep)
+    libevent >= 2.0.10 dep) (closes: #614069)
+    - fix link to online help (closes: 592960)
+  * new transmission-dbg binary package (closes: 607591)
 
  -- Leo Costela <costela@debian.org>  Mon, 21 Feb 2011 17:03:33 +0100
 

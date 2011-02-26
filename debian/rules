@@ -32,3 +32,5 @@ override_dh_auto_install:
 	dh_auto_install
 	( cd qt && INSTALL_ROOT=$(CURDIR)/debian/tmp/usr $(MAKE) install )
 
+override_dh_strip:
+	dh_strip --dbg-package=transmission-dbg

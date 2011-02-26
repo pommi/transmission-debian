@@ -16,11 +16,11 @@ Package: transmission
 Architecture: all
 Depends: transmission-gtk (>= ${binary:Version}) | transmission-qt (>= ${binary:Version}) | transmission-cli (>= ${binary:Version}), transmission-common (>= ${binary:Version}), ${misc:Depends}
 Description: lightweight BitTorrent client
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
  and daemon form). All its incarnations feature a very simple, intuitive 
  interface on top on an efficient, cross-platform back-end.
  .
- This is just a metapackage depending on one of the front-end 
+ This is just a metapackage depending on one of the front-end
  alternatives
 
 Package: transmission-common
@@ -30,12 +30,25 @@ Depends: ${misc:Depends}
 Replaces: transmission-gtk (<< 2.10-1)
 Breaks: transmission-gtk (<< 2.10-1)
 Description: lightweight BitTorrent client (common files)
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
  and daemon form). All its incarnations feature a very simple, intuitive
  interface on top on an efficient, cross-platform back-end.
  .
  This package contains the common files for the different transmission 
  versions.
+
+Package: transmission-dbg
+Architecture: all
+Section: debug
+Priority: extra
+Depends: ${misc:Depends}, transmission-cli, transmission-gtk, transmission-qt, transmission-daemon, transmission-common
+Description: lightweight BitTorrent client (debug symbols)
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
+ and daemon form). All its incarnations feature a very simple, intuitive
+ interface on top on an efficient, cross-platform back-end.
+ .
+ This package contains the debug symbols for the different transmission
+ clients.
 
 Package: transmission-cli
 Architecture: any
@@ -44,7 +57,7 @@ Suggests: transmission-daemon (= ${binary:Version}), transmission-gtk (= ${binar
 Replaces: transmission-daemon (<< 1.50-1)
 Breaks: transmission-daemon (<< 1.50-1)
 Description: lightweight BitTorrent client (command line programs)
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
  and daemon form). All its incarnations feature a very simple, intuitive 
  interface on top on an efficient, cross-platform back-end.
  .
@@ -57,7 +70,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), ${misc:Depends}
 Recommends: xdg-utils
 Description: lightweight BitTorrent client (GTK interface)
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
  and daemon form). All its incarnations feature a very simple, intuitive 
  interface on top on an efficient, cross-platform back-end.
  .
@@ -68,7 +81,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, transmission-common (= ${source:Version}), ${misc:Depends}
 Recommends: xdg-utils
 Description: lightweight BitTorrent client (Qt interface)
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
  and daemon form). All its incarnations feature a very simple, intuitive 
  interface on top on an efficient, cross-platform back-end.
  .
@@ -83,9 +96,9 @@ Breaks: transmission-cli (<< 1.40-1)
 # moving transmission-remote to -cli
 Recommends: transmission-cli (>= 1.50-1)
 Description: lightweight BitTorrent client (daemon)
- Transmission is a set of lightweight BitTorrent clients (in GUI, CLI 
- and daemon form). All its incarnations feature a very simple, intuitive 
+ Transmission is a set of lightweight BitTorrent clients (in GUI, CLI
+ and daemon form). All its incarnations feature a very simple, intuitive
  interface on top on an efficient, cross-platform back-end.
  .
- This package contains the transmission-daemon. For the associated 
- transmission-remote, see the package transmission-cli
+ This package contains the transmission-daemon. For the associated
+ transmission-remote, see the package transmission-cli.
