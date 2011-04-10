@@ -5,6 +5,7 @@ transmission (2.22-1) experimental; urgency=low
     - fix link to online help (closes: 592960)
   * new transmission-dbg binary package (closes: 607591)
   * policy bump to 3.9.2 (no changes)
+  * debian/lintian/*: fix the icon overrides
 
  -- Leo Costela <costela@debian.org>  Sun, 10 Apr 2011 21:53:19 +0200
 
