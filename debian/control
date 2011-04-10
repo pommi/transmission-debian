@@ -38,7 +38,7 @@ Description: lightweight BitTorrent client (common files)
  versions.
 
 Package: transmission-dbg
-Architecture: all
+Architecture: any
 Section: debug
 Priority: extra
 Depends: ${misc:Depends}, transmission-cli, transmission-gtk, transmission-qt, transmission-daemon, transmission-common
