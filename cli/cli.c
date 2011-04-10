@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cli.c 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: cli.c 12054 2011-02-28 02:45:25Z livings124 $
  *
  * Copyright (c) Transmission authors and contributors
  *
@@ -172,8 +172,8 @@ getStatusStr( const tr_stat * st,
             "ul to %d (%s) "
             "[%s]",
             tr_truncd( 100 * st->percentDone, 1 ),
-            st->peersSendingToUs, st->peersConnected, upStr,
-            st->peersGettingFromUs, dnStr,
+            st->peersSendingToUs, st->peersConnected, dnStr,
+            st->peersGettingFromUs, upStr,
             ratioStr );
     }
     else if( st->activity & TR_STATUS_SEED )

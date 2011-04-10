@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: msgwin.c 11828 2011-02-04 06:12:55Z jordan $
+ * $Id: msgwin.c 12023 2011-02-24 14:59:13Z jordan $
  */
 
 #include <errno.h>
@@ -58,7 +58,7 @@ static struct tr_msg_list * myHead = NULL;
 static gboolean
 is_pinned_to_new( struct MsgData * data )
 {
-    gboolean pinned_to_new;
+    gboolean pinned_to_new = FALSE;
 
     if( data->view == NULL )
     {

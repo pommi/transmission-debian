@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: BadgeView.h 11617 2011-01-01 20:42:14Z livings124 $
+ * $Id: BadgeView.h 12070 2011-03-03 03:53:30Z livings124 $
  *
  * Copyright (c) 2007-2011 Transmission authors and contributors
  *
@@ -35,7 +35,7 @@
     BOOL fQuitting;
 }
 
-- (id) initWithFrame: (NSRect) frame lib: (tr_session *) lib;
+- (id) initWithLib: (tr_session *) lib;
 
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate;
 - (void) setQuitting;

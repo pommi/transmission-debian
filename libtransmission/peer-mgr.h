@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-mgr.h 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: peer-mgr.h 12030 2011-02-24 15:33:50Z jordan $
  */
 
 #ifndef __TRANSMISSION__
@@ -221,6 +221,8 @@ void tr_peerMgrTorrentAvailability( const tr_torrent * tor,
                                     unsigned int       tabCount );
 
 struct tr_bitfield* tr_peerMgrGetAvailable( const tr_torrent * tor );
+
+void tr_peerMgrOnTorrentGotMetainfo( tr_torrent * tor );
 
 void tr_peerMgrOnBlocklistChanged( tr_peerMgr * manager );
 

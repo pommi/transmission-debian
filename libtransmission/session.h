@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: session.h 11800 2011-01-31 23:35:10Z jordan $
+ * $Id: session.h 12060 2011-03-01 15:23:22Z jordan $
  */
 
 #ifndef __TRANSMISSION__
@@ -304,16 +304,5 @@ void tr_sessionSetAltSpeed_Bps  ( tr_session *, tr_direction, int Bps );
 tr_bool  tr_sessionGetActiveSpeedLimit_Bps( const tr_session  * session,
                                             tr_direction        dir,
                                             int               * setme );
-
-
-/**
- * Tries to use libevent's cached timeval so we can avoid excessive calls
- * to gettimeofday().
- *
- * This isn't for all uses, but should be reasonably accurate when called
- * near the beginning of a libevent callback.
- */
-uint64_t tr_sessionGetTimeMsec( tr_session * session );
-
 
 #endif

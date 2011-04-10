@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: json.c 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: json.c 12032 2011-02-24 15:38:58Z jordan $
  */
 
 #include <assert.h>
@@ -91,7 +91,7 @@ callback( void *             vdata,
 
         case JSON_T_FLOAT:
             data->hasContent = TRUE;
-            tr_bencInitReal( getNode( data ), (double)value->vu.float_value );
+            tr_bencInitReal( getNode( data ), value->vu.float_value );
             break;
 
         case JSON_T_NULL:

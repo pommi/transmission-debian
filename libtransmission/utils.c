@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: utils.c 11798 2011-01-31 22:47:07Z jordan $
+ * $Id: utils.c 12032 2011-02-24 15:38:58Z jordan $
  */
 
 #ifdef HAVE_MEMMEM
@@ -201,7 +201,7 @@ tr_getLogTimeStr( char * buf, int buflen )
     seconds = tv.tv_sec;
     tr_localtime_r( &seconds, &now_tm );
     strftime( tmp, sizeof( tmp ), "%H:%M:%S", &now_tm );
-    milliseconds = (int)( tv.tv_usec / 1000 );
+    milliseconds = tv.tv_usec / 1000;
     tr_snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
 
     return buf;

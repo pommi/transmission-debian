@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: tr-core.h 11808 2011-02-02 02:45:20Z jordan $
+ * $Id: tr-core.h 12088 2011-03-04 06:03:14Z jordan $
  *
  * Copyright (c) Transmission authors and contributors
  *
@@ -88,6 +88,9 @@ size_t         tr_core_get_active_torrent_count( TrCore * self );
 
 size_t         tr_core_get_torrent_count( TrCore * self );
 
+void           tr_core_pref_changed( TrCore * core, const char * key );
+
+
 /******
 *******
 ******/
@@ -167,8 +170,6 @@ void tr_core_set_pref_double( TrCore * self, const char * key, double val );
 /**
 ***
 **/
-
-void tr_core_torrent_changed( TrCore * core, int id );
 
 void tr_core_port_test( TrCore * core );
 

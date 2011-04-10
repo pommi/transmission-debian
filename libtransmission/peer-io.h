@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: peer-io.h 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: peer-io.h 12023 2011-02-24 14:59:13Z jordan $
  */
 
 #ifndef __TRANSMISSION__
@@ -278,12 +278,7 @@ tr_peerIoIsEncrypted( const tr_peerIo * io )
     return ( io != NULL ) && ( io->encryptionMode == PEER_ENCRYPTION_RC4 );
 }
 
-static inline void
-evbuffer_add_uint8( struct evbuffer * outbuf, uint8_t byte )
-{
-    evbuffer_add( outbuf, &byte, 1 );
-}
-
+void evbuffer_add_uint8 ( struct evbuffer * outbuf, uint8_t byte );
 void evbuffer_add_uint16( struct evbuffer * outbuf, uint16_t hs );
 void evbuffer_add_uint32( struct evbuffer * outbuf, uint32_t hl );
 

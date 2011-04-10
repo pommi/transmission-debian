@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: handshake.c 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: handshake.c 12032 2011-02-24 15:38:58Z jordan $
  */
 
 #include <assert.h>
@@ -265,7 +265,7 @@ parseHandshake( tr_handshake *    handshake,
     uint8_t peer_id[PEER_ID_LEN];
 
     dbgmsg( handshake, "payload: need %d, got %zu",
-            (int)HANDSHAKE_SIZE, evbuffer_get_length( inbuf ) );
+            HANDSHAKE_SIZE, evbuffer_get_length( inbuf ) );
 
     if( evbuffer_get_length( inbuf ) < HANDSHAKE_SIZE )
         return READ_LATER;
@@ -608,7 +608,7 @@ readHandshake( tr_handshake *    handshake,
     uint8_t   hash[SHA_DIGEST_LENGTH];
 
     dbgmsg( handshake, "payload: need %d, got %zu",
-            (int)INCOMING_HANDSHAKE_LEN, evbuffer_get_length( inbuf ) );
+            INCOMING_HANDSHAKE_LEN, evbuffer_get_length( inbuf ) );
 
     if( evbuffer_get_length( inbuf ) < INCOMING_HANDSHAKE_LEN )
         return READ_LATER;
@@ -757,7 +757,7 @@ readYa( tr_handshake *    handshake,
     int            len;
 
     dbgmsg( handshake, "in readYa... need %d, have %zu",
-            (int)KEY_LEN, evbuffer_get_length( inbuf ) );
+            KEY_LEN, evbuffer_get_length( inbuf ) );
     if( evbuffer_get_length( inbuf ) < KEY_LEN )
         return READ_LATER;
 
