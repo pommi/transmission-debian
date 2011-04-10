@@ -3,6 +3,8 @@ transmission (2.22-1) experimental; urgency=low
   * new upstream release (must go to experimental because of 
     libevent >= 2.0.10 dep) (closes: #614069)
     - fix link to online help (closes: 592960)
+    - don't leak FDs with ipv6 (actually fixed in 2.20) (closes: 619534)
+    - fixes FTBFS (closes: 621814)
   * new transmission-dbg binary package (closes: 607591)
   * policy bump to 3.9.2 (no changes)
   * debian/lintian/*: fix the icon overrides
