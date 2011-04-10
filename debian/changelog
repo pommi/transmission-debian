@@ -4,6 +4,7 @@ transmission (2.22-1) experimental; urgency=low
     libevent >= 2.0.10 dep) (closes: #614069)
     - fix link to online help (closes: 592960)
   * new transmission-dbg binary package (closes: 607591)
+  * policy bump to 3.9.2 (no changes)
 
  -- Leo Costela <costela@debian.org>  Sun, 10 Apr 2011 21:53:19 +0200
 
