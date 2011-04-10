@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: details.c 11741 2011-01-21 17:31:35Z jordan $
+ * $Id: details.c 12025 2011-02-24 15:04:11Z jordan $
  */
 
 #include <assert.h>
@@ -406,7 +406,7 @@ down_speed_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 static void
 idle_spun_cb( GtkSpinButton * s, struct DetailsImpl * di )
 {
-    torrent_set_int( di, "seedInactiveLimit", gtk_spin_button_get_value_as_int( s ) );
+    torrent_set_int( di, "seedIdleLimit", gtk_spin_button_get_value_as_int( s ) );
 }
 
 static void

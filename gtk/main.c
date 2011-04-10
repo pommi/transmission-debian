@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: main.c 11834 2011-02-06 17:30:46Z jordan $
+ * $Id: main.c 12088 2011-03-04 06:03:14Z jordan $
  *
  * Copyright (c) Transmission authors and contributors
  *
@@ -82,7 +82,6 @@ static const char * LICENSE =
 struct cbdata
 {
     gboolean            isIconified;
-    gboolean            isClosing;
     guint               timer;
     guint               refresh_actions_tag;
     gpointer            icon;
@@ -553,7 +552,7 @@ onRPCChanged( tr_session            * session,
             tr_sessionGetSettings( session, oldvals );
 
             for( l=changed_keys; l!=NULL; l=l->next )
-                on_prefs_changed( cbdata->core, key, cbdata );
+                tr_core_pref_changed( cbdata->core, l->data );
 
             g_slist_free( changed_keys );
             tr_bencFree( &tmp );
@@ -1547,7 +1546,7 @@ static gboolean
 updatemodel( gpointer gdata )
 {
     struct cbdata *data = gdata;
-    const gboolean done = data->isClosing || global_sigcount;
+    const gboolean done = global_sigcount;
 
     if( !done )
     {

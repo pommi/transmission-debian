@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent.c 11844 2011-02-07 23:09:36Z jordan $
+ * $Id: torrent.c 12030 2011-02-24 15:33:50Z jordan $
  */
 
 #include <sys/types.h> /* stat */
@@ -743,6 +743,8 @@ void
 tr_torrentGotNewInfoDict( tr_torrent * tor )
 {
     torrentInitFromInfo( tor );
+
+    tr_peerMgrOnTorrentGotMetainfo( tor );
 
     tr_torrentFireMetadataCompleted( tor );
 }

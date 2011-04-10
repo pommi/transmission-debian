@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: Badger.m 11759 2011-01-24 00:32:42Z livings124 $
+ * $Id: Badger.m 12070 2011-03-03 03:53:30Z livings124 $
  *
  * Copyright (c) 2006-2011 Transmission authors and contributors
  *
@@ -35,7 +35,7 @@
         
         fCompleted = 0;
         
-        BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
+        BadgeView * view = [[BadgeView alloc] initWithLib: lib];
         [[NSApp dockTile] setContentView: view];
         [view release];
     }

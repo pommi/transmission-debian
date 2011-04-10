@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: bitfield.h 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: bitfield.h 12034 2011-02-24 15:50:09Z jordan $
  */
 
 #ifndef __TRANSMISSION__
@@ -56,8 +56,6 @@ int          tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
 int          tr_bitfieldRemRange( tr_bitfield*, size_t begin, size_t end );
 
 void         tr_bitfieldDifference( tr_bitfield *, const tr_bitfield * );
-
-int          tr_bitfieldIsEmpty( const tr_bitfield* );
 
 size_t       tr_bitfieldCountTrueBits( const tr_bitfield* );
 

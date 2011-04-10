@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: PeerProgressIndicatorCell.m 11617 2011-01-01 20:42:14Z livings124 $
+ * $Id: PeerProgressIndicatorCell.m 12011 2011-02-23 02:39:12Z livings124 $
  * 
  * Copyright (c) 2007-2011 Transmission authors and contributors
  *
@@ -81,7 +81,8 @@
             NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck.png"];
             
             const NSSize imageSize = [checkImage size];
-            const NSRect rect = NSMakeRect(NSMidX(cellFrame) - imageSize.width * 0.5, NSMidY(cellFrame) - imageSize.height * 0.5,
+            const NSRect rect = NSMakeRect(floor(NSMidX(cellFrame) - imageSize.width * 0.5),
+                                            floor(NSMidY(cellFrame) - imageSize.height * 0.5),
                                             imageSize.width, imageSize.height);
             
             if ([NSApp isOnSnowLeopardOrBetter])

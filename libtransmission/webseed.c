@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: webseed.c 11820 2011-02-03 04:17:48Z jordan $
+ * $Id: webseed.c 12030 2011-02-24 15:33:50Z jordan $
  */
 
 #include <string.h> /* strlen() */
@@ -77,7 +77,7 @@ webseed_free( struct tr_webseed * w )
 ****
 ***/
 
-static const tr_peer_event blank_event = { 0, 0, 0, 0, 0.0f, 0, 0, 0 };
+static const tr_peer_event blank_event = { 0, 0, 0, 0, 0, 0, 0 };
 
 static void
 publish( tr_webseed * w, tr_peer_event * e )

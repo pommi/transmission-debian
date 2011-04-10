@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: bitfield.c 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: bitfield.c 12034 2011-02-24 15:50:09Z jordan $
  */
 
 #include <assert.h>
@@ -49,18 +49,6 @@ void
 tr_bitfieldClear( tr_bitfield * bitfield )
 {
     memset( bitfield->bits, 0, bitfield->byteCount );
-}
-
-int
-tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
-{
-    size_t i;
-
-    for( i = 0; i < bitfield->byteCount; ++i )
-        if( bitfield->bits[i] )
-            return 0;
-
-    return 1;
 }
 
 int

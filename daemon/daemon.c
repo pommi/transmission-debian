@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: daemon.c 11709 2011-01-19 13:48:47Z jordan $
+ * $Id: daemon.c 12029 2011-02-24 15:17:43Z jordan $
  */
 
 #include <errno.h>
@@ -554,6 +554,13 @@ main( int argc, char ** argv )
         pumpLogMessages( logfile );
     }
 
+    printf( "Closing transmission session..." );
+    tr_sessionSaveSettings( mySession, configDir, &settings );
+    dtr_watchdir_free( watchdir );
+    tr_sessionClose( mySession );
+    pumpLogMessages( logfile );
+    printf( " done.\n" );
+
     /* shutdown */
 #if HAVE_SYSLOG
     if( !foreground )
@@ -562,12 +569,6 @@ main( int argc, char ** argv )
         closelog( );
     }
 #endif
-
-    printf( "Closing transmission session..." );
-    tr_sessionSaveSettings( mySession, configDir, &settings );
-    dtr_watchdir_free( watchdir );
-    tr_sessionClose( mySession );
-    printf( " done.\n" );
 
     /* cleanup */
     if( pidfile_created )

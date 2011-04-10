@@ -7,7 +7,7 @@
  *
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * $Id: remote.c 11809 2011-02-02 03:17:38Z jordan $
+ * $Id: remote.c 12032 2011-02-24 15:38:58Z jordan $
  */
 
 #include <assert.h>
@@ -489,13 +489,16 @@ static char * sessionId = NULL;
 static char*
 tr_getcwd( void )
 {
+    char * result;
     char buf[2048];
     *buf = '\0';
 #ifdef WIN32
-    _getcwd( buf, sizeof( buf ) );
+    result = _getcwd( buf, sizeof( buf ) );
 #else
-    getcwd( buf, sizeof( buf ) );
+    result = getcwd( buf, sizeof( buf ) );
 #endif
+    if( result == NULL )
+        fprintf( stderr, "getcwd error: \"%s\"", tr_strerror( errno ) );
     return tr_strdup( buf );
 }
 
@@ -2272,7 +2275,7 @@ processArgs( const char * rpcurl, int argc, const char ** argv )
             }
             default:
             {
-                fprintf( stderr, "got opt [%d]\n", (int)c );
+                fprintf( stderr, "got opt [%d]\n", c );
                 showUsage( );
                 break;
             }
