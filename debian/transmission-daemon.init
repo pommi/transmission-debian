@@ -11,9 +11,7 @@
 NAME=transmission-daemon
 DAEMON=/usr/bin/$NAME
 USER=debian-transmission
-# FIXME: no pidfile support; forks, so --make-pidfile doesn't work either
-#PIDFILE=/var/run/$NAME.pid
-STOP_TIMEOUT=3
+STOP_TIMEOUT=30
 
 export PATH="${PATH:+$PATH:}/sbin"
 

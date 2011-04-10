@@ -1,3 +1,11 @@
+transmission (2.22-2) experimental; urgency=low
+
+  * debian/transmission-daemon.init: 
+    - increase STOP_TIMEOUT
+    - remove FIXME about pidfile: --exec works well enough in this case
+
+ -- Leo Costela <costela@debian.org>  Mon, 11 Apr 2011 01:34:02 +0200
+
 transmission (2.22-1) experimental; urgency=low
 
   * new upstream release (must go to experimental because of 
