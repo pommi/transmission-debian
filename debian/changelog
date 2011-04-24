@@ -3,6 +3,9 @@ transmission (2.22-2) experimental; urgency=low
   * debian/transmission-daemon.init: 
     - increase STOP_TIMEOUT
     - remove FIXME about pidfile: --exec works well enough in this case
+  * debian/control: 
+    - fix build-dep on libcurl4-dev (closes: 622796)
+    - fix VCS-browse link
 
  -- Leo Costela <costela@debian.org>  Mon, 11 Apr 2011 01:34:02 +0200
 
