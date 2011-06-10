@@ -1,5 +1,6 @@
-transmission (2.22-2) experimental; urgency=low
+transmission (2.31-1) experimental; urgency=low
 
+  * new upstream release (closes: #628015)
   * debian/transmission-daemon.init: 
     - increase STOP_TIMEOUT
     - remove FIXME about pidfile: --exec works well enough in this case
