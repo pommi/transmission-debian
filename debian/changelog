@@ -8,6 +8,7 @@ transmission (2.31-1) experimental; urgency=low
     - fix build-dep on libcurl4-dev (closes: 622796)
     - fix VCS-browse link
     - remove DM-upload-allow
+    - build-dep on libnotify-dev >= 0.7 (closes: 630305)
   * debian/transmission-daemon.postrm:
     - don't remove user (as per apparent consensus in discussion here:
       http://lists.debian.org/debian-devel/2011/03/msg01174.html)
