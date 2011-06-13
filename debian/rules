@@ -6,6 +6,7 @@
 	dh $@
 
 override_dh_auto_configure:
+	autoreconf # we're patching configure.ac
 	dh_auto_configure -- --disable-libcanberra --disable-libgconf
 	# qt client has a separate build-system
 	( cd qt && qmake-qt4 qtr.pro )
