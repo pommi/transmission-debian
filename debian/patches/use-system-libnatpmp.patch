@@ -1,0 +1,171 @@
+Index: repo/configure.ac
+===================================================================
+--- repo.orig/configure.ac	2011-06-13 15:09:13.000000000 +0200
++++ repo/configure.ac	2011-06-13 15:09:45.000000000 +0200
+@@ -212,6 +212,13 @@
+ MINIUPNPC_LIBS="-lminiupnpc"
+ AC_SUBST(MINIUPNPC_LIBS)
+ 
++dnl ----------------------------------------------------------------------------
++dnl
++dnl  natpmp
++
++MINIUPNPC_LIBS="-lnatpmp"
++AC_SUBST(NATPMP_LIBS)
++
+ 
+ dnl ----------------------------------------------------------------------------
+ dnl
+Index: repo/third-party/Makefile.am
+===================================================================
+--- repo.orig/third-party/Makefile.am	2011-06-13 15:09:54.000000000 +0200
++++ repo/third-party/Makefile.am	2011-06-13 15:10:04.000000000 +0200
+@@ -4,7 +4,6 @@
+ 
+ SUBDIRS = \
+   dht \
+-  libnatpmp \
+   $(UTP_DIR)
+ 
+ EXTRA_DIST = \
+Index: repo/third-party/Makefile.in
+===================================================================
+--- repo.orig/third-party/Makefile.in	2011-06-13 15:09:54.000000000 +0200
++++ repo/third-party/Makefile.in	2011-06-13 15:10:25.000000000 +0200
+@@ -69,7 +69,7 @@
+ 	distdir
+ ETAGS = etags
+ CTAGS = ctags
+-DIST_SUBDIRS = dht libnatpmp libutp
++DIST_SUBDIRS = dht libutp
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ am__relativize = \
+   dir0=`pwd`; \
+@@ -286,7 +286,6 @@
+ @BUILD_UTP_TRUE@UTP_DIR = libutp
+ SUBDIRS = \
+   dht \
+-  libnatpmp \
+   $(UTP_DIR)
+ 
+ EXTRA_DIST = \
+Index: repo/libtransmission/Makefile.am
+===================================================================
+--- repo.orig/libtransmission/Makefile.am	2011-06-13 15:10:36.000000000 +0200
++++ repo/libtransmission/Makefile.am	2011-06-13 15:11:23.000000000 +0200
+@@ -140,7 +140,7 @@
+ apps_ldadd = \
+     ./libtransmission.a  \
+     @MINIUPNPC_LIBS@ \
+-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++    @NATPMP_LIBS@ \
+     @INTLLIBS@ \
+     @DHT_LIBS@ \
+     @LIBUTP_LIBS@ \
+Index: repo/libtransmission/Makefile.in
+===================================================================
+--- repo.orig/libtransmission/Makefile.in	2011-06-13 15:10:36.000000000 +0200
++++ repo/libtransmission/Makefile.in	2011-06-13 15:11:59.000000000 +0200
+@@ -93,8 +93,7 @@
+ PROGRAMS = $(noinst_PROGRAMS)
+ am_bencode_test_OBJECTS = bencode-test.$(OBJEXT)
+ bencode_test_OBJECTS = $(am_bencode_test_OBJECTS)
+-am__DEPENDENCIES_1 = ./libtransmission.a \
+-	$(top_builddir)/third-party/libnatpmp/libnatpmp.a
++am__DEPENDENCIES_1 = ./libtransmission.a
+ bencode_test_DEPENDENCIES = $(am__DEPENDENCIES_1)
+ AM_V_lt = $(am__v_lt_$(V))
+ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+@@ -513,7 +512,7 @@
+ apps_ldadd = \
+     ./libtransmission.a  \
+     @MINIUPNPC_LIBS@ \
+-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++    @NATPMP_LIBS@ \
+     @INTLLIBS@ \
+     @DHT_LIBS@ \
+     @LIBUTP_LIBS@ \
+Index: repo/cli/Makefile.am
+===================================================================
+--- repo.orig/cli/Makefile.am	2011-06-13 15:12:12.000000000 +0200
++++ repo/cli/Makefile.am	2011-06-13 15:12:53.000000000 +0200
+@@ -18,7 +18,7 @@
+ 
+ transmission_cli_LDADD = \
+     $(top_builddir)/libtransmission/libtransmission.a \
+-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++    @NATPMP_LIBS@ \
+     @MINIUPNPC_LIBS@ \
+     @DHT_LIBS@ \
+     @LIBUTP_LIBS@ \
+Index: repo/cli/Makefile.in
+===================================================================
+--- repo.orig/cli/Makefile.in	2011-06-13 15:12:12.000000000 +0200
++++ repo/cli/Makefile.in	2011-06-13 15:13:12.000000000 +0200
+@@ -55,8 +55,7 @@
+ am_transmission_cli_OBJECTS = cli.$(OBJEXT)
+ transmission_cli_OBJECTS = $(am_transmission_cli_OBJECTS)
+ transmission_cli_DEPENDENCIES =  \
+-	$(top_builddir)/libtransmission/libtransmission.a \
+-	$(top_builddir)/third-party/libnatpmp/libnatpmp.a
++	$(top_builddir)/libtransmission/libtransmission.a
+ AM_V_lt = $(am__v_lt_$(V))
+ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+ am__v_lt_0 = --silent
+@@ -317,7 +316,7 @@
+ transmission_cli_SOURCES = cli.c
+ transmission_cli_LDADD = \
+     $(top_builddir)/libtransmission/libtransmission.a \
+-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++    @NATPMP_LIBS@ \
+     @MINIUPNPC_LIBS@ \
+     @DHT_LIBS@ \
+     @LIBUTP_LIBS@ \
+Index: repo/gtk/Makefile.am
+===================================================================
+--- repo.orig/gtk/Makefile.am	2011-06-13 15:13:32.000000000 +0200
++++ repo/gtk/Makefile.am	2011-06-13 15:13:47.000000000 +0200
+@@ -94,7 +94,7 @@
+ transmission_gtk_LDADD = \
+     $(top_builddir)/libtransmission/libtransmission.a \
+     @MINIUPNPC_LIBS@ \
+-    $(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++    @NATPMP_LIBS@ \
+     @LIBCANBERRA_LIBS@ \
+     @GCONF2_LIBS@ \
+     @DHT_LIBS@ \
+Index: repo/gtk/Makefile.in
+===================================================================
+--- repo.orig/gtk/Makefile.in	2011-06-13 15:13:32.000000000 +0200
++++ repo/gtk/Makefile.in	2011-06-13 15:14:03.000000000 +0200
+@@ -74,7 +74,6 @@
+ transmission_gtk_OBJECTS = $(am_transmission_gtk_OBJECTS)
+ transmission_gtk_DEPENDENCIES =  \
+ 	$(top_builddir)/libtransmission/libtransmission.a \
+-	$(top_builddir)/third-party/libnatpmp/libnatpmp.a \
+ 	$(am__append_2)
+ AM_V_lt = $(am__v_lt_$(V))
+ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+@@ -453,7 +452,7 @@
+ transmission_gtk_LDADD =  \
+ 	$(top_builddir)/libtransmission/libtransmission.a \
+ 	@MINIUPNPC_LIBS@ \
+-	$(top_builddir)/third-party/libnatpmp/libnatpmp.a \
++	@NATPMP_LIBS@ \
+ 	@LIBCANBERRA_LIBS@ @GCONF2_LIBS@ @DHT_LIBS@ @LIBUTP_LIBS@ \
+ 	@GTK_LIBS@ @GIO_LIBS@ @LIBAPPINDICATOR_LIBS@ @LIBNOTIFY_LIBS@ \
+ 	@LIBEVENT_LIBS@ @DBUS_GLIB_LIBS@ @LIBCURL_LIBS@ @OPENSSL_LIBS@ \
+Index: repo/qt/qtr.pro
+===================================================================
+--- repo.orig/qt/qtr.pro	2011-06-13 15:15:56.000000000 +0200
++++ repo/qt/qtr.pro	2011-06-13 15:16:16.000000000 +0200
+@@ -21,8 +21,7 @@
+ LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
+ LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
+ LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
+-LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
+-unix: LIBS += -L$${EVENT_TOP}/lib -lminiupnpc -lz -lrt
++unix: LIBS += -L$${EVENT_TOP}/lib -lminiupnpc -lnatpmp -lz -lrt
+ win32:DEFINES += QT_DBUS
+ win32:LIBS += -levent-2.0 -lws2_32 -lintl
+ win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
