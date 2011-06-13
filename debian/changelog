@@ -19,7 +19,7 @@ transmission (2.31-1) experimental; urgency=low
     - don't remove user (as per apparent consensus in discussion here:
       http://lists.debian.org/debian-devel/2011/03/msg01174.html)
 
- -- Leo Costela <costela@debian.org>  Mon, 11 Apr 2011 01:34:02 +0200
+ -- Leo Costela <costela@debian.org>  Mon, 13 Jun 2011 19:30:23 +0200
 
 transmission (2.22-1) experimental; urgency=low
 
