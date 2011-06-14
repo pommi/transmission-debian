@@ -1,7 +1,7 @@
-This package was downloaded from http://download.m0k.org/transmission/files/
+This package was downloaded from http://www.transmissionbt.com
 
 Files: *
-Copyright: © 2005-2010 Transmission authors and contributors
+Copyright: © 2005-2011 Transmission authors and contributors
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
@@ -94,11 +94,11 @@ Copyright: © 2009 Alexander Galanin <gaa.nnov@mail.ru>
 Licence: Public Domain
 
 Files: debian/*
-Copyright: © 2006-2010 Philipp Benner <pbenner@uni-osnabrueck.de>,
-	     	       Leo "costela" Antunes <costela@debian.org>
+Copyright: © 2006-2011 Philipp Benner <pbenner@uni-osnabrueck.de>,
+                       Leo "costela" Antunes <costela@debian.org>
 License: GPL-2+
  The Debian packaging information is under the GPL, version 2 or later.
- 
+
 On Debian GNU/Linux systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL' and the
 complete text of the GNU Lesser General Public License can be found in
