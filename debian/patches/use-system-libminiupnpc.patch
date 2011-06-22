@@ -268,3 +268,18 @@ Index: repo/cli/Makefile.am
      @DHT_LIBS@ \
      @LIBUTP_LIBS@ \
      @LIBEVENT_LIBS@ \
+Index: repo/libtransmission/upnp.c
+===================================================================
+--- repo.orig/libtransmission/upnp.c	2011-06-23 00:56:27.000000000 +0200
++++ repo/libtransmission/upnp.c	2011-06-23 00:56:45.000000000 +0200
+@@ -13,8 +13,8 @@
+ #include <assert.h>
+ #include <errno.h>
+ 
+-#include <miniupnp/miniupnpc.h>
+-#include <miniupnp/upnpcommands.h>
++#include <miniupnpc/miniupnpc.h>
++#include <miniupnpc/upnpcommands.h>
+ 
+ #include "transmission.h"
+ #include "port-forwarding.h"
