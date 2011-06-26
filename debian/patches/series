@@ -1,2 +1,1 @@
-use-system-libminiupnpc.patch
-use-system-libnatpmp.patch
+use-system-libminiupnpc-and-libnatpmp.patch
