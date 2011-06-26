@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 #export DH_VERBOSE=1
+LDFLAGS=-Wl,--as-needed,--no-undefined,--no-add-needed
 
 %:
 	dh $@ --with autotools-dev --with autoreconf
