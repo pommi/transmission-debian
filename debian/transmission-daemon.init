@@ -27,6 +27,7 @@ start_daemon () {
     else    
         start-stop-daemon --start \
         --chuid $USER \
+		$START_STOP_OPTIONS \
         --exec $DAEMON -- $OPTIONS
     fi
 }
