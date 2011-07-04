@@ -16,10 +16,12 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	dh_auto_build
 	dh_auto_build -Dqt
+	(cd qt && lrelease qtr.pro)
 
 override_dh_auto_clean:
 	dh_auto_clean
 	dh_auto_clean -Dqt
+	rm -f qt/translations/*.qm
 
 override_dh_installchangelogs:
 	dh_installchangelogs -p transmission-common NEWS
@@ -29,7 +31,7 @@ override_dh_installexamples:
 	dh_installexamples -p transmission-common
 
 override_dh_install:
-	dh_install -X LICENSE # extra copy in web dir - costela 2008-08-15
+	dh_install --list-missing -X LICENSE # extra copy in web dir - costela 2008-08-15
 
 override_dh_auto_install:
 	dh_auto_install
