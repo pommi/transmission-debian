@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 8), autotools-dev, dh-autoreconf,
  intltool (>= 0.40), 
  qt4-qmake, libqt4-dev, qt4-linguist-tools,
  libminiupnpc-dev, libnatpmp-dev,
-# libcanberra-gtk-dev, libgconf2-dev
+# libcanberra-gtk-dev
 Standards-Version: 3.9.2
 Vcs-Browser: http://git.debian.org/?p=collab-maint/transmission.git
 Vcs-Git: git://git.debian.org/git/collab-maint/transmission.git
