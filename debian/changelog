@@ -1,9 +1,19 @@
+transmission (2.33-1) experimental; urgency=low
+
+  * [a0cec32b] Imported Upstream version 2.33
+  * [0f867d44] refresh patch use-system-lib*
+  * [4986a877] rm libgconf2-dev from build-deps (was commented out anyway)
+  * [8f64551c] build-dep on specific version of libnatpmp-dev
+  * [95b1862a] add patch to build with libnatpmp1
+  * [671011fa] add more options to t-daemon.default/init (Closes: 622225)
+  * [189091a5] install qt translations (thanks Timur Birsh) (Closes: 625537)
+
+ -- Leo Costela <costela@debian.org>  Sun, 22 Aug 2011 16:13:42 +0200
+
 transmission (2.32-1) experimental; urgency=low
 
   * [2e6421d7] Imported Upstream version 2.32
-  * [671011fa] add more options to t-daemon.default/init (Closes: 622225)
   * [7ac14d07] refresh patch; fix qt linking with libutp
-  * [189091a5] install qt translations (thanks Timur Birsh) (Closes: 625537)
 
  -- Leo Antunes <leo@costela.net>  Tue, 05 Jul 2011 02:53:11 +0200
 
