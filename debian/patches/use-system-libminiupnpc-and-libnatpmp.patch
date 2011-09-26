@@ -8,8 +8,8 @@ Forwarded: no
 
 Index: repo/configure.ac
 ===================================================================
---- repo.orig/configure.ac	2011-07-24 00:45:04.000000000 +0200
-+++ repo/configure.ac	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/configure.ac	2011-09-26 10:43:05.188408424 +0200
++++ repo/configure.ac	2011-09-26 10:43:21.916491389 +0200
 @@ -18,7 +18,7 @@
  
  dnl AM_CONFIG_HEADER(config.h)
@@ -51,8 +51,8 @@ Index: repo/configure.ac
                   macosx/Makefile
 Index: repo/libtransmission/Makefile.am
 ===================================================================
---- repo.orig/libtransmission/Makefile.am	2011-07-05 01:31:03.000000000 +0200
-+++ repo/libtransmission/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/libtransmission/Makefile.am	2011-09-26 10:43:05.212408541 +0200
++++ repo/libtransmission/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -1,7 +1,5 @@
  AM_CPPFLAGS = \
 -    -I. \
@@ -83,8 +83,8 @@ Index: repo/libtransmission/Makefile.am
      @LIBUTP_LIBS@ \
 Index: repo/third-party/Makefile.am
 ===================================================================
---- repo.orig/third-party/Makefile.am	2011-07-05 01:31:03.000000000 +0200
-+++ repo/third-party/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/third-party/Makefile.am	2011-09-26 10:43:05.156408266 +0200
++++ repo/third-party/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -4,8 +4,6 @@
  
  SUBDIRS = \
@@ -96,8 +96,8 @@ Index: repo/third-party/Makefile.am
  EXTRA_DIST = \
 Index: repo/utils/Makefile.am
 ===================================================================
---- repo.orig/utils/Makefile.am	2011-07-05 01:31:03.000000000 +0200
-+++ repo/utils/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/utils/Makefile.am	2011-09-26 10:43:05.140408187 +0200
++++ repo/utils/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -26,8 +26,8 @@
  
  transmission_create_LDADD = \
@@ -111,8 +111,8 @@ Index: repo/utils/Makefile.am
      @LIBUTP_LIBS@ \
 Index: repo/daemon/Makefile.am
 ===================================================================
---- repo.orig/daemon/Makefile.am	2011-07-05 01:31:03.000000000 +0200
-+++ repo/daemon/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/daemon/Makefile.am	2011-09-26 10:43:05.124408102 +0200
++++ repo/daemon/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -20,8 +20,8 @@
  
  LDADD = \
@@ -126,8 +126,8 @@ Index: repo/daemon/Makefile.am
      @LIBEVENT_LIBS@ \
 Index: repo/gtk/Makefile.am
 ===================================================================
---- repo.orig/gtk/Makefile.am	2011-07-24 00:45:04.000000000 +0200
-+++ repo/gtk/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/gtk/Makefile.am	2011-09-26 10:43:05.076407867 +0200
++++ repo/gtk/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -92,8 +92,8 @@
  
  transmission_gtk_LDADD = \
@@ -141,16 +141,11 @@ Index: repo/gtk/Makefile.am
      @LIBUTP_LIBS@ \
 Index: repo/qt/qtr.pro
 ===================================================================
---- repo.orig/qt/qtr.pro	2011-07-05 01:31:03.000000000 +0200
-+++ repo/qt/qtr.pro	2011-07-24 00:52:29.000000000 +0200
-@@ -19,12 +19,9 @@
- INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
- INCLUDEPATH += $${TRANSMISSION_TOP}
- LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
--exists( $${TRANSMISSION_TOP}/third-party/libutp/libutp.a ) { 
--    LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
--}
-+LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
+--- repo.orig/qt/qtr.pro	2011-09-26 10:43:05.092407945 +0200
++++ repo/qt/qtr.pro	2011-09-26 10:43:58.020670402 +0200
+@@ -23,8 +23,7 @@
+     LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
+ }
  LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
 -LIBS += $${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a
 -LIBS += $${TRANSMISSION_TOP}/third-party/libnatpmp/libnatpmp.a
@@ -160,8 +155,8 @@ Index: repo/qt/qtr.pro
  win32:LIBS += -levent-2.0 -lws2_32 -lintl
 Index: repo/cli/Makefile.am
 ===================================================================
---- repo.orig/cli/Makefile.am	2011-07-05 01:31:02.000000000 +0200
-+++ repo/cli/Makefile.am	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/cli/Makefile.am	2011-09-26 10:43:05.108408026 +0200
++++ repo/cli/Makefile.am	2011-09-26 10:43:21.916491389 +0200
 @@ -18,8 +18,8 @@
  
  transmission_cli_LDADD = \
@@ -175,8 +170,8 @@ Index: repo/cli/Makefile.am
      @LIBEVENT_LIBS@ \
 Index: repo/libtransmission/upnp.c
 ===================================================================
---- repo.orig/libtransmission/upnp.c	2011-07-05 01:31:03.000000000 +0200
-+++ repo/libtransmission/upnp.c	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/libtransmission/upnp.c	2011-09-26 10:43:05.200408490 +0200
++++ repo/libtransmission/upnp.c	2011-09-26 10:43:21.916491389 +0200
 @@ -13,8 +13,8 @@
  #include <assert.h>
  #include <errno.h>
@@ -190,8 +185,8 @@ Index: repo/libtransmission/upnp.c
  #include "port-forwarding.h"
 Index: repo/libtransmission/natpmp.c
 ===================================================================
---- repo.orig/libtransmission/natpmp.c	2011-07-05 01:31:03.000000000 +0200
-+++ repo/libtransmission/natpmp.c	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/libtransmission/natpmp.c	2011-09-26 10:43:05.228408617 +0200
++++ repo/libtransmission/natpmp.c	2011-09-26 10:43:21.916491389 +0200
 @@ -17,7 +17,7 @@
  #include <event2/util.h> /* evutil_inet_ntop() */
  
@@ -203,8 +198,8 @@ Index: repo/libtransmission/natpmp.c
  #include "natpmp.h"
 Index: repo/third-party/libutp/utp.cpp
 ===================================================================
---- repo.orig/third-party/libutp/utp.cpp	2011-07-05 01:31:03.000000000 +0200
-+++ repo/third-party/libutp/utp.cpp	2011-07-24 00:52:29.000000000 +0200
+--- repo.orig/third-party/libutp/utp.cpp	2011-09-26 10:43:05.172408347 +0200
++++ repo/third-party/libutp/utp.cpp	2011-09-26 10:43:21.920491396 +0200
 @@ -1,4 +1,4 @@
 -#include <StdAfx.h>
 +#include "StdAfx.h"
