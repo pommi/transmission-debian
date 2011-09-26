@@ -1,0 +1,13 @@
+Index: repo/qt/qtr.pro
+===================================================================
+--- repo.orig/qt/qtr.pro	2011-07-04 16:48:11.454477073 +0200
++++ repo/qt/qtr.pro	2011-09-26 10:25:24.063146592 +0200
+@@ -19,7 +19,7 @@
+ INCLUDEPATH = $${EVENT_TOP}/include $${INCLUDEPATH}
+ INCLUDEPATH += $${TRANSMISSION_TOP}
+ LIBS += $${TRANSMISSION_TOP}/libtransmission/libtransmission.a
+-exists( $${TRANSMISSION_TOP}/third-party/libutp/libutp.a ) { 
++exists( $${TRANSMISSION_TOP}/third-party/libutp/Makefile ) {
+     LIBS += $${TRANSMISSION_TOP}/third-party/libutp/libutp.a
+ }
+ LIBS += $${TRANSMISSION_TOP}/third-party/dht/libdht.a
