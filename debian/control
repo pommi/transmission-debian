@@ -3,12 +3,12 @@ Section: net
 Priority: optional
 Maintainer: Leo Costela <costela@debian.org>
 Build-Depends: debhelper (>= 8), autotools-dev, dh-autoreconf,
- libgtk2.0-dev, libevent-dev (>= 2.0), 
+ libgtk2.0-dev, libgtk-3-dev, libevent-dev (>= 2.0),
  libglib2.0-dev, libnotify-dev (>= 0.7), libssl-dev, 
  libcurl4-gnutls-dev | libcurl4-dev | libcurl-dev, 
  intltool (>= 0.40), 
  qt4-qmake, libqt4-dev, qt4-linguist-tools,
- libminiupnpc-dev, libnatpmp-dev (>= 20110808),
+ libminiupnpc-dev (>= 1.6), libnatpmp-dev (>= 20110808),
 # libcanberra-gtk-dev
 Standards-Version: 3.9.2
 Vcs-Browser: http://git.debian.org/?p=collab-maint/transmission.git
