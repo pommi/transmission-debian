@@ -1,3 +1,15 @@
+transmission (2.42-1) experimental; urgency=low
+
+  * [8a7af00b] Imported Upstream version 2.42
+  * [852379b6] + [9461e1ab] adding patch to "fix" check for libutp
+  * [066e3202] t-daemon: patch to add support for "status" action.
+    Thanks to Peter Eisentraut (Closes: 647647)
+  * [00a1d8c2] refresh use-system-libmini(...) patch
+  * [8c4446e1] remove unnused ./configure args and explicitly enable cli+daemon
+  * [d80d20d6] build-deps: add gtk3 and bump miniupnp to >=1.6
+
+ -- Leo Costela <costela@debian.org>  Wed, 30 Nov 2011 00:55:36 +0100
+
 transmission (2.33-1) experimental; urgency=low
 
   * [a0cec32b] Imported Upstream version 2.33
