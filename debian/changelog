@@ -1,3 +1,9 @@
+transmission (2.33-2) unstable; urgency=low
+
+  * upload to unstable (closes: #650812)
+
+ -- Leo Costela <costela@debian.org>  Sat, 10 Dec 2011 01:04:59 +0100
+
 transmission (2.33-1) experimental; urgency=low
 
   * [a0cec32b] Imported Upstream version 2.33
