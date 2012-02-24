@@ -1,3 +1,18 @@
+transmission (2.50-1) unstable; urgency=low
+
+  * [f5bae11c] Imported Upstream version 2.50
+  * [ce6d0239] bump policy to 3.9.3 (no changes)
+  * [9bb46b5d] drop patch for building against system-wide libs; 
+               upstream now does it better and also builds with 
+               libminiupnpc<1.6 again
+  * [3e1b7ba2] drop patch for checking whether to build libutp; fixed 
+               upstream (Closes: 642538)
+  * [bebc613d] update debian/copyright and fully dep5-ify it
+  * [6adf809c] add patch to handle SIGTERM instead of trying to handle 
+               SIGKILL. Thanks to Matt Kraai (Closes: 651365)
+
+ -- Leo Costela <costela@debian.org>  Fri, 24 Feb 2012 17:26:01 +0100
+
 transmission (2.42-1) experimental; urgency=low
 
   * [8a7af00b] Imported Upstream version 2.42
