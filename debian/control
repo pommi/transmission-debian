@@ -51,7 +51,8 @@ Description: lightweight BitTorrent client (debug symbols)
  interface on top on an efficient, cross-platform back-end.
  .
  This package contains the debug symbols for the different transmission
- clients.
+ executables. Most users won't need this, but please install it before
+ submitting bugs with crashes.
 
 Package: transmission-cli
 Architecture: any
