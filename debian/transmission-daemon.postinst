@@ -34,7 +34,7 @@ case "$1" in
 
     chperms debian-transmission debian-transmission 4775 /var/lib/transmission-daemon/downloads
     
-    chperms debian-transmission debian-transmission 4750 /etc/transmission-daemon/settings.json
+    chperms debian-transmission debian-transmission 0660 /etc/transmission-daemon/settings.json
     
     chperms root debian-transmission 2775 /etc/transmission-daemon
   ;;
