@@ -1,3 +1,17 @@
+transmission (2.51-1) unstable; urgency=low
+
+  * [e0e7ceaf] Imported Upstream version 2.51
+               - fixes crash loading new torrent (Closes: #664875)
+  * [b38aa2b2] add reportbug presubj to suggest transmission-dbg
+  * [f3d3e736] drop dh-autoreconf; we're no longer patching build-system
+  * [b64dcbfb] fix permissions of /etc/t-d/settings.json
+  * [bf97fff7] remove old fixes; problems already fixed by version in stable
+  * [bf666ec6] drop gtk2 build-deps (Closes: 666923)
+  * [c3c7122b] drop patch to handle SIGTERM (merged upstream)
+  * [0fd1d95f] drop patch to build with new natpmp (merged upstream)
+
+ -- Leo Costela <costela@debian.org>  Thu, 12 Apr 2012 17:51:16 +0200
+
 transmission (2.50-1) unstable; urgency=low
 
   * [f5bae11c] Imported Upstream version 2.50
