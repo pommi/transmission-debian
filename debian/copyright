@@ -35,23 +35,23 @@ Copyright: 2006-2010 JSON.org
 Licence: Expat
 
 
-Files: libtransmission/bencode.*, libtransmission/blocklist.*,
-       libtransmission/clients.*, libtransmission/crypto.*,
-       libtransmission/handshake.*, libtransmission/inout.*,
-       libtransmission/json.*, libtransmission/list.*,
-       libtransmission/makemeta.*, libtransmission/natpmp.*,
-       libtransmission/peer-*, libtransmission/platform.*,
-       libtransmission/port-forwarding.*, libtransmission/ptrarray.*,
-       libtransmission/publish.*, libtransmission/resume.*,
-       libtransmission/rpc*, libtransmission/session.*,
-       libtransmission/stats.*, libtransmission/torrent-ctor.*,
-       libtransmission/tr-getopt.*, libtransmission/tracker.*,
-       libtransmission/trevent.*, libtransmission/upnp.*,
-       gtk/actions.*, gtk/add-dialog.*, gtk/details.*, gtk/hig.*,
-       gtk/makemeta-ui.*, gtk/msgwin.*, gtk/notify.*, gtk/stats.*,
-       gtk/torrent-cell-renderer.*, gtk/tr-icon.*, gtk/tr-prefs.*,
-       gtk/tracker-list.*,
-       daemon/daemon.c, daemon/remote.c,
+Files: libtransmission/bencode.* libtransmission/blocklist.*
+       libtransmission/clients.* libtransmission/crypto.*
+       libtransmission/handshake.* libtransmission/inout.*
+       libtransmission/json.* libtransmission/list.*
+       libtransmission/makemeta.* libtransmission/natpmp.*
+       libtransmission/peer-* libtransmission/platform.*
+       libtransmission/port-forwarding.* libtransmission/ptrarray.*
+       libtransmission/publish.* libtransmission/resume.*
+       libtransmission/rpc* libtransmission/session.*
+       libtransmission/stats.* libtransmission/torrent-ctor.*
+       libtransmission/tr-getopt.* libtransmission/tracker.*
+       libtransmission/trevent.* libtransmission/upnp.*
+       gtk/actions.* gtk/add-dialog.* gtk/details.* gtk/hig.*
+       gtk/makemeta-ui.* gtk/msgwin.* gtk/notify.* gtk/stats.*
+       gtk/torrent-cell-renderer.* gtk/tr-icon.* gtk/tr-prefs.*
+       gtk/tracker-list.*
+       daemon/daemon.c daemon/remote.c
        wx/*
 Copyright: 2007-2012 Mnemosyne LLC
 License: GPL-2
@@ -67,7 +67,7 @@ Copyright: 2009-2011 Juliusz Chroboczek
 License: Expat
 
 
-Files: third-party/libnatpmp/*, third-party/miniupnp/*
+Files: third-party/libnatpmp/* third-party/miniupnp/*
 Copyright: 2005-2011, Thomas BERNARD <miniupnp@free.fr>
 License: BSD-3-clause
  Redistribution and use in source and binary forms, with or without
