@@ -1,3 +1,10 @@
+transmission (2.51-2) unstable; urgency=low
+
+  * [5c9d09ba] debian/copyright: fix deb-5 formatting
+  * [837a1590] debian/rules: enable hardening flags by default (Closes: #671569)
+
+ -- Leo Costela <costela@debian.org>  Wed, 09 May 2012 16:39:26 +0200
+
 transmission (2.51-1) unstable; urgency=low
 
   * [e0e7ceaf] Imported Upstream version 2.51
