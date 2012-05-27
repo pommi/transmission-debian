@@ -1,8 +1,12 @@
 #!/usr/bin/make -f
 
+export V=1
 #export DH_VERBOSE=1
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed,--no-undefined,--no-add-needed
+
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
 
 %:
 	dh $@ --with autotools-dev
@@ -10,11 +14,9 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed,--no-undefined,--no-add-needed
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		--enable-cli --enable-daemon \
-		--enable-external-natpmp \
-		$(shell dpkg-buildflags --export=configure)
+		--enable-external-natpmp
 	# qt client has a separate build-system
-	dh_auto_configure -Dqt \
-		-- $(shell dpkg-buildflags --export=configure)
+	dh_auto_configure -Dqt
 
 override_dh_auto_build:
 	dh_auto_build
