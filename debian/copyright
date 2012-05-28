@@ -10,7 +10,7 @@ License: Expat
 
 Files: libtransmission/ConvertUTF.*
 Copyright: 2001-2004 Unicode, Inc
-Licence: other
+License: other
  Disclaimer
  .
  This source code is provided as is by Unicode, Inc. No claims are
@@ -32,7 +32,7 @@ Licence: other
 
 Files: libtransmission/JSON_parser.*
 Copyright: 2006-2010 JSON.org
-Licence: Expat
+License: Expat
 
 
 Files: libtransmission/bencode.* libtransmission/blocklist.*
