@@ -23,12 +23,14 @@ export PATH="${PATH:+$PATH:}/sbin"
 
 start_daemon () {
     if [ $ENABLE_DAEMON != 1 ]; then
-        log_progress_msg "(disabled, see /etc/default/${NAME})"
+        log_progress_msg "(disabled)"
+		log_end_msg 255 || true
     else    
         start-stop-daemon --start \
         --chuid $USER \
 		$START_STOP_OPTIONS \
-        --exec $DAEMON -- $OPTIONS
+        --exec $DAEMON -- $OPTIONS || log_end_msg $?
+		log_end_msg 0
     fi
 }
 
@@ -36,35 +38,33 @@ case "$1" in
     start)
         log_daemon_msg "Starting bittorrent daemon" "$NAME"
         start_daemon
-        log_end_msg 0
         ;;
     stop)
         log_daemon_msg "Stopping bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
             --exec $DAEMON --retry $STOP_TIMEOUT \
-            --oknodo
+            --oknodo || log_end_msg $?
         log_end_msg 0
         ;;
     reload)
         log_daemon_msg "Reloading bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
             --exec $DAEMON \
-            --oknodo --signal 1
+            --oknodo --signal 1 || log_end_msg $?
         log_end_msg 0
         ;;
     restart|force-reload)
         log_daemon_msg "Restarting bittorrent daemon" "$NAME"
         start-stop-daemon --stop --quiet \
             --exec $DAEMON --retry $STOP_TIMEOUT \
-            --oknodo
+            --oknodo || log_end_msg $?
         start_daemon
-        log_end_msg 0
         ;;
     status)
         status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
         ;;
     *)
-        echo "Usage: /etc/init.d/$NAME {start|stop|reload|force-reload|restart|status}"
+        log_action_msg "Usage: /etc/init.d/$NAME {start|stop|reload|force-reload|restart|status}" || true
         exit 2
         ;;
 esac
