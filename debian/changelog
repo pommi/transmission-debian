@@ -1,3 +1,12 @@
+transmission (2.52-1) unstable; urgency=low
+
+  * [38ac0424] Imported Upstream version 2.52
+  * [eb266564] really apply hardening flags to all binaries (Closes: 671569)
+  * [6c488258] debian/copyright: fix a couple of typos
+  * [fbff408b] fix warning if daemon disabled by /etc/defaults/...
+
+ -- Leo Costela <costela@debian.org>  Sun, 27 May 2012 15:25:49 +0200
+
 transmission (2.51-2) unstable; urgency=low
 
   * [5c9d09ba] debian/copyright: fix deb-5 formatting
