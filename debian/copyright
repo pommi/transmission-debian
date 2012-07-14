@@ -118,12 +118,3 @@ License: Expat
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
 
-
-Files: debian/*
-Copyright: 2006-2012 Philipp Benner <pbenner@uni-osnabrueck.de>,
-                     Leo "costela" Antunes <costela@debian.org>
-License: GPL-2+
- The Debian packaging information is under the GPL, version 2 or later.
- .
- On Debian GNU/Linux systems, the complete text of the GNU General
- Public License can be found in `/usr/share/common-licenses/GPL-2'.
