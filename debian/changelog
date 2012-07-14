@@ -1,3 +1,11 @@
+transmission (2.60-1) experimental; urgency=low
+
+  * [32fdde64] Imported Upstream version 2.60 (closes: #680710)
+  * [56c70f37] d/copyright: remove debian/ stuff
+  * [c58a1a06] d/copyright: add mention of /usr/share/common-licenses
+
+ -- Leo Costela <costela@debian.org>  Sat, 14 Jul 2012 15:01:28 +0200
+
 transmission (2.52-1) unstable; urgency=low
 
   * [38ac0424] Imported Upstream version 2.52
