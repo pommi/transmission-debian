@@ -1,3 +1,10 @@
+transmission (2.52-3) unstable; urgency=high (fixes CVE-2012-4037)
+
+  * [5b2ca219] backport fix to XSS in web client from 2.61 (CVE-2012-4037)
+    (Closes: 683380)
+
+ -- Leo Costela <costela@debian.org>  Tue, 31 Jul 2012 13:26:16 +0200
+
 transmission (2.52-2) unstable; urgency=low
 
   * [508850cd] cherrypick patch from 2.60 to fix magnet handling
