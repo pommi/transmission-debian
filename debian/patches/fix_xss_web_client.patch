@@ -1,0 +1,272 @@
+Description: fix XSS vulnerability in web client
+Origin: https://trac.transmissionbt.com/changeset/13392
+Bug: https://trac.transmissionbt.com/ticket/4979
+Applied-Upstream: 2.61
+
+Index: trunk/web/javascript/file-row.js
+===================================================================
+--- trunk/web/javascript/file-row.js	(revision 13042)
++++ trunk/web/javascript/file-row.js	(revision 13392)
+@@ -74,5 +74,5 @@
+ 			  Transmission.fmt.percentString(pct),
+ 			  '%)' ].join('');
+-		setInnerHTML(elements.progress, c);
++		setTextContent(elements.progress, c);
+ 	},
+ 	refreshHTML = function() {
+@@ -141,5 +141,5 @@
+ 		e = document.createElement('div');
+ 		e.className = "inspector_torrent_file_list_entry_name";
+-		e.innerHTML = name;
++		setTextContent(e, name);
+ 		root.appendChild(e);
+ 
+Index: trunk/web/javascript/inspector.js
+===================================================================
+--- trunk/web/javascript/inspector.js	(revision 13257)
++++ trunk/web/javascript/inspector.js	(revision 13392)
+@@ -66,5 +66,5 @@
+         else
+             name = '' + torrents.length+' Transfers Selected';
+-        setInnerHTML(e.name_lb, name || na);
++        setTextContent(e.name_lb, name || na);
+ 
+         // update the visible page
+@@ -147,5 +147,5 @@
+                 str = torrents[0].getStateString();
+         }
+-        setInnerHTML(e.state_lb, str);
++        setTextContent(e.state_lb, str);
+         stateString = str;
+ 
+@@ -181,5 +181,5 @@
+                 str = fmt.size(haveVerified) + ' of ' + fmt.size(sizeWhenDone) + ' (' + str +'%), ' + fmt.size(haveUnverified) + ' Unverified';
+         }
+-        setInnerHTML(e.have_lb, str);
++        setTextContent(e.have_lb, str);
+ 
+         //
+@@ -193,5 +193,5 @@
+         else
+             str = '' + fmt.percentString( ( 100.0 * available ) / sizeWhenDone ) +  '%';
+-        setInnerHTML(e.availability_lb, str);
++        setTextContent(e.availability_lb, str);
+ 
+         //
+@@ -212,5 +212,5 @@
+                 str = fmt.size(d);
+         }
+-        setInnerHTML(e.downloaded_lb, str);
++        setTextContent(e.downloaded_lb, str);
+ 
+         //
+@@ -237,5 +237,5 @@
+             str = fmt.size(u) + ' (Ratio: ' + fmt.ratioString( Math.ratio(u,d))+')';
+         }
+-        setInnerHTML(e.uploaded_lb, str);
++        setTextContent(e.uploaded_lb, str);
+ 
+         //
+@@ -261,5 +261,5 @@
+                 str = fmt.timeInterval(now/1000 - baseline);
+         }
+-        setInnerHTML(e.running_time_lb, str);
++        setTextContent(e.running_time_lb, str);
+ 
+         //
+@@ -285,5 +285,5 @@
+                 str = fmt.timeInterval(baseline);
+         }
+-        setInnerHTML(e.remaining_time_lb, str);
++        setTextContent(e.remaining_time_lb, str);
+ 
+         //
+@@ -309,5 +309,5 @@
+                 str = fmt.timeInterval(d) + ' ago';
+         }
+-        setInnerHTML(e.last_activity_lb, str);
++        setTextContent(e.last_activity_lb, str);
+ 
+         //
+@@ -326,5 +326,5 @@
+             }
+         }
+-        setInnerHTML(e.error_lb, str || none);
++        setTextContent(e.error_lb, str || none);
+ 
+         //
+@@ -351,5 +351,5 @@
+                 str = fmt.size(size) + ' (' + pieces.toStringWithCommas() + ' pieces)';
+         }
+-        setInnerHTML(e.size_lb, str);
++        setTextContent(e.size_lb, str);
+ 
+         //
+@@ -368,5 +368,5 @@
+             }
+         }
+-        setInnerHTML(e.hash_lb, str);
++        setTextContent(e.hash_lb, str);
+ 
+         //
+@@ -386,5 +386,5 @@
+             }
+         }
+-        setInnerHTML(e.privacy_lb, str);
++        setTextContent(e.privacy_lb, str);
+ 
+         //
+@@ -405,5 +405,5 @@
+         if(!str)
+             str = none;  
+-        setInnerHTML(e.comment_lb, str.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>'));
++        setTextContent(e.comment_lb, str.replace(/(https?|ftp):\/\/([\w\-]+(\.[\w\-]+)*(\.[a-z]{2,4})?)(\d{1,5})?(\/([^<>\s]*))?/g, '<a target="_blank" href="$&">$&</a>'));
+ 
+         //
+@@ -433,5 +433,5 @@
+                 str = 'Created by ' + creator + ' on ' + (new Date(date*1000)).toDateString();
+         }
+-        setInnerHTML(e.origin_lb, str);
++        setTextContent(e.origin_lb, str);
+ 
+         //
+@@ -450,5 +450,5 @@
+             }
+         }
+-        setInnerHTML(e.foldername_lb, str);
++        setTextContent(e.foldername_lb, str);
+     },
+ 
+@@ -536,5 +536,5 @@
+             html.push('<div class="inspector_group">');
+             if (torrents.length > 1) {
+-                html.push('<div class="inspector_torrent_label">', tor.getName(), '</div>');
++                html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
+             }
+             if (!peers || !peers.length) {
+@@ -561,6 +561,6 @@
+                        '<td class="percentCol">', Math.floor(peer.progress*100), '%', '</td>',
+                        '<td>', fmt.peerStatus(peer.flagStr), '</td>',
+-                       '<td>', peer.address, '</td>',
+-                       '<td class="clientCol">', peer.clientName, '</td>',
++                       '<td>', sanitizeText(peer.address), '</td>',
++                       '<td class="clientCol">', sanitizeText(peer.clientName), '</td>',
+                        '</tr>');
+             }
+@@ -677,6 +677,6 @@
+                 lastScrapeStatusHash = lastScrapeStatus(tracker);
+                 parity = (j%2) ? 'odd' : 'even';
+-                html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', tracker.announce, '">',
+-                      tracker.host, '</div>',
++                html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', sanitizeText(tracker.announce), '">',
++                      sanitizeText(tracker.host), '</div>',
+                       '<div class="tracker_activity">',
+                       '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
+@@ -695,5 +695,5 @@
+         }
+ 
+-        setInnerHTML(trackers_list, html.join(''));
++        setInnerHTML (trackers_list, html.join(''));
+     },
+ 
+Index: trunk/web/javascript/common.js
+===================================================================
+--- trunk/web/javascript/common.js	(revision 13101)
++++ trunk/web/javascript/common.js	(revision 13392)
+@@ -80,7 +80,5 @@
+ 
+ /**
+- * "innerHTML = html" is pretty slow in FF.  Happily a lot of our innerHTML
+- * changes are triggered by periodic refreshes on torrents whose state hasn't
+- * changed since the last update, so even this simple test helps a lot.
++ * Checks to see if the content actually changed before poking the DOM.
+  */
+ function setInnerHTML(e, html)
+@@ -97,4 +95,20 @@
+ 		e.innerHTML = html;
+ 	}
++};
++
++function sanitizeText(text)
++{
++	return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
++};
++
++/**
++ * Many of our text changes are triggered by periodic refreshes
++ * on torrents whose state hasn't changed since the last update,
++ * so see if the text actually changed before poking the DOM.
++ */
++function setTextContent(e, text)
++{
++	if (e && (e.textContent != text))
++		e.textContent = text;
+ };
+ 
+Index: trunk/web/javascript/dialog.js
+===================================================================
+--- trunk/web/javascript/dialog.js	(revision 12865)
++++ trunk/web/javascript/dialog.js	(revision 13392)
+@@ -77,8 +77,8 @@
+ 		if (!isMobileDevice)
+ 			$('.dialog_container').hide();
+-		setInnerHTML(this._heading[0], dialog_heading);
+-		setInnerHTML(this._message[0], dialog_message);
+-		setInnerHTML(this._cancel_button[0], cancel_button_label || 'Cancel');
+-		setInnerHTML(this._confirm_button[0], confirm_button_label);
++		setTextContent(this._heading[0], dialog_heading);
++		setTextContent(this._message[0], dialog_message);
++		setTextContent(this._cancel_button[0], cancel_button_label || 'Cancel');
++		setTextContent(this._confirm_button[0], confirm_button_label);
+ 		this._confirm_button.show();
+ 		this._callback_function = callback_function;
+@@ -97,9 +97,9 @@
+ 		if (!isMobileDevice)
+ 			$('.dialog_container').hide();
+-		setInnerHTML(this._heading[0], dialog_heading);
+-		setInnerHTML(this._message[0], dialog_message);
++		setTextContent(this._heading[0], dialog_heading);
++		setTextContent(this._message[0], dialog_message);
+ 		// jquery::hide() doesn't work here in Safari for some odd reason
+ 		this._confirm_button.css('display', 'none');
+-		setInnerHTML(this._cancel_button[0], cancel_button_label);
++		setTextContent(this._cancel_button[0], cancel_button_label);
+ 		// Just in case
+ 		$('#upload_container').hide();
+Index: trunk/web/javascript/torrent-row.js
+===================================================================
+--- trunk/web/javascript/torrent-row.js	(revision 12986)
++++ trunk/web/javascript/torrent-row.js	(revision 13392)
+@@ -231,5 +231,5 @@
+ 	{
+ 		// name
+-		setInnerHTML(root._name_container, t.getName());
++		setTextContent(root._name_container, t.getName());
+ 
+ 		// progressbar
+@@ -240,9 +240,9 @@
+ 		var e = root._peer_details_container;
+ 		$(e).toggleClass('error',has_error);
+-		setInnerHTML(e, this.getPeerDetails(t));
++		setTextContent(e, this.getPeerDetails(t));
+ 
+ 		// progress details
+ 		e = root._progress_details_container;
+-		setInnerHTML(e, this.getProgressDetails(controller, t));
++		setTextContent(e, this.getProgressDetails(controller, t));
+ 
+ 		// pause/resume button
+@@ -320,5 +320,5 @@
+ 		var e = root._name_container;
+ 		$(e).toggleClass('paused', is_stopped);
+-		setInnerHTML(e, t.getName());
++		setTextContent(e, t.getName());
+ 
+ 		// peer details
+@@ -326,5 +326,5 @@
+ 		e = root._details_container;
+ 		$(e).toggleClass('error', has_error);
+-		setInnerHTML(e, this.getPeerDetails(t));
++		setTextContent(e, this.getPeerDetails(t));
+ 
+ 		// progressbar
