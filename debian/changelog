@@ -1,3 +1,11 @@
+transmission (2.71-1) experimental; urgency=low
+
+  * [14bfe39e] Imported Upstream version 2.71
+     - fixes qt client settings encoding issue (closes: 684088)
+     - fixes html entities in web client (closes: 684687)
+
+ -- Leo Costela <costela@debian.org>  Sun, 14 Oct 2012 23:28:20 +0200
+
 transmission (2.61-1) experimental; urgency=low
 
   * [76d3715e] Imported Upstream version 2.61 
