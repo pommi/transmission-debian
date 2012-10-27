@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: webseed.c 13361 2012-07-01 02:17:35Z jordan $
+ * $Id: webseed.c 13561 2012-10-13 17:32:23Z jordan $
  */
 
 #include <string.h> /* strlen() */
@@ -80,9 +80,12 @@ webseed_free( struct tr_webseed * w )
     const tr_info * inf = tr_torrentInfo( tor );
     tr_file_index_t i;
 
-    for( i=0; i<inf->fileCount; ++i )
-        tr_free( w->file_urls[i] );
-    tr_free( w->file_urls );
+    /* if we have an array of file URLs, free it */
+    if( w->file_urls != NULL ) {
+        for( i=0; i<inf->fileCount; ++i )
+            tr_free( w->file_urls[i] );
+        tr_free( w->file_urls );
+    }
 
     /* webseed destruct */
     event_free( w->timer );

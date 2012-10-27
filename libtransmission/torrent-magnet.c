@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent-magnet.c 13397 2012-07-23 15:28:27Z jordan $
+ * $Id: torrent-magnet.c 13576 2012-10-16 02:48:26Z jordan $
  */
 
 #include <assert.h>
@@ -30,7 +30,7 @@
 #define dbgmsg( tor, ... ) \
     do { \
         if( tr_deepLoggingIsActive( ) ) \
-            tr_deepLog( __FILE__, __LINE__, tor->info.name, __VA_ARGS__ ); \
+            tr_deepLog( __FILE__, __LINE__, tr_torrentName( tor ), __VA_ARGS__ ); \
     } while( 0 )
 
 /***
