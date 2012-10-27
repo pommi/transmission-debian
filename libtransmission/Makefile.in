@@ -55,7 +55,8 @@ build_triplet = @build@
 host_triplet = @host@
 TESTS = blocklist-test$(EXEEXT) bencode-test$(EXEEXT) \
 	clients-test$(EXEEXT) history-test$(EXEEXT) json-test$(EXEEXT) \
-	magnet-test$(EXEEXT) peer-msgs-test$(EXEEXT) rpc-test$(EXEEXT) \
+	magnet-test$(EXEEXT) metainfo-test$(EXEEXT) \
+	peer-msgs-test$(EXEEXT) rpc-test$(EXEEXT) \
 	test-peer-id$(EXEEXT) utils-test$(EXEEXT)
 noinst_PROGRAMS = $(am__EXEEXT_1)
 subdir = libtransmission
@@ -105,7 +106,8 @@ am_libtransmission_a_OBJECTS = announcer.$(OBJEXT) \
 libtransmission_a_OBJECTS = $(am_libtransmission_a_OBJECTS)
 am__EXEEXT_1 = blocklist-test$(EXEEXT) bencode-test$(EXEEXT) \
 	clients-test$(EXEEXT) history-test$(EXEEXT) json-test$(EXEEXT) \
-	magnet-test$(EXEEXT) peer-msgs-test$(EXEEXT) rpc-test$(EXEEXT) \
+	magnet-test$(EXEEXT) metainfo-test$(EXEEXT) \
+	peer-msgs-test$(EXEEXT) rpc-test$(EXEEXT) \
 	test-peer-id$(EXEEXT) utils-test$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_bencode_test_OBJECTS = bencode-test.$(OBJEXT)
@@ -149,6 +151,12 @@ magnet_test_DEPENDENCIES = $(am__DEPENDENCIES_1)
 magnet_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(magnet_test_LDFLAGS) $(LDFLAGS) -o $@
+am_metainfo_test_OBJECTS = metainfo-test.$(OBJEXT)
+metainfo_test_OBJECTS = $(am_metainfo_test_OBJECTS)
+metainfo_test_DEPENDENCIES = $(am__DEPENDENCIES_1)
+metainfo_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(metainfo_test_LDFLAGS) $(LDFLAGS) -o $@
 am_peer_msgs_test_OBJECTS = peer-msgs-test.$(OBJEXT)
 peer_msgs_test_OBJECTS = $(am_peer_msgs_test_OBJECTS)
 peer_msgs_test_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -200,15 +208,15 @@ am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libtransmission_a_SOURCES) $(bencode_test_SOURCES) \
 	$(blocklist_test_SOURCES) $(clients_test_SOURCES) \
 	$(history_test_SOURCES) $(json_test_SOURCES) \
-	$(magnet_test_SOURCES) $(peer_msgs_test_SOURCES) \
-	$(rpc_test_SOURCES) $(test_peer_id_SOURCES) \
-	$(utils_test_SOURCES)
+	$(magnet_test_SOURCES) $(metainfo_test_SOURCES) \
+	$(peer_msgs_test_SOURCES) $(rpc_test_SOURCES) \
+	$(test_peer_id_SOURCES) $(utils_test_SOURCES)
 DIST_SOURCES = $(libtransmission_a_SOURCES) $(bencode_test_SOURCES) \
 	$(blocklist_test_SOURCES) $(clients_test_SOURCES) \
 	$(history_test_SOURCES) $(json_test_SOURCES) \
-	$(magnet_test_SOURCES) $(peer_msgs_test_SOURCES) \
-	$(rpc_test_SOURCES) $(test_peer_id_SOURCES) \
-	$(utils_test_SOURCES)
+	$(magnet_test_SOURCES) $(metainfo_test_SOURCES) \
+	$(peer_msgs_test_SOURCES) $(rpc_test_SOURCES) \
+	$(test_peer_id_SOURCES) $(utils_test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -564,6 +572,9 @@ json_test_LDFLAGS = ${apps_ldflags}
 magnet_test_SOURCES = magnet-test.c
 magnet_test_LDADD = ${apps_ldadd}
 magnet_test_LDFLAGS = ${apps_ldflags}
+metainfo_test_SOURCES = metainfo-test.c
+metainfo_test_LDADD = ${apps_ldadd}
+metainfo_test_LDFLAGS = ${apps_ldflags}
 peer_msgs_test_SOURCES = peer-msgs-test.c
 peer_msgs_test_LDADD = ${apps_ldadd}
 peer_msgs_test_LDFLAGS = ${apps_ldflags}
@@ -644,6 +655,9 @@ json-test$(EXEEXT): $(json_test_OBJECTS) $(json_test_DEPENDENCIES) $(EXTRA_json_
 magnet-test$(EXEEXT): $(magnet_test_OBJECTS) $(magnet_test_DEPENDENCIES) $(EXTRA_magnet_test_DEPENDENCIES) 
 	@rm -f magnet-test$(EXEEXT)
 	$(AM_V_CCLD)$(magnet_test_LINK) $(magnet_test_OBJECTS) $(magnet_test_LDADD) $(LIBS)
+metainfo-test$(EXEEXT): $(metainfo_test_OBJECTS) $(metainfo_test_DEPENDENCIES) $(EXTRA_metainfo_test_DEPENDENCIES) 
+	@rm -f metainfo-test$(EXEEXT)
+	$(AM_V_CCLD)$(metainfo_test_LINK) $(metainfo_test_OBJECTS) $(metainfo_test_LDADD) $(LIBS)
 peer-msgs-test$(EXEEXT): $(peer_msgs_test_OBJECTS) $(peer_msgs_test_DEPENDENCIES) $(EXTRA_peer_msgs_test_DEPENDENCIES) 
 	@rm -f peer-msgs-test$(EXEEXT)
 	$(AM_V_CCLD)$(peer_msgs_test_LINK) $(peer_msgs_test_OBJECTS) $(peer_msgs_test_LDADD) $(LIBS)
@@ -690,6 +704,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/makemeta.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metainfo-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metainfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/natpmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/net.Po@am__quote@

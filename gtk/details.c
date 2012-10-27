@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: details.c 13388 2012-07-14 19:26:55Z jordan $
+ * $Id: details.c 13553 2012-10-07 17:51:56Z jordan $
  */
 
 #include <stddef.h>
@@ -1048,7 +1048,7 @@ getWebseedColumnNames( int column )
 {
     switch( column )
     {
-        case WEBSEED_COL_URL: return _( "Webseeds" );
+        case WEBSEED_COL_URL: return _( "Web Seeds" );
         case WEBSEED_COL_DOWNLOAD_RATE_DOUBLE:
         case WEBSEED_COL_DOWNLOAD_RATE_STRING: return _( "Down" );
         default: return "";

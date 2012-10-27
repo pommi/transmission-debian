@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: AddMagnetWindowController.m 13479 2012-09-08 03:48:12Z livings124 $
+ * $Id: AddMagnetWindowController.m 13583 2012-10-19 03:52:59Z livings124 $
  *
  * Copyright (c) 2010-2012 Transmission authors and contributors
  *
@@ -95,7 +95,7 @@
         [fLocationImageView setImage: nil];
     }
     
-    #warning enable after 2.7
+    #warning enable after 2.7 
     /*
     #warning when 10.7-only, switch to auto layout
     [fMagnetLinkLabel sizeToFit];

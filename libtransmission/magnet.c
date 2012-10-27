@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: magnet.c 12915 2011-09-25 21:51:50Z jordan $
+ * $Id: magnet.c 13546 2012-10-05 16:10:12Z jordan $
  */
 
 #include <assert.h>
@@ -160,7 +160,7 @@ tr_magnetParse( const char * uri )
                     tr[trCount++] = tr_http_unescape( val, vallen );
             }
 
-            if( ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_TRACKERS ) )
+            if( ( vallen > 0 ) && ( keylen==2 ) && !memcmp( key, "ws", 2 ) && ( wsCount < MAX_WEBSEEDS ) )
                 ws[wsCount++] = tr_http_unescape( val, vallen );
 
             walk = next != NULL ? next + 1 : NULL;
