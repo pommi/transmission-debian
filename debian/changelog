@@ -1,3 +1,9 @@
+transmission (2.73-1) experimental; urgency=low
+
+  * [5f051438] Imported Upstream version 2.73
+
+ -- Leo Costela <costela@debian.org>  Sat, 27 Oct 2012 19:28:09 +0200
+
 transmission (2.71-1) experimental; urgency=low
 
   * [14bfe39e] Imported Upstream version 2.71
