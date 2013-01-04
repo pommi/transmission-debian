@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: InfoActivityViewController.m 13583 2012-10-19 03:52:59Z livings124 $
+ * $Id: InfoActivityViewController.m 13660 2012-12-13 13:38:58Z livings124 $
  *
  * Copyright (c) 2010-2012 Transmission authors and contributors
  *
@@ -57,7 +57,6 @@
 {
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updatePiecesView) name: @"UpdatePiecesView" object: nil];
     
-    #warning remove when 10.7-only with auto layout
     /*[fTransferSectionLabel sizeToFit];
     [fDatesSectionLabel sizeToFit];
     [fTimeSectionLabel sizeToFit];
