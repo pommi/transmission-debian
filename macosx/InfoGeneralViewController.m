@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: InfoGeneralViewController.m 13583 2012-10-19 03:52:59Z livings124 $
+ * $Id: InfoGeneralViewController.m 13660 2012-12-13 13:38:58Z livings124 $
  *
  * Copyright (c) 2010-2012 Transmission authors and contributors
  *
@@ -50,8 +50,6 @@
     
     [super dealloc];
 }
-
-#warning enable after 2.7
 /*
 - (void) awakeFromNib
 {
@@ -93,8 +91,8 @@
         frame.size.width -= widthIncrease;
         [field setFrame: frame];
     }
-}*/
-
+}
+*/
 - (void) setInfoForTorrents: (NSArray *) torrents
 {
     //don't check if it's the same in case the metadata changed
