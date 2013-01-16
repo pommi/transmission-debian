@@ -1,3 +1,10 @@
+transmission (2.76-1) experimental; urgency=low
+
+  * [ef26caa5] Imported Upstream version 2.76 (closes: 698134)
+    - update libutp to fix alignment issues (closes: 695115)
+
+ -- Leo Costela <costela@debian.org>  Tue, 15 Jan 2013 22:35:18 +0100
+
 transmission (2.73-1) experimental; urgency=low
 
   * [5f051438] Imported Upstream version 2.73
