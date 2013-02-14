@@ -1,3 +1,12 @@
+transmission (2.52-3+nmu1) unstable; urgency=medium
+
+  * Non-maintainer upload with maintainer’s permission.
+  * CVE-2012-6129_libutp_crash.patch: SECURITY - backport upstream 
+    commit r13646 to fix a crasher that could be exploited remotely.
+  * Closes: #700234, CVE-2012-6129.
+
+ -- Josselin Mouette <joss@debian.org>  Thu, 14 Feb 2013 19:41:13 +0100
+
 transmission (2.52-3) unstable; urgency=high (fixes CVE-2012-4037)
 
   * [5b2ca219] backport fix to XSS in web client from 2.61 (CVE-2012-4037)

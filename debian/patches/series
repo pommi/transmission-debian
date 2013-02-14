@@ -1,2 +1,3 @@
 fix_xss_web_client.patch
 fix_magnet_seed_status.patch
+CVE-2012-6129_libutp_crash.patch
