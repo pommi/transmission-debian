@@ -5,8 +5,8 @@ Maintainer: Leo Costela <costela@debian.org>
 Uploaders: Philipp Benner <pbenner@uni-osnabrueck.de>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7), autotools-dev, libgtk2.0-dev, libevent-dev
- (>= 1.4), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-dev |
- libcurl-dev, chrpath, intltool (>= 0.40), qt4-qmake, libqt4-dev,
+ (>= 1.4), libglib2.0-dev, libnotify-dev, libssl-dev, libcurl4-gnutls-dev |
+ libcurl4-dev | libcurl-dev, chrpath, intltool (>= 0.40), qt4-qmake, libqt4-dev,
  zlib1g-dev
 # libcanberra-gtk-dev, libgconf2-dev
 Standards-Version: 3.9.0
