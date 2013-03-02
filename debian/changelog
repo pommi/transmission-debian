@@ -1,3 +1,14 @@
+transmission (2.03-2squeeze1) stable; urgency=low
+
+  * The following changes are from NMUs 2.03-2.{1,2} which went lost.
+    More info in #636372.
+  * [805df727] fix FTBFS by properly linking against zlib.
+    Thanks to Laurent Bigonville <bigon@debian.org> (Closes: 636372)
+  * [35e206e4] fix build-dep on libcurl to depend on real package.
+    Thanks to Michael Biebl <biebl@debian.org> (Closes: 636787)
+
+ -- Leo Costela <costela@debian.org>  Sat, 02 Mar 2013 23:51:17 +0100
+
 transmission (2.03-2) unstable; urgency=low
   
   * debian/patches: add fix-rpc-server-URL.patch
