@@ -1,0 +1,16 @@
+Description: Link against libz library to fix FTBFS
+Author: Laurent Bigonville <bigon@debian.org>
+Date: Tue, 02 Aug 2011 19:30:45 +0200
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=634398
+
+--- a/qt/qtr.pro
++++ b/qt/qtr.pro
+@@ -9,7 +9,7 @@
+ 
+ CONFIG += qt qdbus thread debug link_pkgconfig
+ QT += network
+-PKGCONFIG = fontconfig libcurl openssl
++PKGCONFIG = fontconfig libcurl openssl zlib
+ 
+ TRANSMISSION_TOP = ..
+ INCLUDEPATH += $${TRANSMISSION_TOP}
