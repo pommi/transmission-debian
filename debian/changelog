@@ -1,3 +1,9 @@
+transmission (2.77-2) unstable; urgency=low
+
+  * [d50c2128] add gconf defaults for gtk2 apps
+
+ -- Leo Costela <costela@debian.org>  Mon, 20 May 2013 23:53:26 +0200
+
 transmission (2.77-1) experimental; urgency=low
 
   * [45a5712d] Imported Upstream version 2.77
