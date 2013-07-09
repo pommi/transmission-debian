@@ -9,7 +9,7 @@ DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
 
 %:
-	dh $@ --with autotools-dev
+	dh $@ --with autotools-dev --with systemd
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
