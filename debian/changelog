@@ -1,3 +1,17 @@
+transmission (2.80-1) unstable; urgency=low
+
+  * [d15f5ecb] Imported Upstream version 2.80
+    - fix webseed speed limits (closes: #672560)
+    - fix download location setting (closes: #711665)
+    - add piece size selection to t-cli (closes: #677938)
+  * [c2267f83] d/watch: update for upstream new XZ-only policy
+  * [b9814eae] gconf-defaults: fix copy-paste error.
+    Thanks to Jeremy Bicha (Closes: 714400)
+  * [391d5e7f] bump policy to 3.9.4 (no changes)
+  * [32110073] add preliminary systemd support
+
+ -- Leo Costela <costela@debian.org>  Tue, 09 Jul 2013 13:13:16 +0200
+
 transmission (2.77-2) unstable; urgency=low
 
   * [d50c2128] add gconf defaults for gtk2 apps
