@@ -16,6 +16,7 @@ Standards-Version: 3.9.4
 Vcs-Browser: http://git.debian.org/?p=collab-maint/transmission.git
 Vcs-Git: git://git.debian.org/git/collab-maint/transmission.git
 Homepage: http://www.transmissionbt.com/
+Bugs: https://trac.transmissionbt.com/
 
 Package: transmission
 Architecture: all
