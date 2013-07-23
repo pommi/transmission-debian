@@ -1,3 +1,11 @@
+transmission (2.81-1) unstable; urgency=low
+
+  * [addd713c] Imported Upstream version 2.81
+  * [a22bbc9f] add patch to fix kfreebsd FTBFS
+  * [1d5de1c0] debian/control: add Bugs field
+
+ -- Leo Costela <costela@debian.org>  Tue, 23 Jul 2013 18:11:38 +0200
+
 transmission (2.80-1) unstable; urgency=low
 
   * [d15f5ecb] Imported Upstream version 2.80
