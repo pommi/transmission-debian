@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id: torrent.c 14083 2013-05-27 21:04:48Z jordan $
+ * $Id: torrent.c 14125 2013-07-16 00:50:45Z jordan $
  */
 
 #include <signal.h> /* signal () */
@@ -1255,11 +1255,17 @@ tr_torrentStat (tr_torrent * tor)
   const uint64_t now = tr_time_msec ();
   unsigned int pieceUploadSpeed_Bps;
   unsigned int pieceDownloadSpeed_Bps;
+  struct tr_swarm_stats swarm_stats;
   int i;
 
   assert (tr_isTorrent (tor));
 
   tor->lastStatTime = tr_time ();
+
+  if (tor->swarm != NULL)
+    tr_swarmGetStats (tor->swarm, &swarm_stats);
+  else
+    swarm_stats = TR_SWARM_STATS_INIT;
 
   s = &tor->stats;
   s->id = tor->uniqueId;
@@ -1270,13 +1276,12 @@ tr_torrentStat (tr_torrent * tor)
   tr_strlcpy (s->errorString, tor->errorString, sizeof (s->errorString));
 
   s->manualAnnounceTime = tr_announcerNextManualAnnounce (tor);
-
-  s->peersConnected      = tor->peerCount;
-  s->peersSendingToUs    = tor->activePeerCount[TR_DOWN];
-  s->peersGettingFromUs  = tor->activePeerCount[TR_UP];
-  s->webseedsSendingToUs = tor->activeWebseedCount;
+  s->peersConnected      = swarm_stats.peerCount;
+  s->peersSendingToUs    = swarm_stats.activePeerCount[TR_DOWN];
+  s->peersGettingFromUs  = swarm_stats.activePeerCount[TR_UP];
+  s->webseedsSendingToUs = swarm_stats.activeWebseedCount;
   for (i=0; i<TR_PEER_FROM__MAX; i++)
-    s->peersFrom[i] = tor->peerFromCount[i];
+    s->peersFrom[i] = swarm_stats.peerFromCount[i];
 
   s->rawUploadSpeed_KBps     = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_UP));
   s->rawDownloadSpeed_KBps   = toSpeedKBps (tr_bandwidthGetRawSpeed_Bps (&tor->bandwidth, now, TR_DOWN));
@@ -2152,20 +2157,25 @@ tr_torrentRecheckCompleteness (tr_torrent * tor)
             {
               /* clear interested flag on all peers */
               tr_peerMgrClearInterest (tor);
-
-              /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
-              tr_torrentCheckSeedLimit (tor);
             }
 
           if (tor->currentDir == tor->incompleteDir)
             tr_torrentSetLocation (tor, tor->downloadDir, true, NULL, NULL);
+        }
+
+      fireCompletenessChange (tor, completeness, wasRunning);
+
+      if (tr_torrentIsSeed (tor))
+        {
+          if (wasLeeching && wasRunning)
+            {
+              /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
+              tr_torrentCheckSeedLimit (tor);
+            }
 
           if (tr_sessionIsTorrentDoneScriptEnabled (tor->session))
             torrentCallScript (tor, tr_sessionGetTorrentDoneScript (tor->session));
         }
-
-
-      fireCompletenessChange (tor, completeness, wasRunning);
 
       tr_torrentSetDirty (tor);
     }
