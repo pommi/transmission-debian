@@ -1,3 +1,17 @@
+transmission (2.82-1) unstable; urgency=low
+
+  * [5b6dca28] Imported Upstream version 2.82
+  * [c887c69a] add explicit build-dep on zlib (Closes: 636372)
+  * [53b0896d] drop dpkg compression override; use default
+  * [819c88d7] refresh kFreeBSD build patch
+  * [f0d47519] bump build-deps for qt5
+  * [e78ba741] add patch to systemd service file to use right user
+    (Closes: 718624)
+  * [88df797b] actually build-dep on systemd-daemon-dev to use it
+    (Closes: 718624)
+
+ -- Leo Costela <costela@debian.org>  Sat, 15 Sep 2013 21:14:04 +0200
+
 transmission (2.81-1) unstable; urgency=low
 
   * [addd713c] Imported Upstream version 2.81
