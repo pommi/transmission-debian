@@ -9,6 +9,7 @@ Build-Depends: debhelper (>= 8), autotools-dev, dh-systemd,
  intltool (>= 0.40), 
  qt5-qmake, qtbase5-dev, qttools5-dev-tools, qt5-default,
  libminiupnpc-dev, libnatpmp-dev (>= 20110808),
+ libsystemd-daemon-dev,
 # buildflags.mk
  dpkg-dev (>= 1.16.1~),
 # libcanberra-gtk-dev
