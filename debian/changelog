@@ -10,7 +10,7 @@ transmission (2.82-1) unstable; urgency=low
   * [88df797b] actually build-dep on systemd-daemon-dev to use it
     (Closes: 718624)
 
- -- Leo Costela <costela@debian.org>  Sat, 15 Sep 2013 21:14:04 +0200
+ -- Leo Costela <costela@debian.org>  Sun, 15 Sep 2013 21:14:04 +0200
 
 transmission (2.81-1) unstable; urgency=low
 
