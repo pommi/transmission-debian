@@ -1,3 +1,25 @@
+transmission (2.82-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * [36a95ac] bump policy to 3.9.5 (no changes)
+  * [6f54782] use systemd only on linux systems
+    Thanks to Peter Green (Closes: 737366)
+  * [8e97c66] add build-dep on dh-autoreconf
+  * [210734a] debian/rules: use dh with autoreconf instead of autotools-dev
+    - fix re-configuring with automake >= 1.14
+    - fix FTBFS on kFreeBSD systems
+  * [14305bc] debian/changelog: fix lintian warning about wrong weekday
+    (2013-09-15 is a Sunday)
+  * [b7972f5] debian/control: fix lintian notes vcs-field-not-canonical
+  * [539e32b] debian/transmission-daemon.init:
+    fix lintian note init.d-script-missing-lsb-description
+  * [b10417b] debian/transmission-daemon.postinst: fix lintian error
+    maintainer-script-should-not-use-adduser-system-without-home
+  * [09bac94] debian/control: fix lintian note
+    capitalization-error-in-description GTK GTK+
+
+ -- Boris Pek <tehnick@debian.org>  Sat, 15 Feb 2014 22:19:08 +0400
+
 transmission (2.82-1) unstable; urgency=low
 
   * [5b6dca28] Imported Upstream version 2.82
