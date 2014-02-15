@@ -8,8 +8,15 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed,--no-undefined,--no-add-needed
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
 
+DH_EXTRA_ARGS := --with autotools-dev
+
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	DH_EXTRA_ARGS += --with systemd
+endif
+
 %:
-	dh $@ --with autotools-dev --with systemd
+	dh $@ $(DH_EXTRA_ARGS)
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
