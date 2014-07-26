@@ -3,7 +3,6 @@ Section: net
 Priority: optional
 Maintainer: Leo Costela <costela@debian.org>
 Build-Depends: debhelper (>= 8), autotools-dev, dh-autoreconf,
- dh-systemd [linux-any],
  libgtk-3-dev, libevent-dev (>= 2.0),
  libglib2.0-dev, libnotify-dev (>= 0.7), libssl-dev, zlib1g-dev,
  libcurl4-gnutls-dev | libcurl4-dev | libcurl-dev, 
