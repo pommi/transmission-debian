@@ -1,0 +1,14 @@
+--- a/qt/qtr.pro
++++ b/qt/qtr.pro
+@@ -11,9 +11,10 @@
+ man.path = /share/man/man1/
+ man.files = transmission-qt.1
+ 
+-CONFIG += qt thread debug link_pkgconfig c++11 warn_on
++CONFIG += qt thread debug link_pkgconfig warn_on
+ QT += network dbus
+ PKGCONFIG = fontconfig libcurl openssl libevent
++QMAKE_CXXFLAGS += -std=c++11
+ 
+ greaterThan(QT_MAJOR_VERSION, 4) {
+     QT += widgets
