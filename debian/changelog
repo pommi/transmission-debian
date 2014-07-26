@@ -1,3 +1,14 @@
+transmission (2.84-1~bpo70+1) wheezy-backports; urgency=low
+
+  * [1a6e541] Imported Upstream version 2.84
+  * [db340a1] Revert "bump build-deps for qt5"
+  * [39c45de] Revert "add preliminary systemd support"
+  * [49ef104] Revert "actually build-dep on systemd-daemon-dev to use it"
+  * [9a6958e] debian/patches: refresh
+  * [bb72e3b] debian/patches: add patch to revert to qt4 support
+
+ -- Pim van den Berg <pim@nethuis.nl>  Sat, 26 Jul 2014 13:31:33 +0200
+
 transmission (2.82-1.1) unstable; urgency=medium
 
   * Non-maintainer upload.
