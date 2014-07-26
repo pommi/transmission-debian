@@ -1,7 +1,5 @@
-Index: repo/daemon/transmission-daemon.service
-===================================================================
---- repo.orig/daemon/transmission-daemon.service	2013-07-27 21:34:53.524172453 +0200
-+++ repo/daemon/transmission-daemon.service	2013-09-15 00:51:18.100530232 +0200
+--- a/daemon/transmission-daemon.service
++++ b/daemon/transmission-daemon.service
 @@ -3,7 +3,7 @@
  After=network.target
  
@@ -10,4 +8,4 @@ Index: repo/daemon/transmission-daemon.service
 +User=debian-transmission
  Type=notify
  ExecStart=/usr/bin/transmission-daemon -f --log-error
- 
+ ExecReload=/bin/kill -s HUP $MAINPID
