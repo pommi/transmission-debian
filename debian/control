@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 8), autotools-dev, dh-autoreconf,
  libglib2.0-dev, libnotify-dev (>= 0.7), libssl-dev, zlib1g-dev,
  libcurl4-gnutls-dev | libcurl4-dev | libcurl-dev, 
  intltool (>= 0.40), 
- qt5-qmake, qtbase5-dev, qttools5-dev-tools, qt5-default,
+ qt4-qmake, libqt4-dev, qt4-linguist-tools,
  libminiupnpc-dev, libnatpmp-dev (>= 20110808),
  libsystemd-daemon-dev [linux-any],
 # buildflags.mk
